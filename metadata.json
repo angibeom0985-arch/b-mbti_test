@@ -1,0 +1,5 @@
+{
+  "name": "성경인물 MBTI 테스트",
+  "description": "MBTI 테스트를 통해 자신과 가장 비슷한 성경 인물을 찾아보고, 관련된 성경 구절을 확인해보세요.",
+  "requestFramePermissions": []
+}

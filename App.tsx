@@ -4,7 +4,6 @@ import { QUESTIONS, RESULTS } from './constants';
 import StartScreen from './components/StartScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
-import StatsScreen from './components/StatsScreen';
 
 type GameState = 'start' | 'quiz' | 'result' | 'stats';
 
@@ -47,7 +46,8 @@ const App: React.FC = () => {
   }, []);
 
   const handleViewStats = useCallback(() => {
-    setGameState('stats');
+    // 통계 기능은 현재 비활성화됨
+    console.log('통계 기능은 추후 구현 예정입니다.');
   }, []);
 
   const handleBackToStart = useCallback(() => {
@@ -107,12 +107,6 @@ const App: React.FC = () => {
             resultData={generatedResult}
             error={error}
             onRestart={handleRestart}
-          />
-        );
-      case 'stats':
-        return (
-          <StatsScreen 
-            onBack={handleBackToStart}
           />
         );
       case 'start':

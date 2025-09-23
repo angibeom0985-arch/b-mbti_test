@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import type { Dichotomy, MbtiType, MbtiResult } from './types';
 import { QUESTIONS, RESULTS } from './constants';
-import { saveTestResult } from './supabase';
 import StartScreen from './components/StartScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
@@ -42,8 +41,6 @@ const App: React.FC = () => {
   const [resultType, setResultType] = useState<MbtiType | null>(null);
   const [generatedResult, setGeneratedResult] = useState<MbtiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   const handleStart = useCallback(() => {
     setGameState('quiz');
@@ -64,8 +61,6 @@ const App: React.FC = () => {
     setResultType(null);
     setGeneratedResult(null);
     setError(null);
-    setIsSaving(false);
-    setSaveSuccess(false);
   }, []);
   
   const calculateResult = useCallback((finalScores: Record<Dichotomy, number>): MbtiType => {
@@ -91,22 +86,6 @@ const App: React.FC = () => {
       const imageUrl = getMbtiImage(finalResultType);
       setGeneratedResult({ ...resultData, image: imageUrl });
       setGameState('result');
-
-      // Supabase에 결과 저장 시도
-      setIsSaving(true);
-      try {
-        const savedResult = await saveTestResult(finalResultType, resultData.character);
-        if (savedResult) {
-          setSaveSuccess(true);
-          console.log('테스트 결과가 성공적으로 저장되었습니다:', savedResult);
-        } else {
-          console.warn('테스트 결과 저장에 실패했지만 테스트는 계속 진행됩니다.');
-        }
-      } catch (error) {
-        console.error('데이터베이스 저장 중 오류:', error);
-      } finally {
-        setIsSaving(false);
-      }
     }
   }, [scores, currentQuestionIndex, calculateResult]);
   

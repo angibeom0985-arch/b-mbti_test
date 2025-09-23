@@ -1,15 +1,37 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { GoogleGenAI, Modality } from '@google/genai';
 import type { Dichotomy, MbtiType, MbtiResult } from './types';
 import { QUESTIONS, RESULTS } from './constants';
+import { saveTestResult } from './supabase';
 import StartScreen from './components/StartScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
+import StatsScreen from './components/StatsScreen';
 
-type GameState = 'start' | 'quiz' | 'result';
+type GameState = 'start' | 'quiz' | 'result' | 'stats';
 
-// Initialize the Gemini API client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// MBTI 유형별 이미지 파일 매핑
+const getMbtiImage = (type: MbtiType): string => {
+  const imageMap: Record<MbtiType, string> = {
+    'ENFP': '/ENFP 아브라함.jpg',
+    'ENFJ': '/ENJS 느헤미야.jpg', // 파일명이 ENJS로 되어있음
+    'ENTJ': '/ENTJ 드보라.jpg',
+    'ENTP': '/ENFP 아브라함.jpg', // ENTP 파일이 없어서 임시로 ENFP 사용
+    'ESFJ': '/ESFJ 막달라 마리아.jpg',
+    'ESFP': '/ESFP 에스더.jpg',
+    'ESTJ': '/ESTJ 모세.jpg',
+    'ESTP': '/ESTP 베드로.jpg',
+    'INFJ': '/INFJ 다니엘.jpg',
+    'INFP': '/INFP 마리아.jpg',
+    'INTJ': '/INTJ 바울.jpg',
+    'INTP': '/INTP 솔로몬.jpg',
+    'ISFJ': '/ISFJ 룻.jpg',
+    'ISFP': '/ISFP 다윗.jpg',
+    'ISTJ': '/ISTJ 요셉.jpg',
+    'ISTP': '/ISTP 삼손.jpg'
+  };
+  
+  return imageMap[type] || '/ENFP 아브라함.jpg'; // 기본값
+};
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('start');
@@ -19,11 +41,20 @@ const App: React.FC = () => {
   });
   const [resultType, setResultType] = useState<MbtiType | null>(null);
   const [generatedResult, setGeneratedResult] = useState<MbtiResult | null>(null);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   const handleStart = useCallback(() => {
     setGameState('quiz');
+  }, []);
+
+  const handleViewStats = useCallback(() => {
+    setGameState('stats');
+  }, []);
+
+  const handleBackToStart = useCallback(() => {
+    setGameState('start');
   }, []);
 
   const handleRestart = useCallback(() => {
@@ -32,8 +63,9 @@ const App: React.FC = () => {
     setScores({ E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 });
     setResultType(null);
     setGeneratedResult(null);
-    setIsGenerating(false);
     setError(null);
+    setIsSaving(false);
+    setSaveSuccess(false);
   }, []);
   
   const calculateResult = useCallback((finalScores: Record<Dichotomy, number>): MbtiType => {
@@ -44,42 +76,7 @@ const App: React.FC = () => {
       return `${e_i}${s_n}${t_f}${j_p}` as MbtiType;
   }, []);
 
-  const generateImage = useCallback(async (resultData: Omit<MbtiResult, 'image'>) => {
-    setIsGenerating(true);
-    setError(null);
-    setGeneratedResult(null); // Clear previous result
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image-preview',
-        contents: {
-          parts: [
-            { text: resultData.imagePrompt },
-          ],
-        },
-        config: {
-          responseModalities: [Modality.IMAGE, Modality.TEXT],
-        },
-      });
-      
-      const imagePart = response.candidates?.[0]?.content?.parts?.find(part => part.inlineData);
-      if (imagePart && imagePart.inlineData) {
-        const base64ImageBytes = imagePart.inlineData.data;
-        const imageUrl = `data:${imagePart.inlineData.mimeType};base64,${base64ImageBytes}`;
-        setGeneratedResult({ ...resultData, image: imageUrl });
-      } else {
-        throw new Error('이미지를 생성하지 못했습니다. 응답에 이미지 데이터가 없습니다.');
-      }
-    } catch (e) {
-      console.error(e);
-      setError('이미지 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      setGeneratedResult(resultData as MbtiResult);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
-
-
-  const handleAnswerSelect = useCallback((type: Dichotomy) => {
+  const handleAnswerSelect = useCallback(async (type: Dichotomy) => {
     const newScores = { ...scores, [type]: scores[type] + 1 };
     setScores(newScores);
 
@@ -89,10 +86,29 @@ const App: React.FC = () => {
       const finalResultType = calculateResult(newScores);
       setResultType(finalResultType);
       const resultData = RESULTS[finalResultType];
+      
+      // 준비된 이미지를 사용하여 결과 설정
+      const imageUrl = getMbtiImage(finalResultType);
+      setGeneratedResult({ ...resultData, image: imageUrl });
       setGameState('result');
-      generateImage(resultData);
+
+      // Supabase에 결과 저장 시도
+      setIsSaving(true);
+      try {
+        const savedResult = await saveTestResult(finalResultType, resultData.character);
+        if (savedResult) {
+          setSaveSuccess(true);
+          console.log('테스트 결과가 성공적으로 저장되었습니다:', savedResult);
+        } else {
+          console.warn('테스트 결과 저장에 실패했지만 테스트는 계속 진행됩니다.');
+        }
+      } catch (error) {
+        console.error('데이터베이스 저장 중 오류:', error);
+      } finally {
+        setIsSaving(false);
+      }
     }
-  }, [scores, currentQuestionIndex, calculateResult, generateImage]);
+  }, [scores, currentQuestionIndex, calculateResult]);
   
   const currentView = useMemo(() => {
     switch(gameState) {
@@ -110,19 +126,24 @@ const App: React.FC = () => {
           <ResultScreen 
             resultType={resultType!}
             resultData={generatedResult}
-            isGenerating={isGenerating}
             error={error}
             onRestart={handleRestart}
           />
         );
+      case 'stats':
+        return (
+          <StatsScreen 
+            onBack={handleBackToStart}
+          />
+        );
       case 'start':
       default:
-        return <StartScreen onStart={handleStart} />;
+        return <StartScreen onStart={handleStart} onViewStats={handleViewStats} />;
     }
-  }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, isGenerating, error, handleRestart, handleStart]);
+  }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, error, handleRestart, handleStart, handleViewStats, handleBackToStart]);
 
   return (
-    <div className="min-h-screen bg-amber-50 text-stone-800 flex items-center justify-center p-4 transition-all duration-500">
+    <div className="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 text-stone-800 flex items-center justify-center p-4 transition-all duration-500">
       <main className="w-full max-w-2xl mx-auto">
         {currentView}
       </main>

@@ -17,3 +17,20 @@ export interface MbtiResult {
   imagePrompt: string;
   image?: string;
 }
+
+// Supabase 데이터베이스 타입 정의
+export interface TestResult {
+  id?: number;
+  mbti_type: MbtiType;
+  character: string;
+  completed_at: string;
+  user_agent?: string;
+  session_id?: string;
+}
+
+export interface MbtiStats {
+  mbti_type: MbtiType;
+  character: string;
+  count: number;
+  percentage: number;
+}

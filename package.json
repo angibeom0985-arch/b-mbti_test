@@ -1,5 +1,5 @@
 {
-  "name": "성경인물-mbti-테스트",
+  "name": "biblical-mbti-test",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^1.20.0",
-    "@supabase/supabase-js": "^2.57.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

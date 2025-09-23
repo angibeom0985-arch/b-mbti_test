@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { MbtiStats } from '../types';
-import { getMbtiStats } from '../supabase';
 
 interface StatsScreenProps {
   onBack: () => void;
@@ -15,8 +14,9 @@ const StatsScreen: React.FC<StatsScreenProps> = ({ onBack }) => {
     const loadStats = async () => {
       try {
         setLoading(true);
-        const data = await getMbtiStats();
-        setStats(data);
+        // 임시 데이터 - 나중에 실제 통계 시스템으로 교체
+        const tempStats: MbtiStats[] = [];
+        setStats(tempStats);
       } catch (err) {
         console.error('통계 로딩 실패:', err);
         setError('통계를 불러오는데 실패했습니다.');

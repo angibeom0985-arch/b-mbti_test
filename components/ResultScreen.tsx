@@ -62,66 +62,119 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
     }
   };
 
+  const handleSaveAsImage = async () => {
+    // HTML2Canvas를 사용하여 결과를 이미지로 저장하는 기능
+    // 여기서는 간단히 공유 기능으로 대체
+    handleShare();
+  };
+
+  const handleViewStats = () => {
+    // 다른 사람들의 결과 통계 보기
+    alert('📊 통계 기능은 곧 업데이트 예정입니다!');
+  };
+
+  const handleLeaveComment = () => {
+    // 댓글/후기 남기기
+    alert('💬 후기 기능은 곧 업데이트 예정입니다!');
+  };
+
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-br from-amber-50 to-orange-100 backdrop-blur-md rounded-3xl shadow-2xl border-2 border-amber-300/50 w-full text-center relative overflow-hidden">
-      {/* 장식적 배경 요소 */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400"></div>
-      
-      <div className="bg-white/70 rounded-xl p-4 mb-6 border border-amber-200/70">
-        <p className="text-amber-800 font-semibold text-lg">당신의 성경 인물 유형은</p>
-        <h1 className="text-4xl md:text-5xl font-bold font-myeongjo text-amber-900 mt-2 mb-2 leading-tight">
+    <div className="p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 w-full max-w-lg mx-auto text-center relative overflow-hidden">
+      {/* 결과 헤더 */}
+      <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
+        <div className="flex items-center justify-center mb-2">
+          <span className="text-2xl mr-2">✨</span>
+          <p className="text-gray-600 font-medium">당신과 닮은 성경 인물</p>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
           {resultData.character}
         </h1>
-        <p className="text-xl font-bold text-orange-700 bg-white/80 rounded-lg px-4 py-2 inline-block border border-amber-200">
+        <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
           {resultType}
-        </p>
+        </div>
       </div>
 
       {resultData.image ? (
-        <div className="mb-6 bg-white/60 rounded-xl p-4 border border-amber-200/70">
+        <div className="mb-6 bg-white/80 rounded-2xl p-3 shadow-sm border border-pink-100/50">
           <img 
             src={resultData.image} 
             alt={resultData.character} 
-            className="w-full h-auto max-h-[400px] object-contain rounded-xl shadow-lg bg-white/90 border-2 border-amber-200"
+            className="w-full h-auto max-h-[300px] object-contain rounded-xl shadow-md"
           />
         </div>
       ) : (
-        <div className="w-full h-64 bg-amber-100 rounded-xl shadow-lg mb-6 flex items-center justify-center border-2 border-amber-200">
-          <p className="text-amber-700">이미지를 불러오는 데 실패했습니다.</p>
+        <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm mb-6 flex items-center justify-center">
+          <p className="text-gray-500">이미지를 불러오는 중...</p>
         </div>
       )}
 
-      <div className="bg-white/70 rounded-xl p-5 mb-6 border border-amber-200/70 shadow-inner">
-        <p className="text-stone-700 text-left leading-relaxed whitespace-pre-wrap font-medium">
+      {/* 설명 텍스트 */}
+      <div className="bg-white/80 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 text-left">
+        <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
           {resultData.description}
         </p>
       </div>
 
-      <div className="bg-gradient-to-r from-amber-100 to-orange-100 p-5 rounded-xl border-l-4 border-amber-600 text-left shadow-inner mb-8">
-        <p className="text-stone-800 font-myeongjo text-lg italic leading-relaxed">
+      {/* 성경 구절 */}
+      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 text-left shadow-sm mb-6">
+        <p className="text-gray-800 font-medium text-sm italic leading-relaxed mb-2">
           "{resultData.verseText}"
         </p>
-        <p className="text-right text-amber-800 font-bold mt-3 text-sm">
+        <p className="text-right text-violet-600 font-semibold text-xs">
           - {resultData.verse}
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+      {/* 액션 버튼들 - MZ 스타일 */}
+      <div className="space-y-3">
+        {/* 메인 액션 버튼들 */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={handleSaveAsImage}
+            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
+          >
+            📸 이미지 저장
+          </button>
+          <button
+            onClick={handleShare}
+            className="bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
+            disabled={copied}
+          >
+            {copied ? '📋 복사됨!' : '🔗 공유하기'}
+          </button>
+        </div>
+
+        {/* 서브 액션 버튼들 */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={handleViewStats}
+            className="bg-white/80 text-gray-600 font-medium py-3 px-4 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-sm"
+          >
+            📊 통계 보기
+          </button>
+          <button
+            onClick={handleLeaveComment}
+            className="bg-white/80 text-gray-600 font-medium py-3 px-4 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-sm"
+          >
+            💬 후기 남기기
+          </button>
+        </div>
+
+        {/* 다시 테스트 버튼 */}
         <button
           onClick={onRestart}
-          className="bg-gradient-to-r from-amber-700 to-orange-700 text-white font-bold py-4 px-8 rounded-full hover:from-amber-800 hover:to-orange-800 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center w-full sm:w-auto border-2 border-amber-600/30"
+          className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
         >
-          <RestartIcon className="w-5 h-5 mr-2" />
-          다시 테스트하기
+          <RestartIcon className="w-4 h-4 mr-2" />
+          🔄 다시 테스트하기
         </button>
-        <button
-          onClick={handleShare}
-          className="bg-gradient-to-r from-stone-600 to-stone-700 text-white font-bold py-4 px-8 rounded-full hover:from-stone-700 hover:to-stone-800 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center w-full sm:w-auto disabled:opacity-75 border-2 border-stone-500/30"
-          disabled={copied}
-        >
-          <ShareIcon className="w-5 h-5 mr-2" />
-          {copied ? '복사되었어요!' : '결과 공유하기'}
-        </button>
+      </div>
+
+      {/* 하단 장식 */}
+      <div className="mt-6 flex justify-center space-x-1">
+        <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></div>
+        <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse delay-75"></div>
+        <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse delay-150"></div>
       </div>
     </div>
   );

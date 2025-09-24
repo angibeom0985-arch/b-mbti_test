@@ -28,10 +28,10 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQues
           <button
             key={index}
             onClick={() => onAnswer(answer.type)}
-            className="group w-full text-left p-4 bg-white/90 rounded-2xl text-gray-700 hover:bg-gradient-to-r hover:from-violet-500 hover:to-pink-500 hover:text-white transition-all duration-300 ease-out transform hover:scale-[1.02] shadow-md hover:shadow-lg border border-gray-100/50 backdrop-blur-sm active:scale-[0.98]"
+            className="group w-full text-left p-4 bg-white/90 rounded-2xl text-gray-700 md:hover:bg-gradient-to-r md:hover:from-violet-500 md:hover:to-pink-500 md:hover:text-white transition-all duration-300 ease-out transform active:scale-[0.98] md:hover:scale-[1.02] shadow-md md:hover:shadow-lg border border-gray-100/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
           >
-            <span className="font-medium text-base leading-relaxed group-hover:font-semibold transition-all duration-200">{answer.text}</span>
-            <div className="w-0 group-hover:w-4 h-0.5 bg-white rounded-full transition-all duration-300 mt-2"></div>
+            <span className="font-medium text-base leading-relaxed md:group-hover:font-semibold transition-all duration-200">{answer.text}</span>
+            <div className="w-0 md:group-hover:w-4 h-0.5 bg-white rounded-full transition-all duration-300 mt-2"></div>
           </button>
         ))}
       </div>

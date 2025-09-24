@@ -21,12 +21,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
   
   if (error && !resultData?.image) {
     return (
-      <div className="p-6 md:p-10 bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-red-200 w-full text-center">
-        <h2 className="text-2xl font-bold text-red-700 mb-4">오류 발생</h2>
-        <p className="text-stone-600 mb-6">{error}</p>
+      <div className="p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-red-100 w-full max-w-md mx-auto text-center">
+        <h2 className="text-xl font-semibold text-red-600 mb-4">오류 발생</h2>
+        <p className="text-gray-600 mb-6 text-sm">{error}</p>
         <button
           onClick={onRestart}
-          className="mt-8 bg-amber-800 text-white font-bold py-3 px-6 rounded-full hover:bg-amber-900 transition-colors duration-300 transform hover:scale-105 shadow-md flex items-center justify-center mx-auto"
+          className="mt-6 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-md flex items-center justify-center mx-auto"
         >
           <RestartIcon className="w-5 h-5 mr-2" />
           Test Again

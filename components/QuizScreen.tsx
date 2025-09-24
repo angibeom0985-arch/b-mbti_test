@@ -12,27 +12,43 @@ interface QuizScreenProps {
 
 const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQuestion, totalQuestions }) => {
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-br from-amber-50 to-orange-100 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-amber-300/50 w-full relative overflow-hidden">
-      {/* 장식적 배경 요소 */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400"></div>
-      
+    <div className="p-4 md:p-8 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl shadow-xl border border-white/30 w-full max-w-lg mx-auto">
       <ProgressBar current={currentQuestion} total={totalQuestions} />
       
-      <div className="bg-white/70 rounded-xl p-6 my-8 border border-amber-200/70 shadow-inner">
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-amber-900 min-h-[6rem] md:min-h-[4rem] flex items-center justify-center leading-relaxed font-myeongjo">
+      {/* 질문 영역 - 폰트 크기 줄임 */}
+      <div className="bg-white/80 rounded-2xl p-4 my-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
+        <h2 className="text-lg md:text-xl font-semibold text-center text-gray-800 min-h-[4rem] flex items-center justify-center leading-relaxed">
           {question.text}
         </h2>
       </div>
       
-      <div className="flex flex-col space-y-4">
+      {/* 답변 버튼들 - MZ 친화적 디자인 */}
+      <div className="flex flex-col space-y-3">
         {question.answers.map((answer, index) => (
           <button
             key={index}
             onClick={() => onAnswer(answer.type)}
-            className="w-full text-left p-5 bg-gradient-to-r from-white to-amber-50 rounded-xl text-stone-700 hover:from-amber-600 hover:to-orange-600 hover:text-white transition-all duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg hover:shadow-xl border-2 border-amber-200 hover:border-amber-500"
+            className="group w-full text-left p-4 bg-white/90 rounded-2xl text-gray-700 hover:bg-gradient-to-r hover:from-violet-500 hover:to-pink-500 hover:text-white transition-all duration-300 ease-out transform hover:scale-[1.02] shadow-md hover:shadow-lg border border-gray-100/50 backdrop-blur-sm active:scale-[0.98]"
           >
-            <span className="font-semibold text-lg leading-relaxed">{answer.text}</span>
+            <span className="font-medium text-base leading-relaxed group-hover:font-semibold transition-all duration-200">{answer.text}</span>
+            <div className="w-0 group-hover:w-4 h-0.5 bg-white rounded-full transition-all duration-300 mt-2"></div>
           </button>
+        ))}
+      </div>
+      
+      {/* MZ 느낌의 하단 장식 */}
+      <div className="flex justify-center mt-6 space-x-2">
+        {Array.from({ length: totalQuestions }, (_, i) => (
+          <div
+            key={i}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              i < currentQuestion 
+                ? 'bg-gradient-to-r from-violet-400 to-pink-400 scale-110' 
+                : i === currentQuestion - 1
+                ? 'bg-gradient-to-r from-orange-400 to-pink-400 scale-125 shadow-sm'
+                : 'bg-gray-200'
+            }`}
+          />
         ))}
       </div>
     </div>

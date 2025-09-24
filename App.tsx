@@ -116,8 +116,15 @@ const App: React.FC = () => {
   }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, error, handleRestart, handleStart, handleViewStats, handleBackToStart]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 text-stone-800 flex items-center justify-center p-4 transition-all duration-500">
-      <main className="w-full max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800 flex items-center justify-center p-4 transition-all duration-500">
+      {/* MZ 스타일 배경 장식 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-violet-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-pink-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl"></div>
+      </div>
+      
+      <main className="w-full max-w-lg mx-auto relative z-10">
         {currentView}
       </main>
     </div>

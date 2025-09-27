@@ -39,6 +39,7 @@ const App: React.FC = () => {
   const [scores, setScores] = useState<Record<Dichotomy, number>>({
     E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0,
   });
+  const [answerHistory, setAnswerHistory] = useState<Dichotomy[]>([]);
   const [resultType, setResultType] = useState<MbtiType | null>(null);
   const [generatedResult, setGeneratedResult] = useState<MbtiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +91,7 @@ const App: React.FC = () => {
     setSelectedVersion(version);
     setCurrentQuestionIndex(0);
     setScores({ E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 });
+    setAnswerHistory([]);
     setResultType(null);
     setGeneratedResult(null);
     setError(null);
@@ -104,6 +106,7 @@ const App: React.FC = () => {
     setGameState('start');
     setCurrentQuestionIndex(0);
     setScores({ E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 });
+    setAnswerHistory([]);
     setResultType(null);
     setGeneratedResult(null);
     setError(null);
@@ -116,6 +119,22 @@ const App: React.FC = () => {
   const handleBackToResult = useCallback(() => {
     setGameState('result');
   }, []);
+
+  const handlePreviousQuestion = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+      
+      // 마지막 답변을 취소하고 점수에서 제거
+      if (answerHistory.length > 0) {
+        const lastAnswer = answerHistory[answerHistory.length - 1];
+        setScores(prevScores => ({
+          ...prevScores,
+          [lastAnswer]: prevScores[lastAnswer] - 1
+        }));
+        setAnswerHistory(prev => prev.slice(0, -1));
+      }
+    }
+  }, [currentQuestionIndex, answerHistory]);
   
   const calculateResult = useCallback((finalScores: Record<Dichotomy, number>): MbtiType => {
       const e_i = finalScores['E'] >= finalScores['I'] ? 'E' : 'I';
@@ -127,7 +146,10 @@ const App: React.FC = () => {
 
   const handleAnswerSelect = useCallback(async (type: Dichotomy) => {
     const newScores = { ...scores, [type]: scores[type] + 1 };
+    const newAnswerHistory = [...answerHistory, type];
+    
     setScores(newScores);
+    setAnswerHistory(newAnswerHistory);
 
     if (currentQuestionIndex < currentQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
@@ -161,6 +183,7 @@ const App: React.FC = () => {
           <QuizScreen 
             question={currentQuestions[currentQuestionIndex]}
             onAnswer={handleAnswerSelect}
+            onPrevious={handlePreviousQuestion}
             currentQuestion={currentQuestionIndex + 1}
             totalQuestions={currentQuestions.length}
           />

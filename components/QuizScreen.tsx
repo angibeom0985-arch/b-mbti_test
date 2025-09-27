@@ -6,11 +6,12 @@ import ProgressBar from './ProgressBar';
 interface QuizScreenProps {
   question: Question;
   onAnswer: (type: Dichotomy) => void;
+  onPrevious?: () => void;
   currentQuestion: number;
   totalQuestions: number;
 }
 
-const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQuestion, totalQuestions }) => {
+const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, onPrevious, currentQuestion, totalQuestions }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   const handleAnswer = (type: Dichotomy, index: number) => {
@@ -38,6 +39,21 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQues
               style={{ width: `${(currentQuestion / totalQuestions) * 100}%` }}
             />
           </div>
+          
+          {/* 이전 질문 버튼 */}
+          {currentQuestion > 1 && onPrevious && (
+            <div className="flex justify-start">
+              <button
+                onClick={onPrevious}
+                className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-white hover:bg-gray-50 rounded-lg border border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                이전
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 질문 카드 - 여백 줄임 */}

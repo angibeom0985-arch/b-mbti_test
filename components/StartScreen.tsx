@@ -59,7 +59,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         </h1>
 
         {/* 3. 대표 이미지 */}
-        <div className="mb-6 bg-white/90 rounded-2xl p-4 shadow-md border border-orange-100/50">
+        <div className="mb-6">
           <img 
             src="/hero-image.svg" 
             alt="성경인물과 나의 성격 MBTI 매칭 테스트" 
@@ -68,7 +68,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         </div>
 
         {/* 4. 나의 성경인물 찾기 - 더 클릭 유도하는 디자인 */}
-        <div className="mb-6 relative">
+        <div className="mb-4 relative">
           <button
             onClick={onStart}
             className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-6 px-8 rounded-3xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-xl text-xl relative overflow-hidden group"
@@ -81,11 +81,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             </span>
           </button>
           
-          {/* 클릭 유도 펄스 효과 */}
-          <div className="absolute inset-0 rounded-3xl border-2 border-orange-400/30 animate-pulse pointer-events-none"></div>
-          
-          {/* 작은 유도 텍스트 */}
-          <p className="text-xs text-gray-500 mt-2 animate-pulse">👆 클릭하여 테스트 시작!</p>
+          {/* 클릭 유도 텍스트 - 크게 만들기 */}
+          <p className="text-sm font-medium text-orange-600 mt-3 animate-pulse">
+            👆 클릭하여 테스트 시작!
+          </p>
         </div>
 
         {/* 5. 사이트 소개 */}

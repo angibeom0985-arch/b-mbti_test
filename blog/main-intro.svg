@@ -1,0 +1,55 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#bgGradient)"/>
+  
+  <!-- Background decorations -->
+  <circle cx="100" cy="100" r="40" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="700" cy="150" r="60" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="150" cy="500" r="30" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="650" cy="450" r="50" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- Main content card -->
+  <rect x="100" y="100" width="600" height="400" rx="30" fill="url(#cardGradient)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="400" y="160" text-anchor="middle" fill="#2d3748" font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    성경인물 MBTI 테스트
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="400" y="200" text-anchor="middle" fill="#4a5568" font-family="Arial, sans-serif" font-size="24" font-weight="600">
+    나와 닮은 성경 속 인물을 찾아보세요
+  </text>
+  
+  <!-- Features -->
+  <g transform="translate(200, 250)">
+    <!-- Feature 1 -->
+    <text x="0" y="0" fill="#667eea" font-family="Arial, sans-serif" font-size="18" font-weight="bold">🎯 3가지 다른 관점의 테스트</text>
+    
+    <!-- Feature 2 -->
+    <text x="0" y="40" fill="#764ba2" font-family="Arial, sans-serif" font-size="18" font-weight="bold">📷 SNS 공유용 이미지 저장</text>
+    
+    <!-- Feature 3 -->
+    <text x="0" y="80" fill="#667eea" font-family="Arial, sans-serif" font-size="18" font-weight="bold">💚 어울리는 성격 유형 분석</text>
+    
+    <!-- Feature 4 -->
+    <text x="0" y="120" fill="#764ba2" font-family="Arial, sans-serif" font-size="18" font-weight="bold">🎮 재미있는 이미지 맞추기 게임</text>
+  </g>
+  
+  <!-- CTA -->
+  <rect x="300" y="430" width="200" height="50" rx="25" fill="#667eea"/>
+  <text x="400" y="460" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">
+    무료로 시작하기
+  </text>
+</svg>

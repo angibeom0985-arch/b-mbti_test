@@ -120,9 +120,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                       <div className={`text-xs ${
                         isSelected ? 'text-white/80' : 'text-gray-500'
                       }`}>
-                        {versionNumber === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
-                        {versionNumber === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
-                        {versionNumber === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
+                        {versionNumber === 1 && "� 나는 교회/직장/가족 안에서 어떤 성경 인물과 닮았을까?"}
+                        {versionNumber === 2 && "⚡ 나는 사명 앞에서 어떤 성경 인물의 능력을 발휘할까?"}
+                        {versionNumber === 3 && "🔥 내가 만약 성경 속의 고난을 겪는다면, 나는 누구처럼 반응할까?"}
                       </div>
                       
                       {isSelected && (

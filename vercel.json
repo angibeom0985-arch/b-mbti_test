@@ -12,6 +12,20 @@
   ],
   "routes": [
     {
+      "src": "/assets/(.*\\.js)$",
+      "headers": {
+        "Content-Type": "application/javascript; charset=utf-8"
+      },
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/assets/(.*\\.mjs)$",
+      "headers": {
+        "Content-Type": "application/javascript; charset=utf-8"
+      },
+      "dest": "/assets/$1"
+    },
+    {
       "src": "/admin",
       "dest": "/index.html"
     },
@@ -22,11 +36,28 @@
   ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/**/*.js",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/assets/**/*.mjs",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         }
       ]
     },
@@ -35,16 +66,7 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.mjs)$",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     }

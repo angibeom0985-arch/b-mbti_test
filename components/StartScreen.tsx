@@ -17,6 +17,16 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
     const count = VisitorCounter.incrementAndGet();
     setVisitorCount(count);
     
+    // URL 파라미터에서 버전 정보 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const versionParam = urlParams.get('version');
+    if (versionParam) {
+      const version = parseInt(versionParam);
+      if (version >= 1 && version <= 3) {
+        setSelectedVersion(version);
+      }
+    }
+    
     // 카운터 애니메이션
     let start = 0;
     const duration = 2000; // 2초 동안 애니메이션

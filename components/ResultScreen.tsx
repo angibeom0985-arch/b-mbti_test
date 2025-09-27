@@ -346,17 +346,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
       {/* 액션 버튼들 - MZ 스타일 */}
       <div className="space-y-3">
-        {/* 메인 액션 버튼들 */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 메인 액션 버튼들 - 세로 배치 */}
+        <div className="space-y-3">
           <button
             onClick={handleSaveAsImage}
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
+            className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
           >
             📸 이미지 저장
           </button>
           <button
             onClick={handleShare}
-            className="bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
+            className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
             disabled={copied}
           >
             {copied ? '📋 복사됨!' : '🔗 공유하기'}
@@ -533,28 +533,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
         {/* 액션 버튼들을 감싸는 컨테이너 */}
         <div className="space-y-4">
-          {/* 퀴즈 게임 - 참여 유도 문구로 변경 */}
+          {/* 이미지 맞추기 게임 - 참여 유도 문구로 변경 */}
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 border border-purple-100/50">
             <div className="text-center">
               <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-                <span className="mr-2">🎮</span>
-                성경인물 퀴즈에 도전해보세요!
+                <span className="mr-2">🖼️</span>
+                이미지 맞추기 게임에 도전해보세요!
               </h3>
               <p className="text-sm text-gray-600 mb-3">
-                재미있는 퀴즈를 통해 성경인물들을 더 알아보세요! ✨
+                성경인물 이미지를 보고 누구인지 맞춰보세요! ✨
               </p>
               <button
                 onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
               >
-                🎯 퀴즈 시작하기
+                🖼️ 게임 시작하기
               </button>
             </div>
           </div>
 
           {/* 다시 테스트 버튼 */}
           <button
-            onClick={onRestart}
+            onClick={() => {
+              // completedVersion이 있으면 시작 페이지로 버전 정보와 함께 이동
+              if (completedVersion) {
+                window.location.href = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
+              } else {
+                onRestart();
+              }
+            }}
             className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
           >
             🔁 다시 테스트하기
@@ -632,7 +639,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 성경인물 퀴즈 게임 모달 */}
+      {/* 성경인물 이미지 맞추기 게임 모달 */}
       {showOtherCharacters && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">

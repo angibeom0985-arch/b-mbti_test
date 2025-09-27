@@ -42,6 +42,32 @@ const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   return compatibilityMap[currentType] || [];
 };
 
+// 호환성 이유 설명
+const getCompatibilityReason = (currentType: MbtiType, targetType: MbtiType): string => {
+  const reasons: Record<string, string> = {
+    'ENFP-INFJ': '서로의 직관과 감정을 깊이 이해하며, 영적 교감이 뛰어납니다',
+    'ENFP-INTJ': '창의적 아이디어와 체계적 실행력이 완벽하게 조화를 이룹니다',
+    'ENFJ-INFP': '서로의 가치관을 존중하며 따뜻한 관계를 형성합니다',
+    'ENTP-INFJ': '혁신적 사고와 깊은 통찰력이 만나 시너지를 창출합니다',
+    'ENTJ-INFP': '리더십과 창의성이 만나 균형 잡힌 협력을 보여줍니다',
+    'ESFP-ISFJ': '활발함과 배려심이 조화롭게 어우러져 즐거운 관계를 만듭니다',
+    'ESFJ-ISFP': '따뜻한 마음과 예술적 감성이 아름답게 융합됩니다',
+    'ESTP-ISFJ': '행동력과 세심함이 서로의 부족함을 채워줍니다',
+    'ESTJ-ISFP': '체계성과 유연성이 만나 실용적 협력을 이룹니다',
+    'INFP-ENFJ': '내면의 가치와 따뜻한 리더십이 서로를 성장시킵니다',
+    'INFJ-ENFP': '깊은 통찰력과 밝은 에너지가 완벽한 조화를 이룹니다',
+    'INTP-ENFJ': '논리적 사고와 인간적 따뜻함이 균형을 맞춥니다',
+    'INTJ-ENFP': '전략적 사고와 창의적 영감이 시너지를 발휘합니다',
+    'ISFP-ESFJ': '예술적 감성과 사회적 배려가 아름답게 어우러집니다',
+    'ISFJ-ESFP': '안정감과 활력이 서로를 보완하며 조화를 이룹니다',
+    'ISTP-ESFJ': '실용적 기술과 따뜻한 배려가 실생활에서 큰 도움이 됩니다',
+    'ISTJ-ESFP': '체계적 계획과 즉흥적 활력이 균형잡힌 관계를 만듭니다'
+  };
+  
+  const key = `${currentType}-${targetType}`;
+  return reasons[key] || '서로 다른 강점이 조화롭게 어우러져 좋은 관계를 형성합니다';
+};
+
 // 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
 const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   const incompatibilityMap: Record<MbtiType, MbtiType[]> = {
@@ -64,6 +90,32 @@ const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   };
   
   return incompatibilityMap[currentType] || [];
+};
+
+// 비호환성 이유 설명
+const getIncompatibilityReason = (currentType: MbtiType, targetType: MbtiType): string => {
+  const reasons: Record<string, string> = {
+    'ENFP-ISTJ': '자유로운 창의성과 체계적 계획성이 충돌할 수 있어 소통에 노력이 필요합니다',
+    'ENFP-ISTP': '감정표현 방식과 실용적 접근의 차이로 오해가 생길 수 있습니다',
+    'ENFJ-ISTP': '따뜻한 감정 표현과 차분한 성향의 차이가 거리감을 만들 수 있습니다',
+    'ENTP-ISFJ': '혁신적 변화 추구와 안정 선호로 인해 갈등이 생길 수 있습니다',
+    'ENTJ-ISFJ': '목표 지향적 추진력과 안정 추구로 인한 충돌 가능성이 있습니다',
+    'ESFP-INTJ': '즉흥적 활력과 신중한 계획성이 서로 답답함을 느낄 수 있습니다',
+    'ESFJ-INTP': '감정적 배려와 논리적 분석 방식의 차이로 오해가 생길 수 있습니다',
+    'ESTP-INFJ': '행동 중심적 성향과 신중한 성찰의 차이가 갈등을 만들 수 있습니다',
+    'ESTJ-INFP': '체계적 통제와 개인적 자유 추구로 인한 마찰이 있을 수 있습니다',
+    'INFP-ESTJ': '개인적 가치와 객관적 효율성 추구의 차이로 충돌할 수 있습니다',
+    'INFJ-ESTP': '깊은 성찰과 즉흥적 행동의 차이가 서로를 이해하기 어렵게 만듭니다',
+    'INTP-ESFJ': '논리적 분석과 감정적 배려의 차이로 소통에 어려움이 있을 수 있습니다',
+    'INTJ-ESFP': '장기적 계획과 순간적 즐거움 추구의 차이가 갈등을 만들 수 있습니다',
+    'ISFP-ENTJ': '개인적 가치와 목표 달성 중심 사고의 차이로 마찰이 생길 수 있습니다',
+    'ISFJ-ENTP': '안정 추구와 변화 선호의 차이로 인해 스트레스를 받을 수 있습니다',
+    'ISTP-ENFJ': '독립적 성향과 사회적 관계 중시의 차이가 거리감을 만들 수 있습니다',
+    'ISTJ-ENFP': '체계적 질서와 자유로운 창의성이 서로 제약으로 느껴질 수 있습니다'
+  };
+  
+  const key = `${currentType}-${targetType}`;
+  return reasons[key] || '서로 다른 성향으로 인해 이해하는 데 더 많은 노력이 필요할 수 있습니다';
 };
 
 // MBTI 유형별 이미지 파일 매핑 함수
@@ -104,6 +156,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
+  const [enlargedImage, setEnlargedImage] = useState<{ src: string; character: string } | null>(null);
   
   // 퀴즈 게임 상태
   const [quizCharacter, setQuizCharacter] = useState<string>('');
@@ -315,33 +368,49 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           성격 특징
         </h3>
         <div className="space-y-3">
-          {resultData.description.split('.').filter(sentence => sentence.trim()).map((sentence, index) => (
-            <div key={index} className="flex items-start space-x-3">
-              <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                {index + 1}
-              </span>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                {sentence.trim()}.
-              </p>
-            </div>
-          ))}
+          {(() => {
+            // 설명을 5개 문장으로 분할
+            const sentences = resultData.description.split('.').filter(sentence => sentence.trim());
+            const targetSentences = sentences.slice(0, 5); // 최대 5개까지만
+            while (targetSentences.length < 5 && sentences.length > 0) {
+              // 문장이 5개 미만이면 기본 특성 추가
+              const additionalTraits = [
+                '깊은 사색과 성찰을 통해 지혜를 얻습니다',
+                '다른 사람들에게 선한 영향력을 끼칩니다',
+                '어려운 상황에서도 희망을 잃지 않습니다',
+                '진실한 마음으로 관계를 맺습니다',
+                '하나님의 뜻을 구하며 살아갑니다'
+              ];
+              const additionalIndex = targetSentences.length;
+              if (additionalIndex < additionalTraits.length) {
+                targetSentences.push(additionalTraits[additionalIndex]);
+              } else {
+                break;
+              }
+            }
+            
+            return targetSentences.map((sentence, index) => (
+              <div key={index} className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                  {index + 1}
+                </span>
+                <p className="text-gray-700 text-sm leading-relaxed text-left">
+                  {sentence.trim()}{sentence.includes('.') ? '' : '.'}
+                </p>
+              </div>
+            ));
+          })()}
         </div>
       </div>
 
-      {/* 성경 구절 - 개선된 디자인 */}
-      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-5 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6">
-        <div className="flex items-start space-x-3">
-          <span className="flex-shrink-0 text-2xl">📖</span>
-          <div className="flex-1">
-            <h4 className="text-violet-800 font-bold text-sm mb-2">대표 성경구절</h4>
-            <blockquote className="text-gray-800 font-medium text-sm italic leading-relaxed mb-3 pl-4 border-l-2 border-violet-300">
-              "{resultData.verseText}"
-            </blockquote>
-            <p className="text-right text-violet-600 font-semibold text-xs">
-              - {resultData.verse} -
-            </p>
-          </div>
-        </div>
+      {/* 성경 구절 - 간소화된 디자인 */}
+      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6">
+        <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center">
+          📖 대표 성경구절 ({resultData.verse})
+        </h4>
+        <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
+          "{resultData.verseText}"
+        </blockquote>
       </div>
 
       {/* 액션 버튼들 - MZ 스타일 */}
@@ -377,13 +446,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               if (!compatibleType) return null;
               return (
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100/50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 flex-shrink-0">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-16 h-16 flex-shrink-0 relative cursor-pointer group">
                       <img 
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
-                        className="w-full h-full object-cover rounded-lg shadow-sm"
+                        className="w-full h-full object-cover rounded-lg shadow-sm transition-transform group-hover:scale-105"
+                        onClick={() => setEnlargedImage({
+                          src: getMbtiImage(compatibleType),
+                          character: RESULTS[compatibleType].character
+                        })}
                       />
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        크게보기
+                      </div>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
@@ -394,10 +470,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           {RESULTS[compatibleType].character}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {RESULTS[compatibleType].description.slice(0, 80)}...
+                      <p className="text-sm text-gray-700 leading-relaxed text-left mb-2">
+                        {getCompatibilityReason(resultType, compatibleType)}
                       </p>
-                      <div className="mt-2 flex items-center">
+                      <div className="flex items-center">
                         <span className="text-green-600 text-sm font-medium">💚 호환성이 매우 높습니다</span>
                       </div>
                     </div>
@@ -418,13 +494,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               if (!incompatibleType) return null;
               return (
                 <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-4 border border-red-100/50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 flex-shrink-0">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-16 h-16 flex-shrink-0 relative cursor-pointer group">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
-                        className="w-full h-full object-cover rounded-lg shadow-sm"
+                        className="w-full h-full object-cover rounded-lg shadow-sm transition-transform group-hover:scale-105"
+                        onClick={() => setEnlargedImage({
+                          src: getMbtiImage(incompatibleType),
+                          character: RESULTS[incompatibleType].character
+                        })}
                       />
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        크게보기
+                      </div>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
@@ -435,10 +518,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           {RESULTS[incompatibleType].character}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {RESULTS[incompatibleType].description.slice(0, 80)}...
+                      <p className="text-sm text-gray-700 leading-relaxed text-left mb-2">
+                        {getIncompatibilityReason(resultType, incompatibleType)}
                       </p>
-                      <div className="mt-2 flex items-center">
+                      <div className="flex items-center">
                         <span className="text-red-600 text-sm font-medium">💔 소통에 더 많은 노력이 필요해요</span>
                       </div>
                     </div>
@@ -470,11 +553,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               {Object.entries(TEST_VERSIONS)
                 .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
                 .map(([versionKey, version]) => (
-                  <div key={versionKey} className={`bg-gradient-to-r ${
-                    version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
-                    version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
-                    'from-blue-50 to-cyan-50 border-blue-200'
-                  } rounded-xl p-4 border hover:shadow-md transition-all duration-200`}>
+                  <div 
+                    key={versionKey} 
+                    className={`bg-gradient-to-r ${
+                      version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
+                      version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
+                      'from-blue-50 to-cyan-50 border-blue-200'
+                    } rounded-xl p-4 border hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02]`}
+                    onClick={() => {
+                      const testUrls = {
+                        1: 'https://b-mbti.money-hotissue.com/test1',
+                        2: 'https://b-mbti.money-hotissue.com/test2',
+                        3: 'https://b-mbti.money-hotissue.com/test3'
+                      };
+                      window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
+                    }}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center flex-1">
                         <div className={`w-4 h-4 rounded-full mr-3 ${
@@ -496,34 +590,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => {
-                          const versionNum = parseInt(versionKey);
-                          if (selectedTestVersion === versionNum) {
-                            // 이미 선택된 버전을 다시 클릭하면 해당 테스트 페이지로 이동
-                            const testUrls = {
-                              1: 'https://b-mbti.money-hotissue.com/test1',
-                              2: 'https://b-mbti.money-hotissue.com/test2',
-                              3: 'https://b-mbti.money-hotissue.com/test3'
-                            };
-                            window.location.href = testUrls[versionNum as keyof typeof testUrls];
-                          } else {
-                            // 다른 버전 선택
-                            setSelectedTestVersion(versionNum);
-                          }
-                        }}
-                        className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 ${
-                          selectedTestVersion === parseInt(versionKey)
-                            ? `${
-                                version.color === 'orange' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-200' :
-                                version.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-200' :
-                                'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
-                              }`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {selectedTestVersion === parseInt(versionKey) ? '🚀 시작!' : '선택'}
-                      </button>
+                      <div className="flex-shrink-0 ml-4">
+                        <span className={`px-3 py-1 rounded-full font-semibold text-sm ${
+                          version.color === 'orange' ? 'bg-orange-500 text-white' :
+                          version.color === 'purple' ? 'bg-purple-500 text-white' :
+                          'bg-blue-500 text-white'
+                        }`}>
+                          시작!
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -749,6 +824,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 닫기
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이미지 확대 모달 */}
+      {enlargedImage && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setEnlargedImage(null)}>
+          <div className="relative max-w-lg w-full">
+            <img 
+              src={enlargedImage.src} 
+              alt={enlargedImage.character}
+              className="w-full h-auto rounded-2xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              {enlargedImage.character}
+            </div>
+            <button 
+              onClick={() => setEnlargedImage(null)}
+              className="absolute top-4 right-4 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/90 transition-colors"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}

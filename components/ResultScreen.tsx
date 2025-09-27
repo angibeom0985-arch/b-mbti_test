@@ -253,30 +253,60 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="text-center">
           <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
             <span className="mr-2">🎯</span>
-            다른 방식으로도 테스트해보세요!
+            너가 선택한 테스트도 재밌었어? 나머지 2가지 테스트도 한 번 해봐!
           </h3>
           <p className="text-sm text-gray-600 mb-3">
-            여러 관점에서 분석하면 더 정확한 결과를 얻을 수 있어요.
+            다양한 관점에서 분석하면 더 정확하고 풍부한 결과를 얻을 수 있어요 ✨
           </p>
           
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 gap-3">
             {Object.entries(TEST_VERSIONS)
               .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
               .map(([versionKey, version]) => (
-                <div key={versionKey} className="flex items-center justify-between bg-white/80 rounded-xl p-3 border border-gray-100">
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-3 bg-${version.color}-400`}></div>
-                    <div className="text-left">
-                      <div className="font-semibold text-gray-800 text-sm">{version.name}</div>
-                      <div className="text-xs text-gray-600">{version.description}</div>
+                <div key={versionKey} className={`bg-gradient-to-r ${
+                  version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
+                  version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
+                  'from-blue-50 to-cyan-50 border-blue-200'
+                } rounded-xl p-4 border hover:shadow-md transition-all duration-200`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center flex-1">
+                      <div className={`w-4 h-4 rounded-full mr-3 ${
+                        version.color === 'orange' ? 'bg-orange-400' :
+                        version.color === 'purple' ? 'bg-purple-400' :
+                        'bg-blue-400'
+                      }`}></div>
+                      <div className="text-left flex-1">
+                        <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
+                        <div className="text-sm text-gray-600 mb-2">{version.description}</div>
+                        <div className={`text-xs ${
+                          version.color === 'orange' ? 'text-orange-700' :
+                          version.color === 'purple' ? 'text-purple-700' :
+                          'text-blue-700'
+                        }`}>
+                          {parseInt(versionKey) === 1 && "💭 차분하고 꾸준한 성향의 분들에게 추천"}
+                          {parseInt(versionKey) === 2 && "🧠 깊이 생각하고 성찰을 좋아하는 분들에게 추천"}
+                          {parseInt(versionKey) === 3 && "⚡ 실용적이고 현실적인 성향의 분들에게 추천"}
+                        </div>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => {
+                        const testUrls = {
+                          1: 'https://b-mbti.money-hotissue.com/test1',
+                          2: 'https://b-mbti.money-hotissue.com/test2',
+                          3: 'https://b-mbti.money-hotissue.com/test3'
+                        };
+                        window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
+                      }}
+                      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 ${
+                        version.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200' :
+                        version.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-200' :
+                        'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-200'
+                      } shadow-lg`}
+                    >
+                      🚀 시작하기
+                    </button>
                   </div>
-                  <button
-                    onClick={onRestart}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors bg-${version.color}-50 border-${version.color}-200 text-${version.color}-700 hover:bg-${version.color}-100`}
-                  >
-                    도전하기
-                  </button>
                 </div>
               ))}
           </div>

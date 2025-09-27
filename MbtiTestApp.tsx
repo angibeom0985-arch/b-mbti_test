@@ -208,7 +208,7 @@ const App: React.FC = () => {
         <footer className="relative z-10 bg-white/80 backdrop-blur-sm border-t border-gray-200/50 py-3 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-xs text-gray-500 leading-relaxed">
-              "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+              "쿠팡파트너스 활동을 통해 일정액의 수수료를 받을 수 있습니다."
               <br />
               <span className="text-gray-400">© 2025 성경인물 MBTI 테스트. 모든 권리 보유.</span>
             </p>

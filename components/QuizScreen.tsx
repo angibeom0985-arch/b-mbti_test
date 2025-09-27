@@ -23,7 +23,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, onPrevious,
     }, 200);
   };
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-start justify-center pt-8 px-4">
       <div className="w-full max-w-lg mx-auto">
         {/* 프로그레스 헤더 - 여백 줄임 */}
         <div className="text-center mb-4">
@@ -39,21 +39,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, onPrevious,
               style={{ width: `${(currentQuestion / totalQuestions) * 100}%` }}
             />
           </div>
-          
-          {/* 이전 질문 버튼 */}
-          {currentQuestion > 1 && onPrevious && (
-            <div className="flex justify-start">
-              <button
-                onClick={onPrevious}
-                className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-white hover:bg-gray-50 rounded-lg border border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm"
-              >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                이전
-              </button>
-            </div>
-          )}
         </div>
 
         {/* 질문 카드 - 여백 줄임 */}
@@ -85,6 +70,21 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, onPrevious,
             ))}
           </div>
         </div>
+
+        {/* 이전 질문 버튼을 답변지 아래로 이동 */}
+        {currentQuestion > 1 && onPrevious && (
+          <div className="flex justify-start">
+            <button
+              onClick={onPrevious}
+              className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-white hover:bg-gray-50 rounded-lg border border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              이전
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

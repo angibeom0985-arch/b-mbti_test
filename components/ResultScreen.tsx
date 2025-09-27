@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { MbtiType, MbtiResult } from '../types';
-import { RESULTS, TEST_VERSIONS } from '../constants';
+import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from '../constants';
 import RestartIcon from './icons/RestartIcon';
 import LoadingIndicator from './LoadingIndicator';
 import ShareIcon from './icons/ShareIcon';
@@ -331,53 +331,62 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-        <div className="flex items-center justify-center mb-2">
-          <span className="text-2xl mr-2">✨</span>
-          <p className="text-gray-600 font-medium">당신과 닮은 성경 인물</p>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
-          {resultData.character}
-        </h1>
-        <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
-          {resultType}
-        </div>
-        
-        {/* 완료한 버전 정보 */}
-        <div className="mt-3 pt-3 border-t border-gray-200/50">
-          <div className="inline-flex items-center bg-white/90 rounded-full px-3 py-1 text-sm">
-            <div className={`w-3 h-3 rounded-full mr-2 ${
-              completedVersion === 1 ? 'bg-orange-400' :
-              completedVersion === 2 ? 'bg-purple-400' :
-              'bg-blue-400'
-            }`}></div>
-            <span className="text-gray-700 font-medium">
-              {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 테스트'} 완료
-            </span>
-            <span className="ml-2">✓</span>
+        <div className="flex items-center justify-between">
+          {/* 왼쪽: 텍스트 영역 */}
+          <div className="flex-1">
+            <div className="flex items-center mb-2">
+              <span className="text-2xl mr-2">✨</span>
+              <p className="text-gray-600 font-medium">당신과 닮은 성경 인물</p>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 leading-tight">
+              {resultData.character}
+            </h1>
+            <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
+              {resultType}
+            </div>
+            
+            {/* 완료한 버전 정보 */}
+            <div className="mt-3 pt-3 border-t border-gray-200/50">
+              <div className="inline-flex items-center bg-white/90 rounded-full px-3 py-1 text-sm">
+                <div className={`w-3 h-3 rounded-full mr-2 ${
+                  completedVersion === 1 ? 'bg-orange-400' :
+                  completedVersion === 2 ? 'bg-purple-400' :
+                  'bg-blue-400'
+                }`}></div>
+                <span className="text-gray-700 font-medium">
+                  {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 테스트'} 완료
+                </span>
+                <span className="ml-2">✓</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* 오른쪽: 이미지 영역 */}
+          <div className="ml-6 flex-shrink-0">
+            {resultData.image ? (
+              <div 
+                className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
+              >
+                <div className="w-32 h-32 md:w-36 md:h-36 bg-white/80 rounded-2xl p-2 shadow-sm border border-pink-100/50 overflow-hidden">
+                  <img 
+                    src={resultData.image} 
+                    alt={resultData.character} 
+                    className="w-full h-full object-cover rounded-xl shadow-md"
+                    style={{
+                      imageRendering: 'crisp-edges'
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="w-32 h-32 md:w-36 md:h-36 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
+                <p className="text-gray-500 text-xs">이미지 로딩중...</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {resultData.image ? (
-        <div className="mb-6 flex justify-center">
-          <div className="w-48 h-48 bg-white/80 rounded-2xl p-3 shadow-sm border border-pink-100/50 overflow-hidden">
-            <img 
-              src={resultData.image} 
-              alt={resultData.character} 
-              className="w-full h-full object-cover rounded-xl shadow-md"
-              style={{
-                imageRendering: 'crisp-edges'
-              }}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="mb-6 flex justify-center">
-          <div className="w-48 h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
-            <p className="text-gray-500 text-sm">이미지 로딩중...</p>
-          </div>
-        </div>
-      )}
 
       {/* 설명 텍스트 - 가독성 개선 */}
       <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
@@ -386,38 +395,48 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           성격 특징
         </h3>
         <div className="space-y-3">
-          {(() => {
-            // 설명을 5개 문장으로 분할
-            const sentences = resultData.description.split('.').filter(sentence => sentence.trim());
-            const targetSentences = sentences.slice(0, 5); // 최대 5개까지만
-            while (targetSentences.length < 5 && sentences.length > 0) {
-              // 문장이 5개 미만이면 기본 특성 추가
-              const additionalTraits = [
-                '깊은 사색과 성찰을 통해 지혜를 얻습니다',
-                '다른 사람들에게 선한 영향력을 끼칩니다',
-                '어려운 상황에서도 희망을 잃지 않습니다',
-                '진실한 마음으로 관계를 맺습니다',
-                '하나님의 뜻을 구하며 살아갑니다'
-              ];
-              const additionalIndex = targetSentences.length;
-              if (additionalIndex < additionalTraits.length) {
-                targetSentences.push(additionalTraits[additionalIndex]);
-              } else {
-                break;
+          {PERSONALITY_TRAITS[resultType]?.map((trait, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                {index + 1}
+              </span>
+              <p className="text-gray-700 text-sm leading-relaxed text-left">
+                {trait}
+              </p>
+            </div>
+          )) || (
+            // Fallback - 기존 로직
+            (() => {
+              const sentences = resultData.description.split('.').filter(sentence => sentence.trim());
+              const targetSentences = sentences.slice(0, 5);
+              while (targetSentences.length < 5 && sentences.length > 0) {
+                const additionalTraits = [
+                  '깊은 사색과 성찰을 통해 지혜를 얻습니다',
+                  '다른 사람들에게 선한 영향력을 끼칩니다',
+                  '어려운 상황에서도 희망을 잃지 않습니다',
+                  '진실한 마음으로 관계를 맺습니다',
+                  '하나님의 뜻을 구하며 살아갑니다'
+                ];
+                const additionalIndex = targetSentences.length;
+                if (additionalIndex < additionalTraits.length) {
+                  targetSentences.push(additionalTraits[additionalIndex]);
+                } else {
+                  break;
+                }
               }
-            }
-            
-            return targetSentences.map((sentence, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                  {index + 1}
-                </span>
-                <p className="text-gray-700 text-sm leading-relaxed text-left">
-                  {sentence.trim()}{sentence.includes('.') ? '' : '.'}
-                </p>
-              </div>
-            ));
-          })()}
+              
+              return targetSentences.map((sentence, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                    {index + 1}
+                  </span>
+                  <p className="text-gray-700 text-sm leading-relaxed text-left">
+                    {sentence.trim()}{sentence.includes('.') ? '' : '.'}
+                  </p>
+                </div>
+              ));
+            })()
+          )}
         </div>
       </div>
 
@@ -547,7 +566,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           
           <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 심리학을 바탕으로 선정된 궁합 정보입니다. 개인차가 있을 수 있어요!
+              💡 MBTI 심리학을 바탕으로 선정된 궁합입니다. 개인차가 있을 수 있어요!
             </p>
           </div>
         </div>
@@ -625,18 +644,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         {/* 액션 버튼들을 감싸는 컨테이너 */}
         <div className="space-y-4">
           {/* 이미지 맞추기 게임 - 참여 유도 문구로 변경 */}
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 border border-purple-100/50">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 mb-6 border-2 border-indigo-200 shadow-md">
             <div className="text-center">
-              <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+              <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center">
                 <span className="mr-2">🖼️</span>
                 이미지 맞추기 게임에 도전해보세요!
               </h3>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-indigo-600 mb-3">
                 성경인물 이미지를 보고 누구인지 맞춰보세요! ✨
               </p>
               <button
                 onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
               >
                 🖼️ 게임 시작하기
               </button>
@@ -653,7 +672,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 onRestart();
               }
             }}
-            className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm"
           >
             🔁 다시 테스트하기
           </button>
@@ -844,14 +863,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 이미지 확대 모달 */}
+      {/* 이미지 확대 모달 - 350px 정사각형 */}
       {enlargedImage && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setEnlargedImage(null)}>
-          <div className="relative max-w-lg w-full">
+          <div className="relative">
             <img 
               src={enlargedImage.src} 
               alt={enlargedImage.character}
-              className="w-full h-auto rounded-2xl shadow-2xl"
+              className="w-[350px] h-[350px] object-cover rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">

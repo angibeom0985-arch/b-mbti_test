@@ -302,7 +302,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleLeaveComment}
-            className="bg-white/80 text-gray-600 font-medium py-3 px-3 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-sm"
+            className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-3 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm"
           >
             💬 후기 남기기
           </button>
@@ -440,9 +440,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                             version.color === 'purple' ? 'text-purple-700' :
                             'text-blue-700'
                           }`}>
-                            {parseInt(versionKey) === 1 && "💭 차분하고 꾸준한 성향의 분들에게 추천"}
-                            {parseInt(versionKey) === 2 && "🧠 깊이 생각하고 성찰을 좋아하는 분들에게 추천"}
-                            {parseInt(versionKey) === 3 && "⚡ 실용적이고 현실적인 성향의 분들에게 추천"}
+                            {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
+                            {parseInt(versionKey) === 2 && "🧠 신앙 고민을 깊이 있게 탐구하고 싶은 분들에게 추천"}
+                            {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
                           </div>
                         </div>
                       </div>

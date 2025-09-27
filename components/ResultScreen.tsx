@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { MbtiType, MbtiResult } from '../types';
-import { RESULTS } from '../constants';
+import { RESULTS, TEST_VERSIONS } from '../constants';
 import RestartIcon from './icons/RestartIcon';
 import LoadingIndicator from './LoadingIndicator';
 import ShareIcon from './icons/ShareIcon';
@@ -10,6 +10,8 @@ interface ResultScreenProps {
   resultData: MbtiResult | null;
   error: string | null;
   onRestart: () => void;
+  completedVersion?: number;
+  onQuizGame?: () => void;
 }
 
 // 16가지 MBTI 유형과 대응하는 성경인물들
@@ -40,7 +42,62 @@ const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   return compatibilityMap[currentType] || [];
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, error, onRestart }) => {
+// 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
+const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
+  const incompatibilityMap: Record<MbtiType, MbtiType[]> = {
+    'ENFP': ['ISTJ', 'ISTP', 'ESTJ', 'ESTP'],
+    'ENFJ': ['ISTP', 'INTP', 'ESTP', 'ENTP'],
+    'ENTP': ['ISFJ', 'ISTJ', 'ESFJ', 'ESTJ'],
+    'ENTJ': ['ISFJ', 'ISFP', 'ESFJ', 'ESFP'],
+    'ESFP': ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
+    'ESFJ': ['INTP', 'ENTP', 'INTJ', 'ENTJ'],
+    'ESTP': ['INFJ', 'INFP', 'ENFJ', 'ENFP'],
+    'ESTJ': ['INFP', 'ENFP', 'INFJ', 'ENFJ'],
+    'INFP': ['ESTJ', 'ENTJ', 'ESTP', 'ENTP'],
+    'INFJ': ['ESTP', 'ESFP', 'ESTJ', 'ESFJ'],
+    'INTP': ['ESFJ', 'ESFP', 'ESTJ', 'ESTP'],
+    'INTJ': ['ESFP', 'ESTP', 'ESFJ', 'ESTJ'],
+    'ISFP': ['ENTJ', 'ENTP', 'ESTJ', 'ESTP'],
+    'ISFJ': ['ENTP', 'ENTJ', 'ESTP', 'ESTJ'],
+    'ISTP': ['ENFJ', 'ESFJ', 'ENFP', 'ESFP'],
+    'ISTJ': ['ENFP', 'ESFP', 'ENTP', 'ESTP']
+  };
+  
+  return incompatibilityMap[currentType] || [];
+};
+
+// MBTI 유형별 이미지 파일 매핑 함수
+const getMbtiImage = (type: MbtiType): string => {
+  const imageMap: Record<MbtiType, string> = {
+    'ENFP': '/ENFP 아브라함.jpg',
+    'ENFJ': '/ENJS 느헤미야.jpg',
+    'ENTJ': '/ENTJ 드보라.jpg',
+    'ENTP': '/ENFP 아브라함.jpg', // ENTP 파일이 없어서 임시로 ENFP 사용
+    'ESFJ': '/ESFJ 막달라 마리아.jpg',
+    'ESFP': '/ESFP 에스더.jpg',
+    'ESTJ': '/ESTJ 모세.jpg',
+    'ESTP': '/ESTP 베드로.jpg',
+    'INFJ': '/INFJ 다니엘.jpg',
+    'INFP': '/INFP 마리아.jpg',
+    'INTJ': '/INTJ 바울.jpg',
+    'INTP': '/INTP 솔로몬.jpg',
+    'ISFJ': '/ISFJ 룻.jpg',
+    'ISFP': '/ISFP 다윗.jpg',
+    'ISTJ': '/ISTJ 요셉.jpg',
+    'ISTP': '/ISTP 삼손.jpg'
+  };
+  
+  return imageMap[type] || '/ENFP 아브라함.jpg';
+};
+
+const ResultScreen: React.FC<ResultScreenProps> = ({ 
+  resultType, 
+  resultData, 
+  error, 
+  onRestart,
+  completedVersion = 1,
+  onQuizGame
+}) => {
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showOtherCharacters, setShowOtherCharacters] = useState(false);
@@ -120,39 +177,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
   };
 
   const handleSaveAsImage = async () => {
-    try {
-      const element = document.querySelector('.result-container') as HTMLElement;
-      if (!element) {
-        alert('🚨 이미지를 생성할 수 없습니다.');
-        return;
-      }
-
-      // 동적으로 html2canvas 로드
-      const html2canvas = await import('html2canvas');
-      const canvas = await html2canvas.default(element, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true,
-        width: element.offsetWidth,
-        height: element.offsetHeight
-      });
-
-      // 이미지 다운로드
-      const link = document.createElement('a');
-      link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
-      link.href = canvas.toDataURL('image/png');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      alert('📸 이미지가 저장되었습니다!');
-    } catch (error) {
-      console.error('이미지 저장 실패:', error);
-      alert('📸 이미지 저장에 실패했습니다. 공유 기능을 이용해 주세요.');
-      setShowShareModal(true);
-    }
+    // 먼저 쿠팡 링크를 열기
+    const characterName = resultData?.character || '';
+    const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
+    
+    // 새 창에서 쿠팡 링크 열기
+    window.open(coupangUrl, '_blank');
+    
+    // 이미지 저장 페이지로 이동 (현재 창에서)
+    window.location.href = 'https://b-mbti.money-hotissue.com/image';
   };
 
   const handleViewOtherCharacters = () => {
@@ -173,16 +206,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
   };
   
   const checkQuizAnswer = () => {
-    if (userGuess.trim() === '') return;
+    if (!userGuess || userGuess.trim() === '') return;
     
     const isCorrect = userGuess.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
     setQuizResult(isCorrect ? 'correct' : 'wrong');
   };
   
   const selectCharacterFromCandidates = (character: string) => {
+    if (quizResult !== null) return; // 이미 답안 제출된 경우 선택 불가
     setUserGuess(character);
-    const isCorrect = character.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
-    setQuizResult(isCorrect ? 'correct' : 'wrong');
   };
 
   return (
@@ -198,6 +230,56 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
         </h1>
         <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
           {resultType}
+        </div>
+        
+        {/* 완료한 버전 정보 */}
+        <div className="mt-3 pt-3 border-t border-gray-200/50">
+          <div className="inline-flex items-center bg-white/90 rounded-full px-3 py-1 text-sm">
+            <div className={`w-3 h-3 rounded-full mr-2 ${
+              completedVersion === 1 ? 'bg-orange-400' :
+              completedVersion === 2 ? 'bg-purple-400' :
+              'bg-blue-400'
+            }`}></div>
+            <span className="text-gray-700 font-medium">
+              {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 버전'} 완료
+            </span>
+            <span className="ml-2">✓</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 다른 버전 시도 권장 */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
+        <div className="text-center">
+          <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+            <span className="mr-2">🎯</span>
+            더 정확한 결과를 원한다면?
+          </h3>
+          <p className="text-sm text-gray-600 mb-3">
+            다른 버전으로도 테스트해보세요! 여러 관점에서 분석하여 신뢰도를 높일 수 있습니다.
+          </p>
+          
+          <div className="grid grid-cols-1 gap-2">
+            {Object.entries(TEST_VERSIONS)
+              .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
+              .map(([versionKey, version]) => (
+                <div key={versionKey} className="flex items-center justify-between bg-white/80 rounded-xl p-3 border border-gray-100">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-3 bg-${version.color}-400`}></div>
+                    <div className="text-left">
+                      <div className="font-semibold text-gray-800 text-sm">{version.name}</div>
+                      <div className="text-xs text-gray-600">{version.description}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={onRestart}
+                    className={`text-xs px-3 py-1 rounded-full border transition-colors bg-${version.color}-50 border-${version.color}-200 text-${version.color}-700 hover:bg-${version.color}-100`}
+                  >
+                    시도하기
+                  </button>
+                </div>
+              ))}
+          </div>
         </div>
       </div>
 
@@ -260,41 +342,100 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
             💬 후기 남기기
           </button>
           <button
-            onClick={handleViewOtherCharacters}
+            onClick={onQuizGame || (() => window.location.href = 'https://b-mbti.money-hotissue.com/quizgame')}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium py-3 px-3 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-sm text-sm"
           >
             🎮 인물 퀴즈
           </button>
         </div>
 
-        {/* 어울리는 성격 유형 섹션 */}
-        <div className="mb-6 bg-white/80 rounded-2xl p-4 shadow-sm border border-orange-100/50">
-          <div className="flex items-center justify-center mb-4">
-            <span className="text-xl mr-2">💝</span>
-            <h3 className="text-lg font-bold text-gray-800">어울리는 성격 유형</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {getCompatibleTypes(resultType).map((compatibleType) => (
-              <div 
-                key={compatibleType}
-                className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-xl p-3 border border-pink-100/50 hover:shadow-md transition-all duration-200"
-              >
-                <div className="text-center">
-                  <div className="text-xs font-semibold text-pink-600 mb-1">{compatibleType}</div>
-                  <div className="font-bold text-gray-800 text-sm mb-2">{RESULTS[compatibleType].character}</div>
-                  <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-pink-200 to-orange-200 rounded-full flex items-center justify-center">
-                    <span className="text-lg">👥</span>
-                  </div>
-                  <div className="text-xs text-gray-600 leading-tight">
-                    {RESULTS[compatibleType].character}와 잘 맞아요!
+        {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
+        <div className="mb-6 space-y-4">
+          {/* 어울리는 성격 유형 */}
+          <div className="bg-white/80 rounded-2xl p-4 shadow-sm border border-green-100/50">
+            <div className="flex items-center justify-center mb-4">
+              <span className="text-xl mr-2">💝</span>
+              <h3 className="text-lg font-bold text-green-800">어울리는 성격 유형</h3>
+            </div>
+            {(() => {
+              const compatibleType = getCompatibleTypes(resultType)[0];
+              if (!compatibleType) return null;
+              return (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100/50">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 flex-shrink-0">
+                      <img 
+                        src={getMbtiImage(compatibleType)} 
+                        alt={RESULTS[compatibleType].character}
+                        className="w-full h-full object-cover rounded-lg shadow-sm"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2">
+                        <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">
+                          {compatibleType}
+                        </span>
+                        <span className="font-bold text-green-800 text-lg">
+                          {RESULTS[compatibleType].character}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {RESULTS[compatibleType].description.slice(0, 80)}...
+                      </p>
+                      <div className="mt-2 flex items-center">
+                        <span className="text-green-600 text-sm font-medium">💚 호환성이 매우 높습니다</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })()}
           </div>
-          <div className="mt-4 p-3 bg-gradient-to-r from-pink-100 to-orange-100 rounded-xl">
+
+          {/* 어울리지 않는 성격 유형 */}
+          <div className="bg-white/80 rounded-2xl p-4 shadow-sm border border-red-100/50">
+            <div className="flex items-center justify-center mb-4">
+              <span className="text-xl mr-2">⚠️</span>
+              <h3 className="text-lg font-bold text-red-800">주의해야 할 성격 유형</h3>
+            </div>
+            {(() => {
+              const incompatibleType = getIncompatibleTypes(resultType)[0];
+              if (!incompatibleType) return null;
+              return (
+                <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-4 border border-red-100/50">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 flex-shrink-0">
+                      <img 
+                        src={getMbtiImage(incompatibleType)} 
+                        alt={RESULTS[incompatibleType].character}
+                        className="w-full h-full object-cover rounded-lg shadow-sm"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2">
+                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">
+                          {incompatibleType}
+                        </span>
+                        <span className="font-bold text-red-800 text-lg">
+                          {RESULTS[incompatibleType].character}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {RESULTS[incompatibleType].description.slice(0, 80)}...
+                      </p>
+                      <div className="mt-2 flex items-center">
+                        <span className="text-red-600 text-sm font-medium">💔 소통에 더 많은 노력이 필요해요</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+          
+          <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 심리학을 바탕으로 선정된 호환성 높은 성격 유형들입니다
+              💡 MBTI 심리학을 바탕으로 선정된 호환성 분석입니다. 개인차가 있을 수 있어요!
             </p>
           </div>
         </div>
@@ -406,15 +547,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
                 </div>
                 <h4 className="text-lg font-bold text-gray-800 mb-2">이 분은 누구일까요? 🤔</h4>
                 
-                {/* 주관식 입력 */}
-                <input
-                  type="text"
-                  value={userGuess}
-                  onChange={(e) => setUserGuess(e.target.value)}
-                  placeholder="성경인물 이름을 입력하세요"
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl text-center font-medium focus:border-purple-400 focus:outline-none"
-                  disabled={quizResult !== null}
-                />
+                {/* 선택된 답안 표시 */}
+                {userGuess && quizResult === null && (
+                  <div className="mt-3 p-3 bg-blue-100 text-blue-700 rounded-xl">
+                    선택한 답안: <strong>{userGuess}</strong>
+                  </div>
+                )}
                 
                 {quizResult && (
                   <div className={`mt-3 p-3 rounded-xl ${quizResult === 'correct' 
@@ -431,7 +569,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
             {/* 16명 후보 선택지 */}
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-600 mb-3 text-center">
-                💡 힌트: 아래 후보 중에서 선택하세요!
+                💡 아래 후보 중에서 선택하세요!
               </h4>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                 {ALL_CHARACTERS.map((type) => (
@@ -440,8 +578,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
                     onClick={() => selectCharacterFromCandidates(RESULTS[type].character)}
                     disabled={quizResult !== null}
                     className={`p-2 rounded-xl text-xs font-medium transition-all duration-200 ${
-                      quizResult !== null && RESULTS[type].character === quizCharacter
-                        ? 'bg-green-200 text-green-800'
+                      userGuess === RESULTS[type].character && quizResult === null
+                        ? 'bg-blue-200 text-blue-800 border-2 border-blue-400'
+                        : quizResult !== null && RESULTS[type].character === quizCharacter
+                        ? 'bg-green-200 text-green-800 border-2 border-green-400'
                         : quizResult === null
                         ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700'
                         : 'bg-gray-50 text-gray-400'
@@ -459,7 +599,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
               {quizResult === null ? (
                 <button 
                   onClick={checkQuizAnswer}
-                  className="flex-1 p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-semibold"
+                  disabled={!userGuess || userGuess.trim() === ''}
+                  className={`flex-1 p-3 rounded-2xl font-semibold transition-all duration-200 ${
+                    userGuess && userGuess.trim() !== ''
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   ✅ 답안 제출
                 </button>

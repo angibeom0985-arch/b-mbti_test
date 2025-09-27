@@ -1,6 +1,26 @@
 import type { Question, MbtiResult, MbtiType } from './types';
 
-export const QUESTIONS: Question[] = [
+// 테스트 버전 정보
+export const TEST_VERSIONS = {
+  1: { 
+    name: "기본 버전", 
+    description: "일상적인 신앙 생활을 중심으로",
+    color: "from-blue-500 to-purple-500"
+  },
+  2: { 
+    name: "심화 버전", 
+    description: "신앙 고민과 성장에 초점",
+    color: "from-purple-500 to-pink-500"
+  },
+  3: { 
+    name: "실생활 버전", 
+    description: "현실적인 상황과 선택을 중심으로",
+    color: "from-green-500 to-blue-500"
+  }
+};
+
+// 버전 1: 기본 버전 - 일상적인 신앙 생활
+export const QUESTIONS_V1: Question[] = [
   {
     text: "주일 아침, 예배 전 교회에 도착했을 때",
     answers: [
@@ -86,6 +106,192 @@ export const QUESTIONS: Question[] = [
     ],
   },
 ];
+
+// 버전 2: 심화 버전 - 신앙 고민과 성장에 초점
+export const QUESTIONS_V2: Question[] = [
+  {
+    text: "신앙생활이 어려울 때 당신의 반응은?",
+    answers: [
+      { text: "동료 믿음의 형제자매들과 고민을 나누고 위로를 구한다", type: 'E' },
+      { text: "조용한 곳에서 혼자 깊이 묵상하며 답을 찾는다", type: 'I' },
+    ],
+  },
+  {
+    text: "하나님의 뜻을 구할 때 중요하게 여기는 것은?",
+    answers: [
+      { text: "성경의 명확한 말씀과 구체적인 상황적 인도", type: 'S' },
+      { text: "성령의 감동과 내적 확신, 영적 직관", type: 'N' },
+    ],
+  },
+  {
+    text: "교회 내 어려운 결정을 내려야 할 때",
+    answers: [
+      { text: "성경적 원리와 객관적 기준에 따라 판단한다", type: 'T' },
+      { text: "관련된 모든 사람들의 마음과 상황을 고려한다", type: 'F' },
+    ],
+  },
+  {
+    text: "영성 훈련을 어떻게 계획하시나요?",
+    answers: [
+      { text: "체계적인 계획을 세워 단계적으로 꾸준히 실행", type: 'J' },
+      { text: "그때그때 영적 필요에 따라 유연하게 조정", type: 'P' },
+    ],
+  },
+  {
+    text: "믿음의 성장을 위해 선호하는 방식은?",
+    answers: [
+      { text: "성도들과의 활발한 교제와 공동체 활동을 통해", type: 'E' },
+      { text: "개인적인 묵상과 기도를 통한 깊은 영적 체험", type: 'I' },
+    ],
+  },
+  {
+    text: "성경 해석에서 가장 신뢰하는 방법은?",
+    answers: [
+      { text: "주석서와 역사적 맥락을 통한 철저한 연구", type: 'S' },
+      { text: "성령의 조명을 구하며 영적 의미를 깨닫기", type: 'N' },
+    ],
+  },
+  {
+    text: "교회에서 갈등이 생겼을 때의 접근법은?",
+    answers: [
+      { text: "문제의 핵심을 파악하고 합리적 해결방안 모색", type: 'T' },
+      { text: "관계 회복을 우선으로 하는 화해 중심의 접근", type: 'F' },
+    ],
+  },
+  {
+    text: "신앙 서적을 읽을 때 선호하는 스타일은?",
+    answers: [
+      { text: "정해진 시간에 체계적으로 노트정리하며 읽기", type: 'J' },
+      { text: "마음에 와닿는 부분을 자유롭게 골라 읽기", type: 'P' },
+    ],
+  },
+  {
+    text: "하나님과의 관계에서 가장 중요하게 여기는 것은?",
+    answers: [
+      { text: "교제와 소통, 함께하는 관계의 친밀감", type: 'E' },
+      { text: "깊은 내적 만남과 개인적인 영적 체험", type: 'I' },
+    ],
+  },
+  {
+    text: "믿음의 확신을 얻는 주된 방법은?",
+    answers: [
+      { text: "성경 말씀의 객관적 약속과 구체적 경험", type: 'S' },
+      { text: "내적 평안과 영적 직관, 하나님의 음성", type: 'N' },
+    ],
+  },
+  {
+    text: "신앙적 조언을 할 때 중점을 두는 것은?",
+    answers: [
+      { text: "성경적 원리에 근거한 명확하고 실질적 조언", type: 'T' },
+      { text: "상대방의 마음을 공감하며 위로와 격려 전달", type: 'F' },
+    ],
+  },
+  {
+    text: "영적 성장 과정을 어떻게 관리하나요?",
+    answers: [
+      { text: "목표를 정하고 진척 상황을 점검하며 체계적 관리", type: 'J' },
+      { text: "자연스러운 흐름에 맡기며 순간순간의 은혜에 집중", type: 'P' },
+    ],
+  },
+];
+
+// 버전 3: 실생활 버전 - 현실적인 상황과 선택을 중심으로
+export const QUESTIONS_V3: Question[] = [
+  {
+    text: "직장에서 스트레스받을 때 당신의 해결법은?",
+    answers: [
+      { text: "동료들과 이야기하며 함께 해결책을 찾는다", type: 'E' },
+      { text: "혼자 시간을 갖고 조용히 생각을 정리한다", type: 'I' },
+    ],
+  },
+  {
+    text: "가정 예배나 기도회를 인도할 때",
+    answers: [
+      { text: "실생활에 적용할 수 있는 구체적인 말씀을 나눈다", type: 'S' },
+      { text: "영적 비전과 하나님 나라의 소망을 전한다", type: 'N' },
+    ],
+  },
+  {
+    text: "가족 간 의견 충돌이 있을 때",
+    answers: [
+      { text: "합리적 근거를 제시하며 논리적으로 설득한다", type: 'T' },
+      { text: "각자의 마음을 이해하고 조화로운 해결책을 찾는다", type: 'F' },
+    ],
+  },
+  {
+    text: "가정의 재정 관리는 어떻게 하시나요?",
+    answers: [
+      { text: "예산을 세우고 계획적으로 관리한다", type: 'J' },
+      { text: "상황에 따라 유연하게 조정하며 관리한다", type: 'P' },
+    ],
+  },
+  {
+    text: "이웃과의 관계에서 중요하게 여기는 것은?",
+    answers: [
+      { text: "활발한 교류와 서로 도움이 되는 관계", type: 'E' },
+      { text: "적절한 거리를 유지하며 서로 존중하는 관계", type: 'I' },
+    ],
+  },
+  {
+    text: "십일조와 헌금에 대한 당신의 접근법은?",
+    answers: [
+      { text: "수입에 따른 정확한 계산으로 규칙적인 헌금", type: 'S' },
+      { text: "마음의 감동에 따른 자발적이고 영적인 헌금", type: 'N' },
+    ],
+  },
+  {
+    text: "자녀 교육에서 가장 중시하는 가치는?",
+    answers: [
+      { text: "실력과 성과, 객관적 성취를 통한 성장", type: 'T' },
+      { text: "인격과 관계, 정서적 안정을 통한 성장", type: 'F' },
+    ],
+  },
+  {
+    text: "주말 시간을 어떻게 계획하시나요?",
+    answers: [
+      { text: "미리 계획을 세워 알차게 보낸다", type: 'J' },
+      { text: "그때그때 기분과 상황에 따라 자유롭게 보낸다", type: 'P' },
+    ],
+  },
+  {
+    text: "직장에서 복음을 전할 기회가 생겼을 때",
+    answers: [
+      { text: "적극적으로 나서서 자연스럽게 대화를 이끈다", type: 'E' },
+      { text: "상대방이 먼저 관심을 보일 때까지 기다린다", type: 'I' },
+    ],
+  },
+  {
+    text: "교회 건축헌금이나 특별헌금 요청이 있을 때",
+    answers: [
+      { text: "구체적인 계획과 사용 용도를 확인한 후 결정", type: 'S' },
+      { text: "하나님의 일이라는 믿음으로 마음에 감동받는 대로", type: 'N' },
+    ],
+  },
+  {
+    text: "직장 동료나 친구와의 갈등 해결법은?",
+    answers: [
+      { text: "문제의 원인을 분석하고 명확한 해결책 제시", type: 'T' },
+      { text: "상대방의 입장을 이해하고 먼저 화해의 손길", type: 'F' },
+    ],
+  },
+  {
+    text: "새로운 교회를 선택할 때 가장 중요한 기준은?",
+    answers: [
+      { text: "체계적인 시스템과 안정적인 교회 운영", type: 'J' },
+      { text: "자유로운 분위기와 다양성을 인정하는 개방성", type: 'P' },
+    ],
+  },
+];
+
+// 기존 QUESTIONS를 QUESTIONS_V1으로 대체
+export const QUESTIONS = QUESTIONS_V1;
+
+// 버전별 질문 매핑
+export const QUESTIONS_BY_VERSION = {
+  1: QUESTIONS_V1,
+  2: QUESTIONS_V2,
+  3: QUESTIONS_V3,
+};
 
 export const RESULTS: Record<MbtiType, Omit<MbtiResult, 'image'>> = {
   ISTJ: {

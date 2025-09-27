@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { VisitorCounter } from '../utils/visitor';
+import { TEST_VERSIONS } from '../constants';
 
 interface StartScreenProps {
-  onStart: () => void;
+  onStart: (version: number) => void;
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   const [visitorCount, setVisitorCount] = useState<number>(0);
   const [animatedCount, setAnimatedCount] = useState<number>(0);
+  const [selectedVersion, setSelectedVersion] = useState<number>(1);
 
   useEffect(() => {
     // 컴포넌트 마운트 시 방문자수 증가
@@ -40,11 +42,11 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto text-center">
         
-        {/* 1. 지금까지 참여한 사람들 */}
-        <div className="mb-6 bg-white/80 rounded-3xl p-4 shadow-lg border border-gray-100">
+        {/* 1. 지금까지 참여한 사람들 - 조화로운 색상으로 수정 */}
+        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 shadow-lg border border-orange-100">
           <div className="flex items-center justify-center space-x-2 mb-2">
             <span className="text-xl animate-bounce">👥</span>
-            <p className="text-sm font-medium text-gray-600">지금까지 참여한 사람들</p>
+            <p className="text-sm font-medium text-orange-700">지금까지 참여한 사람들</p>
           </div>
           <p className="text-xl font-bold text-orange-600 tabular-nums">
             <span className="inline-block">
@@ -53,69 +55,113 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </p>
         </div>
 
-        {/* 2. 나와 닮은 성경인물은? */}
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 leading-tight">
-          <span className="bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">나와 닮은 성경인물은?</span>
-        </h1>
-
-        {/* 3. 대표 이미지 */}
+        {/* 2. 대표 이미지 - 전체 너비, 둥근 테두리 제거 */}
         <div className="mb-6">
           <img 
             src="/hero-image.svg" 
             alt="성경인물과 나의 성격 MBTI 매칭 테스트" 
-            className="w-full h-auto max-w-sm mx-auto rounded-xl"
+            className="w-full h-auto"
           />
         </div>
 
-        {/* 4. 나의 성경인물 찾기 - 더 클릭 유도하는 디자인 */}
-        <div className="mb-4 relative">
-          <button
-            onClick={onStart}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-6 px-8 rounded-3xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-xl text-xl relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-white/20 transform skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-            <span className="relative flex items-center justify-center">
-              <span className="mr-2">🚀</span>
-              나의 성경인물 찾기
-              <span className="ml-2 animate-bounce">→</span>
-            </span>
-          </button>
-          
-          {/* 클릭 유도 텍스트 - 크게 만들기 */}
-          <p className="text-sm font-medium text-orange-600 mt-3 animate-pulse">
-            👆 클릭하여 테스트 시작!
-          </p>
+        {/* 3. 테스트 버전 선택 - 더블클릭으로 시작 */}
+        <div className="mb-6 space-y-4">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            💡 신뢰도 향상을 위한 3가지 버전
+          </h3>
+          <div className="space-y-3">
+            {Object.entries(TEST_VERSIONS).map(([versionKey, version]) => {
+              const versionNumber = parseInt(versionKey);
+              const isSelected = selectedVersion === versionNumber;
+              
+              return (
+                <button
+                  key={versionNumber}
+                  onClick={() => {
+                    if (selectedVersion === versionNumber) {
+                      // 이미 선택된 버전을 다시 클릭하면 시작
+                      onStart(versionNumber);
+                    } else {
+                      // 다른 버전 선택
+                      setSelectedVersion(versionNumber);
+                    }
+                  }}
+                  className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.01] ${
+                    isSelected
+                      ? `border-${version.color}-400 bg-gradient-to-r ${
+                          version.color === 'orange' 
+                            ? 'from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-200' 
+                            : version.color === 'purple'
+                            ? 'from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-200'
+                            : 'from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
+                        }`
+                      : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className={`text-lg font-bold mb-2 ${
+                        isSelected ? 'text-white' : 'text-gray-800'
+                      }`}>
+                        {version.name}
+                      </h4>
+                      <p className={`text-sm ${
+                        isSelected ? 'text-white/90' : 'text-gray-600'
+                      }`}>
+                        {version.description}
+                      </p>
+                      {isSelected && (
+                        <div className="mt-3 flex items-center justify-center">
+                          <span className="text-white/90 text-sm mr-2">👆 한번 더 클릭하면</span>
+                          <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
+                            🚀 시작!
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className={`ml-4 w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                      isSelected
+                        ? 'border-white/50 bg-white/20'
+                        : 'border-gray-300'
+                    }`}>
+                      {isSelected && (
+                        <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+            <p className="text-sm text-blue-700 text-center">
+              <span className="font-semibold">💡 팁:</span> 각 버전별로 다른 관점에서 질문하여 더 정확한 결과를 얻을 수 있습니다
+            </p>
+          </div>
         </div>
 
-        {/* 5. 사이트 소개 */}
-        <div className="text-gray-600 text-base leading-relaxed mb-6 px-4">
-          📖 성경 속 위대한 인물들과 당신의 성격을 비교해보세요!<br />
-          <span className="font-bold text-orange-600">12가지 질문</span>으로 알아보는<br />
-          나만의 성경인물 매칭 테스트 💫
-        </div>
         
-        
-        {/* 6. 특징 미리보기 - 호환성 분석, 이미지 저장, 결과 공유, 후기 시스템 */}
+        {/* 특징 미리보기 - 색상 조화롭게 조정 */}
         <div className="grid grid-cols-2 gap-3 mb-6 px-2">
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-orange-100/50">
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-3 shadow-sm border border-orange-200">
             <div className="text-xl mb-1">👥</div>
-            <div className="text-xs font-semibold text-gray-700">호환성 분석</div>
-            <div className="text-xs text-gray-500">어울리는 유형</div>
+            <div className="text-xs font-semibold text-orange-800">호환성 분석</div>
+            <div className="text-xs text-orange-600">어울리는 유형</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-purple-100/50">
+          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
             <div className="text-xl mb-1">📊</div>
-            <div className="text-xs font-semibold text-gray-700">실시간 통계</div>
-            <div className="text-xs text-gray-500">다른 사람들 결과</div>
+            <div className="text-xs font-semibold text-purple-800">실시간 통계</div>
+            <div className="text-xs text-purple-600">다른 사람들 결과</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-blue-100/50">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 shadow-sm border border-blue-200">
             <div className="text-xl mb-1">📸</div>
-            <div className="text-xs font-semibold text-gray-700">이미지 저장</div>
-            <div className="text-xs text-gray-500">SNS 공유용</div>
+            <div className="text-xs font-semibold text-blue-800">이미지 저장</div>
+            <div className="text-xs text-blue-600">SNS 공유용</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-pink-100/50">
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
             <div className="text-xl mb-1">💬</div>
-            <div className="text-xs font-semibold text-gray-700">후기 시스템</div>
-            <div className="text-xs text-gray-500">사용자 리뷰</div>
+            <div className="text-xs font-semibold text-pink-800">후기 시스템</div>
+            <div className="text-xs text-pink-600">사용자 리뷰</div>
           </div>
         </div>
 

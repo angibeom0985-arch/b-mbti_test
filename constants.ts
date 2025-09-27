@@ -1,21 +1,21 @@
 import type { Question, MbtiResult, MbtiType } from './types';
 
-// 테스트 버전 정보
+// 테스트 선택 옵션 정보
 export const TEST_VERSIONS = {
   1: { 
-    name: "기본 버전", 
-    description: "일상적인 신앙 생활을 중심으로",
-    color: "from-blue-500 to-purple-500"
+    name: "신앙생활 깊이보기", 
+    description: "일상 속 신앙 모습으로 성격 파악",
+    color: "orange"
   },
   2: { 
-    name: "심화 버전", 
-    description: "신앙 고민과 성장에 초점",
-    color: "from-purple-500 to-pink-500"
+    name: "내면 성찰하기", 
+    description: "신앙 고민과 성장 과정 중심 분석",
+    color: "purple"
   },
   3: { 
-    name: "실생활 버전", 
-    description: "현실적인 상황과 선택을 중심으로",
-    color: "from-green-500 to-blue-500"
+    name: "현실 적용하기", 
+    description: "실생활 선택과 행동 패턴 분석",
+    color: "blue"
   }
 };
 

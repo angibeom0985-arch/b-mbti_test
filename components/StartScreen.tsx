@@ -64,10 +64,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           />
         </div>
 
-        {/* 3. 테스트 버전 선택 - 더블클릭으로 시작 */}
+        {/* 3. 테스트 선택 - 더블클릭으로 시작 */}
         <div className="mb-6 space-y-4">
           <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
-            💡 신뢰도 향상을 위한 3가지 버전
+            🎯 나에게 딱 맞는 테스트를 선택해보세요!
           </h3>
           <div className="space-y-3">
             {Object.entries(TEST_VERSIONS).map(([versionKey, version]) => {
@@ -135,7 +135,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </div>
           <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
             <p className="text-sm text-blue-700 text-center">
-              <span className="font-semibold">💡 팁:</span> 각 버전별로 다른 관점에서 질문하여 더 정확한 결과를 얻을 수 있습니다
+              <span className="font-semibold">💡 팁:</span> 각각 다른 관점에서 분석하여 더 정확한 결과를 얻어요!
             </p>
           </div>
         </div>

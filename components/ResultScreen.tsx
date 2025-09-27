@@ -241,7 +241,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               'bg-blue-400'
             }`}></div>
             <span className="text-gray-700 font-medium">
-              {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 버전'} 완료
+              {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 테스트'} 완료
             </span>
             <span className="ml-2">✓</span>
           </div>
@@ -253,10 +253,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="text-center">
           <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
             <span className="mr-2">🎯</span>
-            더 정확한 결과를 원한다면?
+            다른 방식으로도 테스트해보세요!
           </h3>
           <p className="text-sm text-gray-600 mb-3">
-            다른 버전으로도 테스트해보세요! 여러 관점에서 분석하여 신뢰도를 높일 수 있습니다.
+            여러 관점에서 분석하면 더 정확한 결과를 얻을 수 있어요.
           </p>
           
           <div className="grid grid-cols-1 gap-2">
@@ -275,7 +275,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     onClick={onRestart}
                     className={`text-xs px-3 py-1 rounded-full border transition-colors bg-${version.color}-50 border-${version.color}-200 text-${version.color}-700 hover:bg-${version.color}-100`}
                   >
-                    시도하기
+                    도전하기
                   </button>
                 </div>
               ))}

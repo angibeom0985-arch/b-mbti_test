@@ -248,71 +248,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       </div>
 
-      {/* 다른 버전 시도 권장 */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
-        <div className="text-center">
-          <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-            <span className="mr-2">🎯</span>
-            너가 선택한 테스트도 재밌었어? 나머지 2가지 테스트도 한 번 해봐!
-          </h3>
-          <p className="text-sm text-gray-600 mb-3">
-            다양한 관점에서 분석하면 더 정확하고 풍부한 결과를 얻을 수 있어요 ✨
-          </p>
-          
-          <div className="grid grid-cols-1 gap-3">
-            {Object.entries(TEST_VERSIONS)
-              .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
-              .map(([versionKey, version]) => (
-                <div key={versionKey} className={`bg-gradient-to-r ${
-                  version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
-                  version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
-                  'from-blue-50 to-cyan-50 border-blue-200'
-                } rounded-xl p-4 border hover:shadow-md transition-all duration-200`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center flex-1">
-                      <div className={`w-4 h-4 rounded-full mr-3 ${
-                        version.color === 'orange' ? 'bg-orange-400' :
-                        version.color === 'purple' ? 'bg-purple-400' :
-                        'bg-blue-400'
-                      }`}></div>
-                      <div className="text-left flex-1">
-                        <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
-                        <div className="text-sm text-gray-600 mb-2">{version.description}</div>
-                        <div className={`text-xs ${
-                          version.color === 'orange' ? 'text-orange-700' :
-                          version.color === 'purple' ? 'text-purple-700' :
-                          'text-blue-700'
-                        }`}>
-                          {parseInt(versionKey) === 1 && "💭 차분하고 꾸준한 성향의 분들에게 추천"}
-                          {parseInt(versionKey) === 2 && "🧠 깊이 생각하고 성찰을 좋아하는 분들에게 추천"}
-                          {parseInt(versionKey) === 3 && "⚡ 실용적이고 현실적인 성향의 분들에게 추천"}
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        const testUrls = {
-                          1: 'https://b-mbti.money-hotissue.com/test1',
-                          2: 'https://b-mbti.money-hotissue.com/test2',
-                          3: 'https://b-mbti.money-hotissue.com/test3'
-                        };
-                        window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
-                      }}
-                      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 ${
-                        version.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200' :
-                        version.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-200' :
-                        'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-200'
-                      } shadow-lg`}
-                    >
-                      🚀 시작하기
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
-
       {resultData.image ? (
         <div className="mb-6 bg-white/80 rounded-2xl p-3 shadow-sm border border-pink-100/50">
           <img 
@@ -467,6 +402,71 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             <p className="text-xs text-gray-600 text-center">
               💡 MBTI 심리학을 바탕으로 선정된 호환성 분석입니다. 개인차가 있을 수 있어요!
             </p>
+          </div>
+        </div>
+
+        {/* 나머지 테스트 추천 섹션 */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
+          <div className="text-center">
+            <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+              <span className="mr-2">🔥</span>
+              다른 테스트도 도전해볼까?
+            </h3>
+            <p className="text-sm text-gray-600 mb-3">
+              더 정확한 분석을 위해 추가 테스트 해보세요! 🎯
+            </p>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {Object.entries(TEST_VERSIONS)
+                .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
+                .map(([versionKey, version]) => (
+                  <div key={versionKey} className={`bg-gradient-to-r ${
+                    version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
+                    version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
+                    'from-blue-50 to-cyan-50 border-blue-200'
+                  } rounded-xl p-4 border hover:shadow-md transition-all duration-200`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center flex-1">
+                        <div className={`w-4 h-4 rounded-full mr-3 ${
+                          version.color === 'orange' ? 'bg-orange-400' :
+                          version.color === 'purple' ? 'bg-purple-400' :
+                          'bg-blue-400'
+                        }`}></div>
+                        <div className="text-left flex-1">
+                          <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
+                          <div className="text-sm text-gray-600 mb-2">{version.description}</div>
+                          <div className={`text-xs ${
+                            version.color === 'orange' ? 'text-orange-700' :
+                            version.color === 'purple' ? 'text-purple-700' :
+                            'text-blue-700'
+                          }`}>
+                            {parseInt(versionKey) === 1 && "💭 차분하고 꾸준한 성향의 분들에게 추천"}
+                            {parseInt(versionKey) === 2 && "🧠 깊이 생각하고 성찰을 좋아하는 분들에게 추천"}
+                            {parseInt(versionKey) === 3 && "⚡ 실용적이고 현실적인 성향의 분들에게 추천"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const testUrls = {
+                            1: 'https://b-mbti.money-hotissue.com/test1',
+                            2: 'https://b-mbti.money-hotissue.com/test2',
+                            3: 'https://b-mbti.money-hotissue.com/test3'
+                          };
+                          window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
+                        }}
+                        className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 ${
+                          version.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200' :
+                          version.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-200' :
+                          'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-200'
+                        } shadow-lg`}
+                      >
+                        🚀 시작하기
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
 

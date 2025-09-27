@@ -58,7 +58,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
       <div className="w-full max-w-md mx-auto text-center">
         
         {/* 1. 사이트 제목과 지금까지 참여한 사람들 */}
-        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 shadow-lg border border-orange-100">
+        <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-3xl p-4 shadow-lg border border-green-200">
           {/* 사이트 제목 */}
           <h1 className="text-2xl font-bold text-gray-800 mb-3">
             성경인물 MBTI 테스트
@@ -67,9 +67,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           {/* 참여자 수 */}
           <div className="flex items-center justify-center space-x-1">
             <span className="text-lg animate-bounce">👥</span>
-            <p className="text-sm font-medium text-orange-700">
+            <p className="text-sm font-medium text-green-700">
               지금까지 참여한 사람들 
-              <span className="font-bold text-orange-600 tabular-nums ml-1">
+              <span className="font-bold text-green-600 tabular-nums ml-1">
                 {VisitorCounter.formatCount(animatedCount)}명 참여
               </span>
             </p>

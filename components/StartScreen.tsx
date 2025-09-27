@@ -105,11 +105,21 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                       }`}>
                         {version.name}
                       </h4>
-                      <p className={`text-sm ${
+                      <p className={`text-sm mb-2 ${
                         isSelected ? 'text-white/90' : 'text-gray-600'
                       }`}>
                         {version.description}
                       </p>
+                      
+                      {/* 각 테스트별 추가 특징 */}
+                      <div className={`text-xs ${
+                        isSelected ? 'text-white/80' : 'text-gray-500'
+                      }`}>
+                        {versionNumber === 1 && "💭 차분하고 꾸준한 성향의 분들에게 추천"}
+                        {versionNumber === 2 && "🧠 깊이 생각하고 성찰을 좋아하는 분들에게 추천"}
+                        {versionNumber === 3 && "⚡ 실용적이고 현실적인 성향의 분들에게 추천"}
+                      </div>
+                      
                       {isSelected && (
                         <div className="mt-3 flex items-center justify-center">
                           <span className="text-white/90 text-sm mr-2">👆 한번 더 클릭하면</span>

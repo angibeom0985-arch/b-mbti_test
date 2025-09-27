@@ -4,17 +4,17 @@ import type { Question, MbtiResult, MbtiType } from './types';
 export const TEST_VERSIONS = {
   1: { 
     name: "신앙생활 깊이보기", 
-    description: "일상 속 신앙 모습으로 성격 파악",
+    description: "예배, 기도, 교제... 일상 속 나만의 신앙 스타일 발견",
     color: "orange"
   },
   2: { 
     name: "내면 성찰하기", 
-    description: "신앙 고민과 성장 과정 중심 분석",
+    description: "내 마음 깊숙한 곳의 신앙 고민과 성장 여정 탐색",
     color: "purple"
   },
   3: { 
     name: "현실 적용하기", 
-    description: "실생활 선택과 행동 패턴 분석",
+    description: "직장, 가정, 인간관계에서 보여지는 진짜 내 모습",
     color: "blue"
   }
 };

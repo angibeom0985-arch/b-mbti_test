@@ -121,7 +121,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                         isSelected ? 'text-white/80' : 'text-gray-500'
                       }`}>
                         {versionNumber === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
-                        {versionNumber === 2 && "🧠 신앙 고민을 깊이 있게 탐구하고 싶은 분들에게 추천"}
+                        {versionNumber === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
                         {versionNumber === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
                       </div>
                       
@@ -164,9 +164,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             <div className="text-xs text-orange-600">어울리는 유형</div>
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
-            <div className="text-xl mb-1">📊</div>
-            <div className="text-xs font-semibold text-purple-800">실시간 통계</div>
-            <div className="text-xs text-purple-600">다른 사람들 결과</div>
+            <div className="text-xl mb-1">🎮</div>
+            <div className="text-xs font-semibold text-purple-800">인물 퀴즈</div>
+            <div className="text-xs text-purple-600">재미있는 게임</div>
           </div>
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 shadow-sm border border-blue-200">
             <div className="text-xl mb-1">📸</div>
@@ -174,9 +174,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             <div className="text-xs text-blue-600">SNS 공유용</div>
           </div>
           <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
-            <div className="text-xl mb-1">💬</div>
-            <div className="text-xs font-semibold text-pink-800">후기 시스템</div>
-            <div className="text-xs text-pink-600">사용자 리뷰</div>
+            <div className="text-xl mb-1">🎯</div>
+            <div className="text-xs font-semibold text-pink-800">3가지 테스트</div>
+            <div className="text-xs text-pink-600">다양한 관점</div>
           </div>
         </div>
 

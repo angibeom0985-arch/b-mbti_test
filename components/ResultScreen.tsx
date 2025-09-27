@@ -441,7 +441,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                             'text-blue-700'
                           }`}>
                             {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
-                            {parseInt(versionKey) === 2 && "🧠 신앙 고민을 깊이 있게 탐구하고 싶은 분들에게 추천"}
+                            {parseInt(versionKey) === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
                             {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
                           </div>
                         </div>

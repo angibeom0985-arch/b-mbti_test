@@ -1,8 +1,13 @@
 {
-  "name": "biblical-mbti-test",
+  "name": "b-mbti-test",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "homepage": "https://b-mbti.money-hotissue.com",
+  "description": "나와 닮은 성경인물을 찾아보는 MBTI 성격 유형 테스트",
+  "keywords": ["MBTI", "성경인물", "성격테스트", "심리테스트", "크리스천"],
+  "author": "angibeom0985-arch",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,10 +15,13 @@
   },
   "dependencies": {
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "lucide-react": "^0.460.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",

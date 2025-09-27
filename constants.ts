@@ -202,3 +202,11 @@ export const RESULTS: Record<MbtiType, Omit<MbtiResult, 'image'>> = {
     imagePrompt: 'A confident and wise female prophetess and judge, sitting under a palm tree in ancient Israel, dispensing judgment with authority and insight. She has a commanding presence and intelligent eyes. The style is a strong, realistic historical portrait.',
   },
 };
+
+// 모든 MBTI 타입 배열
+export const ALL_CHARACTERS: MbtiType[] = [
+  'INTJ', 'INTP', 'ENTJ', 'ENTP', 
+  'INFJ', 'INFP', 'ENFJ', 'ENFP',
+  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
+  'ISTP', 'ISFP', 'ESTP', 'ESFP'
+];

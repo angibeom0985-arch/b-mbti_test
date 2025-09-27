@@ -308,21 +308,40 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 설명 텍스트 */}
-      <div className="bg-white/80 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 text-left">
-        <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
-          {resultData.description}
-        </p>
+      {/* 설명 텍스트 - 가독성 개선 */}
+      <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
+        <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+          <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent mr-2">✨</span>
+          성격 특징
+        </h3>
+        <div className="space-y-3">
+          {resultData.description.split('.').filter(sentence => sentence.trim()).map((sentence, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                {index + 1}
+              </span>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                {sentence.trim()}.
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* 성경 구절 */}
-      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 text-left shadow-sm mb-6">
-        <p className="text-gray-800 font-medium text-sm italic leading-relaxed mb-2">
-          "{resultData.verseText}"
-        </p>
-        <p className="text-right text-violet-600 font-semibold text-xs">
-          - {resultData.verse}
-        </p>
+      {/* 성경 구절 - 개선된 디자인 */}
+      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-5 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6">
+        <div className="flex items-start space-x-3">
+          <span className="flex-shrink-0 text-2xl">📖</span>
+          <div className="flex-1">
+            <h4 className="text-violet-800 font-bold text-sm mb-2">대표 성경구절</h4>
+            <blockquote className="text-gray-800 font-medium text-sm italic leading-relaxed mb-3 pl-4 border-l-2 border-violet-300">
+              "{resultData.verseText}"
+            </blockquote>
+            <p className="text-right text-violet-600 font-semibold text-xs">
+              - {resultData.verse} -
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* 액션 버튼들 - MZ 스타일 */}
@@ -431,7 +450,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           
           <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 심리학을 바탕으로 선정된 호환성 분석입니다. 개인차가 있을 수 있어요!
+              💡 MBTI 심리학을 바탕으로 선정된 궁합 정보입니다. 개인차가 있을 수 있어요!
             </p>
           </div>
         </div>
@@ -501,7 +520,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                                 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
                               }`
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        } shadow-md`}
+                        }`}
                       >
                         {selectedTestVersion === parseInt(versionKey) ? '🚀 시작!' : '선택'}
                       </button>
@@ -512,41 +531,43 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
         </div>
 
-        {/* 퀴즈 게임 - 참여 유도 문구로 변경 */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 border border-purple-100/50">
-          <div className="text-center">
-            <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-              <span className="mr-2">🎮</span>
-              성경인물 퀴즈에 도전해보세요!
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              재미있는 퀴즈를 통해 성경인물들을 더 알아보세요! ✨
-            </p>
-            <button
-              onClick={onQuizGame || (() => window.location.href = 'https://b-mbti.money-hotissue.com/quizgame')}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
-            >
-              🎯 퀴즈 시작하기
-            </button>
+        {/* 액션 버튼들을 감싸는 컨테이너 */}
+        <div className="space-y-4">
+          {/* 퀴즈 게임 - 참여 유도 문구로 변경 */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 border border-purple-100/50">
+            <div className="text-center">
+              <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+                <span className="mr-2">🎮</span>
+                성경인물 퀴즈에 도전해보세요!
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                재미있는 퀴즈를 통해 성경인물들을 더 알아보세요! ✨
+              </p>
+              <button
+                onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
+              >
+                🎯 퀴즈 시작하기
+              </button>
+            </div>
           </div>
+
+          {/* 다시 테스트 버튼 */}
+          <button
+            onClick={onRestart}
+            className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
+          >
+            🔁 다시 테스트하기
+          </button>
+
+          {/* 후기 남기기 */}
+          <button
+            onClick={handleLeaveComment}
+            className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm"
+          >
+            💬 후기 남기기
+          </button>
         </div>
-
-        {/* 다시 테스트 버튼 */}
-        <button
-          onClick={onRestart}
-          className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
-        >
-          🔁 다시 테스트하기
-        </button>
-
-        {/* 후기 남기기 */}
-        <button
-          onClick={handleLeaveComment}
-          className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm"
-        >
-          💬 후기 남기기
-        </button>
-      </div>
 
       {/* SNS 공유 모달 */}
       {showShareModal && (

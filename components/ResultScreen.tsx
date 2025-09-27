@@ -343,25 +343,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             {copied ? '📋 복사됨!' : '🔗 공유하기'}
           </button>
         </div>
+      </div>
 
-        {/* 서브 액션 버튼들 */}
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={handleLeaveComment}
-            className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-3 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm"
-          >
-            💬 후기 남기기
-          </button>
-          <button
-            onClick={onQuizGame || (() => window.location.href = 'https://b-mbti.money-hotissue.com/quizgame')}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium py-3 px-3 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-sm text-sm"
-          >
-            🎮 인물 퀴즈
-          </button>
-        </div>
-
-        {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
-        <div className="mb-6 space-y-4">
+      {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
+      <div className="mb-6 space-y-4">
           {/* 어울리는 성격 유형 */}
           <div className="bg-white/80 rounded-2xl p-4 shadow-sm border border-green-100/50">
             <div className="flex items-center justify-center mb-4">
@@ -527,13 +512,39 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
         </div>
 
+        {/* 퀴즈 게임 - 참여 유도 문구로 변경 */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 border border-purple-100/50">
+          <div className="text-center">
+            <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+              <span className="mr-2">🎮</span>
+              성경인물 퀴즈에 도전해보세요!
+            </h3>
+            <p className="text-sm text-gray-600 mb-3">
+              재미있는 퀴즈를 통해 성경인물들을 더 알아보세요! ✨
+            </p>
+            <button
+              onClick={onQuizGame || (() => window.location.href = 'https://b-mbti.money-hotissue.com/quizgame')}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
+            >
+              🎯 퀴즈 시작하기
+            </button>
+          </div>
+        </div>
+
         {/* 다시 테스트 버튼 */}
         <button
           onClick={onRestart}
           className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-sm flex items-center justify-center"
         >
-          <RestartIcon className="w-4 h-4 mr-2" />
-          🔄 다시 테스트하기
+          🔁 다시 테스트하기
+        </button>
+
+        {/* 후기 남기기 */}
+        <button
+          onClick={handleLeaveComment}
+          className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm"
+        >
+          💬 후기 남기기
         </button>
       </div>
 

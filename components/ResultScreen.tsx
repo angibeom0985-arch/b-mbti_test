@@ -422,8 +422,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       </div>
 
       {/* 성경 구절 - 간소화된 디자인 */}
-      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6">
-        <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center">
+      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6 text-center">
+        <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center justify-center">
           📖 대표 성경구절 ({resultData.verse})
         </h4>
         <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
@@ -452,7 +452,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       </div>
 
       {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 space-y-4 mt-6">
           {/* 어울리는 성격 유형 */}
           <div className="bg-white/80 rounded-2xl p-4 shadow-sm border border-green-100/50">
             <div className="flex items-center justify-center mb-4">
@@ -487,13 +487,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         <span className="font-bold text-green-800 text-lg">
                           {RESULTS[compatibleType].character}
                         </span>
+                        <span className="text-green-600 text-lg ml-2">💚</span>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed text-left mb-2">
+                      <p className="text-sm text-gray-700 leading-relaxed text-left">
                         {getCompatibilityReason(resultType, compatibleType)}
                       </p>
-                      <div className="flex items-center">
-                        <span className="text-green-600 text-sm font-medium">💚 호환성이 매우 높습니다</span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -535,13 +533,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         <span className="font-bold text-red-800 text-lg">
                           {RESULTS[incompatibleType].character}
                         </span>
+                        <span className="text-red-600 text-lg ml-2">💔</span>
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed text-left mb-2">
+                      <p className="text-sm text-gray-700 leading-relaxed text-left">
                         {getIncompatibilityReason(resultType, incompatibleType)}
                       </p>
-                      <div className="flex items-center">
-                        <span className="text-red-600 text-sm font-medium">💔 소통에 더 많은 노력이 필요해요</span>
-                      </div>
                     </div>
                   </div>
                 </div>

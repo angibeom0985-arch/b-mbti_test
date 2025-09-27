@@ -361,7 +361,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           {/* 오른쪽: 이미지 */}
           <div className="flex-shrink-0">
             {resultData.image ? (
-              <div className="relative group">
+              <div className="space-y-2">
                 <div 
                   className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
@@ -378,12 +378,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   </div>
                 </div>
                 
-                {/* 크게보기 버튼 */}
+                {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
                 <button
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
-                  className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black/90 transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
                 >
-                  🔍 크게보기
+                  <span>🔍</span>
+                  <span>크게보기</span>
                 </button>
               </div>
             ) : (
@@ -481,40 +482,38 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       <div className="mb-6 space-y-4 mt-6">
           {/* 어울리는 성격 유형 */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 shadow-sm border border-green-200">
-            <div className="flex items-center justify-center mb-4">
-              <h3 className="text-lg font-bold text-green-800">어울리는 성격 유형</h3>
-            </div>
             {(() => {
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
                 <div className="space-y-4">
-                  {/* 첫 번째 줄: 이미지 / 유형명 + 하트 이모지 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex justify-center">
-                      <div className="w-16 h-16 relative cursor-pointer">
-                        <img 
-                          src={getMbtiImage(compatibleType)} 
-                          alt={RESULTS[compatibleType].character}
-                          className="w-full h-full object-cover rounded-lg shadow-sm transition-transform hover:scale-105"
-                          onClick={() => setEnlargedImage({
-                            src: getMbtiImage(compatibleType),
-                            character: RESULTS[compatibleType].character
-                          })}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
-                          크게보기
-                        </div>
+                  {/* 제목과 MBTI 유형을 한 줄로 표시 */}
+                  <div className="flex items-center justify-center space-x-2">
+                    <h3 className="text-lg font-bold text-green-800">어울리는 성격 유형 :</h3>
+                    <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                      {compatibleType}
+                    </span>
+                    <span className="font-bold text-green-800 text-lg">
+                      {RESULTS[compatibleType].character}
+                    </span>
+                    <span className="text-green-600 text-xl">💚</span>
+                  </div>
+                  
+                  {/* 이미지 */}
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 relative cursor-pointer">
+                      <img 
+                        src={getMbtiImage(compatibleType)} 
+                        alt={RESULTS[compatibleType].character}
+                        className="w-full h-full object-cover rounded-lg shadow-sm transition-transform hover:scale-105"
+                        onClick={() => setEnlargedImage({
+                          src: getMbtiImage(compatibleType),
+                          character: RESULTS[compatibleType].character
+                        })}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
+                        크게보기
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                        {compatibleType}
-                      </span>
-                      <span className="font-bold text-green-800 text-lg">
-                        {RESULTS[compatibleType].character}
-                      </span>
-                      <span className="text-green-600 text-xl">💚</span>
                     </div>
                   </div>
                   
@@ -531,40 +530,38 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
           {/* 어울리지 않는 성격 유형 */}
           <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-4 shadow-sm border border-red-200">
-            <div className="flex items-center justify-center mb-4">
-              <h3 className="text-lg font-bold text-red-800">주의해야 할 성격 유형</h3>
-            </div>
             {(() => {
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
                 <div className="space-y-4">
-                  {/* 첫 번째 줄: 이미지 / 유형명 + 하트 이모지 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex justify-center">
-                      <div className="w-16 h-16 relative cursor-pointer">
-                        <img 
-                          src={getMbtiImage(incompatibleType)} 
-                          alt={RESULTS[incompatibleType].character}
-                          className="w-full h-full object-cover rounded-lg shadow-sm transition-transform hover:scale-105"
-                          onClick={() => setEnlargedImage({
-                            src: getMbtiImage(incompatibleType),
-                            character: RESULTS[incompatibleType].character
-                          })}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
-                          크게보기
-                        </div>
+                  {/* 제목과 MBTI 유형을 한 줄로 표시 */}
+                  <div className="flex items-center justify-center space-x-2">
+                    <h3 className="text-lg font-bold text-red-800">주의해야 할 성격 유형 :</h3>
+                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                      {incompatibleType}
+                    </span>
+                    <span className="font-bold text-red-800 text-lg">
+                      {RESULTS[incompatibleType].character}
+                    </span>
+                    <span className="text-red-600 text-xl">💔</span>
+                  </div>
+                  
+                  {/* 이미지 */}
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 relative cursor-pointer">
+                      <img 
+                        src={getMbtiImage(incompatibleType)} 
+                        alt={RESULTS[incompatibleType].character}
+                        className="w-full h-full object-cover rounded-lg shadow-sm transition-transform hover:scale-105"
+                        onClick={() => setEnlargedImage({
+                          src: getMbtiImage(incompatibleType),
+                          character: RESULTS[incompatibleType].character
+                        })}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
+                        크게보기
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                        {incompatibleType}
-                      </span>
-                      <span className="font-bold text-red-800 text-lg">
-                        {RESULTS[incompatibleType].character}
-                      </span>
-                      <span className="text-red-600 text-xl">💔</span>
                     </div>
                   </div>
                   

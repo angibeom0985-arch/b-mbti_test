@@ -164,10 +164,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         
         {/* 특징 미리보기 - 색상 조화롭게 조정 */}
         <div className="grid grid-cols-2 gap-3 mb-6 px-2">
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-3 shadow-sm border border-orange-200">
-            <div className="text-xl mb-1">👥</div>
-            <div className="text-xs font-semibold text-orange-800">호환성 분석</div>
-            <div className="text-xs text-orange-600">어울리는 유형</div>
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
+            <div className="text-xl mb-1">🎯</div>
+            <div className="text-xs font-semibold text-pink-800">3가지 테스트</div>
+            <div className="text-xs text-pink-600">다양한 관점</div>
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
             <div className="text-xl mb-1">🎮</div>
@@ -179,10 +179,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             <div className="text-xs font-semibold text-blue-800">이미지 저장</div>
             <div className="text-xs text-blue-600">SNS 공유용</div>
           </div>
-          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
-            <div className="text-xl mb-1">🎯</div>
-            <div className="text-xs font-semibold text-pink-800">3가지 테스트</div>
-            <div className="text-xs text-pink-600">다양한 관점</div>
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-3 shadow-sm border border-orange-200">
+            <div className="text-xl mb-1">👥</div>
+            <div className="text-xs font-semibold text-orange-800">테스트 결과 공유</div>
+            <div className="text-xs text-orange-600">어울리는 유형</div>
           </div>
         </div>
 

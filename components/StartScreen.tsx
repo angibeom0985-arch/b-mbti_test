@@ -100,7 +100,13 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                             ? 'from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-200'
                             : 'from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
                         }`
-                      : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                      : `bg-gradient-to-r ${
+                          version.color === 'orange' 
+                            ? 'from-orange-50 to-amber-50 border-orange-200 hover:border-orange-300' 
+                            : version.color === 'purple'
+                            ? 'from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300'
+                            : 'from-blue-50 to-cyan-50 border-blue-200 hover:border-blue-300'
+                        } hover:shadow-md`
                   }`}
                 >
                   <div className="flex items-center justify-between">

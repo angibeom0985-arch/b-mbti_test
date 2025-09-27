@@ -103,6 +103,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [showOtherCharacters, setShowOtherCharacters] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
+  const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
   
   // 퀴즈 게임 상태
   const [quizCharacter, setQuizCharacter] = useState<string>('');
@@ -177,15 +178,60 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   const handleSaveAsImage = async () => {
-    // 먼저 쿠팡 링크를 열기
-    const characterName = resultData?.character || '';
-    const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
-    
-    // 새 창에서 쿠팡 링크 열기
-    window.open(coupangUrl, '_blank');
-    
-    // 이미지 저장 페이지로 이동 (현재 창에서)
-    window.location.href = 'https://b-mbti.money-hotissue.com/image';
+    try {
+      // html2canvas를 사용하여 결과 화면을 캡처
+      const resultElement = document.querySelector('.result-container');
+      if (!resultElement) {
+        alert('결과 화면을 찾을 수 없습니다.');
+        return;
+      }
+
+      // 동적으로 html2canvas 라이브러리 로드
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      document.head.appendChild(script);
+
+      script.onload = async () => {
+        try {
+          // @ts-ignore - html2canvas는 전역 변수로 로드됨
+          const canvas = await html2canvas(resultElement, {
+            backgroundColor: '#ffffff',
+            scale: 2,
+            useCORS: true
+          });
+
+          // 캔버스를 이미지로 변환
+          const dataURL = canvas.toDataURL('image/png');
+          
+          // 다운로드 링크 생성
+          const link = document.createElement('a');
+          link.download = `mbti-result-${resultType}.png`;
+          link.href = dataURL;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // 이미지 저장 완료 후 쿠팡 링크 열기
+          setTimeout(() => {
+            const characterName = resultData?.character || '';
+            const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
+            window.open(coupangUrl, '_blank');
+          }, 500);
+          
+        } catch (error) {
+          console.error('이미지 저장 실패:', error);
+          alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+        }
+      };
+
+      script.onerror = () => {
+        alert('이미지 저장 라이브러리 로드에 실패했습니다.');
+      };
+
+    } catch (error) {
+      console.error('이미지 저장 중 오류:', error);
+      alert('이미지 저장 중 오류가 발생했습니다.');
+    }
   };
 
   const handleViewOtherCharacters = () => {
@@ -448,20 +494,31 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       </div>
                       <button
                         onClick={() => {
-                          const testUrls = {
-                            1: 'https://b-mbti.money-hotissue.com/test1',
-                            2: 'https://b-mbti.money-hotissue.com/test2',
-                            3: 'https://b-mbti.money-hotissue.com/test3'
-                          };
-                          window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
+                          const versionNum = parseInt(versionKey);
+                          if (selectedTestVersion === versionNum) {
+                            // 이미 선택된 버전을 다시 클릭하면 해당 테스트 페이지로 이동
+                            const testUrls = {
+                              1: 'https://b-mbti.money-hotissue.com/test1',
+                              2: 'https://b-mbti.money-hotissue.com/test2',
+                              3: 'https://b-mbti.money-hotissue.com/test3'
+                            };
+                            window.location.href = testUrls[versionNum as keyof typeof testUrls];
+                          } else {
+                            // 다른 버전 선택
+                            setSelectedTestVersion(versionNum);
+                          }
                         }}
                         className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 ${
-                          version.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200' :
-                          version.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-200' :
-                          'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-200'
-                        } shadow-lg`}
+                          selectedTestVersion === parseInt(versionKey)
+                            ? `${
+                                version.color === 'orange' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-200' :
+                                version.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-200' :
+                                'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
+                              }`
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        } shadow-md`}
                       >
-                        🚀 시작하기
+                        {selectedTestVersion === parseInt(versionKey) ? '🚀 시작!' : '선택'}
                       </button>
                     </div>
                   </div>

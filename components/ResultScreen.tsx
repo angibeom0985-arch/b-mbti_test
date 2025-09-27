@@ -486,11 +486,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
-                <div className="flex items-start space-x-4">
-                  {/* 왼쪽: 텍스트 정보 */}
-                  <div className="flex-1 space-y-3">
-                    {/* 제목과 MBTI 유형을 한 줄로 표시 */}
-                    <div className="flex items-center flex-wrap gap-2">
+                <div className="space-y-4">
+                  {/* 제목과 MBTI 유형을 완전 중앙 정렬로 표시 */}
+                  <div className="flex justify-center">
+                    <div className="flex items-center gap-2 flex-wrap justify-center">
                       <h3 className="text-lg font-bold text-green-800">어울리는 성격 유형 :</h3>
                       <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                         {compatibleType}
@@ -500,18 +499,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       </span>
                       <span className="text-green-600 text-xl">💚</span>
                     </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-3 border border-green-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {getCompatibilityReason(resultType, compatibleType)}
-                      </p>
-                    </div>
                   </div>
                   
-                  {/* 오른쪽: 이미지 */}
-                  <div className="flex-shrink-0">
-                    <div className="w-24 h-24 relative cursor-pointer group">
+                  {/* 중앙에 큰 이미지 */}
+                  <div className="flex justify-center">
+                    <div className="w-32 h-32 relative cursor-pointer group">
                       <img 
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
@@ -521,12 +513,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           character: RESULTS[compatibleType].character
                         })}
                       />
+                      {/* 이미지 안에 크게보기 버튼 - 완전히 이미지 내부에 오버레이 */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-all duration-200 flex items-center justify-center">
                         <span className="bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           🔍 크게보기
                         </span>
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* 이유 설명 */}
+                  <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-3 border border-green-200">
+                    <p className="text-sm text-gray-700 leading-relaxed text-center">
+                      {getCompatibilityReason(resultType, compatibleType)}
+                    </p>
                   </div>
                 </div>
               );
@@ -539,11 +539,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
-                <div className="flex items-start space-x-4">
-                  {/* 왼쪽: 텍스트 정보 */}
-                  <div className="flex-1 space-y-3">
-                    {/* 제목과 MBTI 유형을 한 줄로 표시 */}
-                    <div className="flex items-center flex-wrap gap-2">
+                <div className="space-y-4">
+                  {/* 제목과 MBTI 유형을 완전 중앙 정렬로 표시 */}
+                  <div className="flex justify-center">
+                    <div className="flex items-center gap-2 flex-wrap justify-center">
                       <h3 className="text-lg font-bold text-red-800">주의해야 할 성격 유형 :</h3>
                       <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                         {incompatibleType}
@@ -553,18 +552,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       </span>
                       <span className="text-red-600 text-xl">💔</span>
                     </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-3 border border-red-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {getIncompatibilityReason(resultType, incompatibleType)}
-                      </p>
-                    </div>
                   </div>
                   
-                  {/* 오른쪽: 이미지 */}
-                  <div className="flex-shrink-0">
-                    <div className="w-24 h-24 relative cursor-pointer group">
+                  {/* 중앙에 큰 이미지 */}
+                  <div className="flex justify-center">
+                    <div className="w-32 h-32 relative cursor-pointer group">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
@@ -574,12 +566,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           character: RESULTS[incompatibleType].character
                         })}
                       />
+                      {/* 이미지 안에 크게보기 버튼 - 완전히 이미지 내부에 오버레이 */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-all duration-200 flex items-center justify-center">
                         <span className="bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           🔍 크게보기
                         </span>
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* 이유 설명 */}
+                  <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-3 border border-red-200">
+                    <p className="text-sm text-gray-700 leading-relaxed text-center">
+                      {getIncompatibilityReason(resultType, incompatibleType)}
+                    </p>
                   </div>
                 </div>
               );

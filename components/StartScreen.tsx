@@ -29,7 +29,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
     
     // 카운터 애니메이션
     let start = 0;
-    const duration = 2000; // 2초 동안 애니메이션
+    const duration = 1000; // 1초 동안 애니메이션
     const increment = count / (duration / 16); // 60fps 기준
     
     const animate = () => {
@@ -52,17 +52,23 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto text-center">
         
-        {/* 1. 지금까지 참여한 사람들 - 조화로운 색상으로 수정 */}
+        {/* 1. 사이트 제목과 지금까지 참여한 사람들 */}
         <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 shadow-lg border border-orange-100">
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <span className="text-xl animate-bounce">👥</span>
-            <p className="text-sm font-medium text-orange-700">지금까지 참여한 사람들</p>
+          {/* 사이트 제목 */}
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">
+            성경인물 MBTI 테스트
+          </h1>
+          
+          {/* 참여자 수 */}
+          <div className="flex items-center justify-center space-x-1">
+            <span className="text-lg animate-bounce">👥</span>
+            <p className="text-sm font-medium text-orange-700">
+              지금까지 참여한 사람들 
+              <span className="font-bold text-orange-600 tabular-nums ml-1">
+                {VisitorCounter.formatCount(animatedCount)}명 참여
+              </span>
+            </p>
           </div>
-          <p className="text-xl font-bold text-orange-600 tabular-nums">
-            <span className="inline-block">
-              {VisitorCounter.formatCount(animatedCount)}명 참여
-            </span>
-          </p>
         </div>
 
         {/* 3. 테스트 선택 - 더블클릭으로 시작 */}
@@ -115,6 +121,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                       <h4 className={`text-lg font-bold mb-2 ${
                         isSelected ? 'text-white' : 'text-gray-800'
                       }`}>
+                        {versionNumber === 1 && "💝 "}
+                        {versionNumber === 2 && "⚡ "}
+                        {versionNumber === 3 && "🔥 "}
                         {version.name}
                       </h4>
                       <p className={`text-sm mb-2 ${
@@ -127,9 +136,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                       <div className={`text-xs ${
                         isSelected ? 'text-white/80' : 'text-gray-500'
                       }`}>
-                        {versionNumber === 1 && "💝 공동체 속 관계를 중요하게 생각하는 분들에게 추천"}
-                        {versionNumber === 2 && "⚡ 사명과 비전을 품고 있는 분들에게 추천"}
-                        {versionNumber === 3 && "🔥 인생의 시련을 겪고 계신 분들에게 추천"}
+                        {versionNumber === 1 && "공동체 속 관계를 중요하게 생각하는 분들에게 추천"}
+                        {versionNumber === 2 && "사명과 비전을 품고 있는 분들에게 추천"}
+                        {versionNumber === 3 && "인생의 시련을 겪고 계신 분들에게 추천"}
                       </div>
                       
                       {isSelected && (

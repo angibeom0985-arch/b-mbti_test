@@ -41,13 +41,13 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
       <div className="w-full max-w-md mx-auto text-center">
         
         {/* 1. 지금까지 참여한 사람들 */}
-        <div className="mb-6 bg-white/80 rounded-3xl p-4 shadow-lg border border-gray-100 transform hover:scale-105 transition-all duration-300">
+        <div className="mb-6 bg-white/80 rounded-3xl p-4 shadow-lg border border-gray-100">
           <div className="flex items-center justify-center space-x-2 mb-2">
-            <span className="text-2xl animate-bounce">👥</span>
+            <span className="text-xl animate-bounce">👥</span>
             <p className="text-sm font-medium text-gray-600">지금까지 참여한 사람들</p>
           </div>
-          <p className="text-2xl font-bold text-orange-600 tabular-nums">
-            <span className="inline-block animate-pulse">
+          <p className="text-xl font-bold text-orange-600 tabular-nums">
+            <span className="inline-block">
               {VisitorCounter.formatCount(animatedCount)}명 참여
             </span>
           </p>
@@ -61,10 +61,8 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 leading-tight">
-            <span className="bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">나와 닮은</span>
-            <br />
-            <span className="text-gray-800">성경인물은?</span>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
+            <span className="bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">나와 닮은 성경인물은?</span>
           </h1>
         </div>
 
@@ -86,23 +84,23 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         
         {/* 5. 특징 미리보기 - 호환성 분석, 이미지 저장, 결과 공유, 후기 시스템 */}
         <div className="grid grid-cols-2 gap-3 mb-6 px-2">
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-orange-100">
-            <div className="text-2xl mb-1">👥</div>
+          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-orange-100/50">
+            <div className="text-xl mb-1">👥</div>
             <div className="text-xs font-semibold text-gray-700">호환성 분석</div>
             <div className="text-xs text-gray-500">어울리는 유형</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-red-100">
-            <div className="text-2xl mb-1">📊</div>
+          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-purple-100/50">
+            <div className="text-xl mb-1">📊</div>
             <div className="text-xs font-semibold text-gray-700">실시간 통계</div>
             <div className="text-xs text-gray-500">다른 사람들 결과</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-orange-100">
-            <div className="text-2xl mb-1">📸</div>
+          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-blue-100/50">
+            <div className="text-xl mb-1">📸</div>
             <div className="text-xs font-semibold text-gray-700">이미지 저장</div>
             <div className="text-xs text-gray-500">SNS 공유용</div>
           </div>
-          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-red-100">
-            <div className="text-2xl mb-1">💬</div>
+          <div className="bg-white/90 rounded-2xl p-3 shadow-sm border border-pink-100/50">
+            <div className="text-xl mb-1">💬</div>
             <div className="text-xs font-semibold text-gray-700">후기 시스템</div>
             <div className="text-xs text-gray-500">사용자 리뷰</div>
           </div>

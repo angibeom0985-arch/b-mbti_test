@@ -331,30 +331,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {/* 왼쪽: 텍스트 영역 - 중앙정렬로 변경 */}
-          <div className="flex-1 text-center">
-            <div className="mb-2">
-              <p className="text-gray-600 font-medium">당신과 닮은 성경인물</p>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3 leading-tight flex items-center justify-center">
-              <span className="text-2xl mr-2">✨</span>
-              {resultData.character}
-            </h1>
-            <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
-              {resultType}
-            </div>
-          </div>
-          
-          {/* 오른쪽: 이미지 영역 */}
-          <div className="md:ml-6 flex-shrink-0 flex justify-center md:justify-end">
+        <div className="flex justify-center">
+          {/* 이미지 영역 with 오버레이 텍스트 */}
+          <div className="relative">
             {resultData.image ? (
               <div className="relative group">
                 <div 
                   className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
                 >
-                  <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-3 shadow-lg border border-pink-100/50 overflow-hidden">
+                  <div className="w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 bg-white/80 rounded-2xl p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
                     <img 
                       src={resultData.image} 
                       alt={resultData.character} 
@@ -363,8 +349,36 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         imageRendering: 'crisp-edges'
                       }}
                     />
+                    
+                    {/* 텍스트 오버레이 */}
+                    <div className="absolute inset-0 flex flex-col justify-between p-4">
+                      {/* 상단: "당신과 닮은 성경인물" */}
+                      <div className="text-center">
+                        <div className="bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 inline-block">
+                          <p className="text-white text-sm font-medium">당신과 닮은 성경인물</p>
+                        </div>
+                      </div>
+                      
+                      {/* 중간: 이름 */}
+                      <div className="text-center">
+                        <div className="bg-black/70 backdrop-blur-sm rounded-full px-4 py-2 inline-block">
+                          <h1 className="text-white text-xl md:text-2xl font-bold flex items-center">
+                            <span className="text-xl mr-2">✨</span>
+                            {resultData.character}
+                          </h1>
+                        </div>
+                      </div>
+                      
+                      {/* 하단: MBTI 유형 (더 넓게) */}
+                      <div className="text-center">
+                        <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-8 py-3 rounded-full text-lg font-bold inline-block min-w-[120px]">
+                          {resultType}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                
                 {/* 크게보기 버튼 */}
                 <button
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
@@ -374,7 +388,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
+              <div className="w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
                 <p className="text-gray-500 text-sm">이미지 로딩중...</p>
               </div>
             )}
@@ -476,8 +490,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               if (!compatibleType) return null;
               return (
                 <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-4 border border-green-200">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-16 h-16 flex-shrink-0 relative cursor-pointer">
+                  <div className="flex items-center justify-center space-x-3">
+                    <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                      {compatibleType}
+                    </span>
+                    <span className="font-bold text-green-800 text-lg">
+                      {RESULTS[compatibleType].character}
+                    </span>
+                    <span className="text-green-600 text-xl">💚</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed text-center mt-3">
+                    {getCompatibilityReason(resultType, compatibleType)}
+                  </p>
+                  <div className="flex justify-center mt-3">
+                    <div className="w-16 h-16 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
@@ -490,20 +516,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
                         크게보기
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2 flex-wrap">
-                        <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">
-                          {compatibleType}
-                        </span>
-                        <span className="font-bold text-green-800 text-lg mr-2">
-                          {RESULTS[compatibleType].character}
-                        </span>
-                        <span className="text-green-600 text-lg">💚</span>
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed text-left">
-                        {getCompatibilityReason(resultType, compatibleType)}
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -521,8 +533,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               if (!incompatibleType) return null;
               return (
                 <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-4 border border-red-200">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-16 h-16 flex-shrink-0 relative cursor-pointer">
+                  <div className="flex items-center justify-center space-x-3">
+                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                      {incompatibleType}
+                    </span>
+                    <span className="font-bold text-red-800 text-lg">
+                      {RESULTS[incompatibleType].character}
+                    </span>
+                    <span className="text-red-600 text-xl">💔</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed text-center mt-3">
+                    {getIncompatibilityReason(resultType, incompatibleType)}
+                  </p>
+                  <div className="flex justify-center mt-3">
+                    <div className="w-16 h-16 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
@@ -535,20 +559,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-0.5 rounded-b-lg">
                         크게보기
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2 flex-wrap">
-                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">
-                          {incompatibleType}
-                        </span>
-                        <span className="font-bold text-red-800 text-lg mr-2">
-                          {RESULTS[incompatibleType].character}
-                        </span>
-                        <span className="text-red-600 text-lg">💔</span>
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed text-left">
-                        {getIncompatibilityReason(resultType, incompatibleType)}
-                      </p>
                     </div>
                   </div>
                 </div>

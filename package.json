@@ -5,7 +5,13 @@
   "type": "module",
   "homepage": "https://b-mbti.money-hotissue.com",
   "description": "나와 닮은 성경인물을 찾아보는 MBTI 성격 유형 테스트",
-  "keywords": ["MBTI", "성경인물", "성격테스트", "심리테스트", "크리스천"],
+  "keywords": [
+    "MBTI",
+    "성경인물",
+    "성격테스트",
+    "심리테스트",
+    "크리스천"
+  ],
   "author": "angibeom0985-arch",
   "license": "MIT",
   "scripts": {
@@ -15,9 +21,10 @@
     "vercel-build": "vite build"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.460.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "lucide-react": "^0.460.0"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

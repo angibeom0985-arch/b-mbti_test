@@ -45,11 +45,6 @@ const App: React.FC = () => {
     setGameState('quiz');
   }, []);
 
-  const handleViewStats = useCallback(() => {
-    // 통계 기능은 현재 비활성화됨
-    console.log('통계 기능은 추후 구현 예정입니다.');
-  }, []);
-
   const handleBackToStart = useCallback(() => {
     setGameState('start');
   }, []);
@@ -111,9 +106,9 @@ const App: React.FC = () => {
         );
       case 'start':
       default:
-        return <StartScreen onStart={handleStart} onViewStats={handleViewStats} />;
+        return <StartScreen onStart={handleStart} />;
     }
-  }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, error, handleRestart, handleStart, handleViewStats, handleBackToStart]);
+  }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, error, handleRestart, handleStart, handleBackToStart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800 flex items-center justify-center p-4 transition-all duration-500">

@@ -4,7 +4,6 @@ import { RESULTS } from '../constants';
 import RestartIcon from './icons/RestartIcon';
 import LoadingIndicator from './LoadingIndicator';
 import ShareIcon from './icons/ShareIcon';
-import AdBanner from './AdBanner';
 
 interface ResultScreenProps {
   resultType: MbtiType;
@@ -16,23 +15,51 @@ interface ResultScreenProps {
 // 16가지 MBTI 유형과 대응하는 성경인물들
 const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
 
+// 어울리는 성격 유형 추천 로직
+const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
+  // 각 유형별로 어울리는 유형들을 정의 (심리학적 호환성 기반)
+  const compatibilityMap: Record<MbtiType, MbtiType[]> = {
+    'ENFP': ['INFJ', 'INTJ', 'ENFJ', 'INFP'],
+    'ENFJ': ['INFP', 'ISFP', 'ENFP', 'INFJ'],
+    'ENTP': ['INFJ', 'INTJ', 'ENFJ', 'INFP'],
+    'ENTJ': ['INFP', 'ISFP', 'ENFP', 'INFJ'],
+    'ESFP': ['ISFJ', 'ISTJ', 'ESFJ', 'ISFP'],
+    'ESFJ': ['ISFP', 'ISTP', 'ESFP', 'ISFJ'],
+    'ESTP': ['ISFJ', 'ISTJ', 'ESFJ', 'ISFP'],
+    'ESTJ': ['ISFP', 'ISTP', 'ESFP', 'ISFJ'],
+    'INFP': ['ENFJ', 'ENTJ', 'ENFP', 'INFJ'],
+    'INFJ': ['ENFP', 'ENTP', 'ENFJ', 'INFP'],
+    'INTP': ['ENFJ', 'ENTJ', 'ENFP', 'INFJ'],
+    'INTJ': ['ENFP', 'ENTP', 'ENFJ', 'INFP'],
+    'ISFP': ['ESFJ', 'ESTJ', 'ESFP', 'ISFJ'],
+    'ISFJ': ['ESFP', 'ESTP', 'ESFJ', 'ISFP'],
+    'ISTP': ['ESFJ', 'ESTJ', 'ESFP', 'ISFJ'],
+    'ISTJ': ['ESFP', 'ESTP', 'ESFJ', 'ISFP']
+  };
+  
+  return compatibilityMap[currentType] || [];
+};
+
 const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, error, onRestart }) => {
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showOtherCharacters, setShowOtherCharacters] = useState(false);
-  const [showStats, setShowStats] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
+  
+  // 퀴즈 게임 상태
+  const [quizCharacter, setQuizCharacter] = useState<string>('');
+  const [userGuess, setUserGuess] = useState('');
+  const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
+  const [currentQuizType, setCurrentQuizType] = useState<string>('');
 
-  // 가짜 통계 데이터 (실제 서비스에서는 DB에서 가져옴)
-  const fakeStats = {
-    [resultType]: Math.floor(Math.random() * 25) + 10,
-    total: 1247,
-    others: ALL_CHARACTERS.filter(type => type !== resultType).map(type => ({
-      type,
-      character: RESULTS[type].character,
-      percentage: Math.floor(Math.random() * 15) + 2
-    })).sort((a, b) => b.percentage - a.percentage)
+  // 퀴즈를 위한 랜덤 캐릭터 선택
+  const getRandomCharacter = () => {
+    const randomType = ALL_CHARACTERS[Math.floor(Math.random() * ALL_CHARACTERS.length)];
+    setCurrentQuizType(randomType);
+    setQuizCharacter(RESULTS[randomType].character);
+    setUserGuess('');
+    setQuizResult(null);
   };
 
   // 가짜 댓글 데이터
@@ -92,16 +119,47 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
     }
   };
 
-  const handleSaveAsImage = () => {
-    // 임시로 공유 모달 열기 (실제로는 html2canvas 사용)
-    alert('📸 이미지 저장 기능은 곧 업데이트됩니다!\n현재는 공유 기능을 이용해 주세요.');
-    setShowShareModal(true);
+  const handleSaveAsImage = async () => {
+    try {
+      const element = document.querySelector('.result-container') as HTMLElement;
+      if (!element) {
+        alert('🚨 이미지를 생성할 수 없습니다.');
+        return;
+      }
+
+      // 동적으로 html2canvas 로드
+      const html2canvas = await import('html2canvas');
+      const canvas = await html2canvas.default(element, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        width: element.offsetWidth,
+        height: element.offsetHeight
+      });
+
+      // 이미지 다운로드
+      const link = document.createElement('a');
+      link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      alert('📸 이미지가 저장되었습니다!');
+    } catch (error) {
+      console.error('이미지 저장 실패:', error);
+      alert('📸 이미지 저장에 실패했습니다. 공유 기능을 이용해 주세요.');
+      setShowShareModal(true);
+    }
   };
 
-  const handleViewStats = () => {
-    setShowStats(true);
+  const handleViewOtherCharacters = () => {
+    getRandomCharacter();
+    setShowOtherCharacters(true);
   };
-
+  
   const handleLeaveComment = () => {
     setShowComments(true);
   };
@@ -113,13 +171,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
       setShowComments(false);
     }
   };
-
-  const handleViewOtherCharacters = () => {
-    setShowOtherCharacters(true);
+  
+  const checkQuizAnswer = () => {
+    if (userGuess.trim() === '') return;
+    
+    const isCorrect = userGuess.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
+    setQuizResult(isCorrect ? 'correct' : 'wrong');
+  };
+  
+  const selectCharacterFromCandidates = (character: string) => {
+    setUserGuess(character);
+    const isCorrect = character.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
+    setQuizResult(isCorrect ? 'correct' : 'wrong');
   };
 
   return (
-    <div className="p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 w-full max-w-lg mx-auto text-center relative overflow-hidden">
+    <div className="result-container p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 w-full max-w-lg mx-auto text-center relative overflow-hidden">
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
         <div className="flex items-center justify-center mb-2">
@@ -185,34 +252,51 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
         </div>
 
         {/* 서브 액션 버튼들 */}
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            onClick={handleViewStats}
-            className="bg-white/80 text-gray-600 font-medium py-3 px-3 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-xs"
-          >
-            📊 통계
-          </button>
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleLeaveComment}
-            className="bg-white/80 text-gray-600 font-medium py-3 px-3 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-xs"
+            className="bg-white/80 text-gray-600 font-medium py-3 px-3 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-sm"
           >
-            💬 후기
+            💬 후기 남기기
           </button>
           <button
             onClick={handleViewOtherCharacters}
-            className="bg-white/80 text-gray-600 font-medium py-3 px-3 rounded-2xl hover:bg-white hover:text-gray-800 transition-all duration-200 shadow-sm border border-gray-200/50 text-xs"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium py-3 px-3 rounded-2xl hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-sm text-sm"
           >
-            👥 다른인물
+            🎮 인물 퀴즈
           </button>
         </div>
 
-        {/* 광고 배너 */}
-        <div className="my-6">
-          <AdBanner 
-            slot="2689008677"
-            className="rounded-2xl overflow-hidden"
-            style={{ minHeight: '120px' }}
-          />
+        {/* 어울리는 성격 유형 섹션 */}
+        <div className="mb-6 bg-white/80 rounded-2xl p-4 shadow-sm border border-orange-100/50">
+          <div className="flex items-center justify-center mb-4">
+            <span className="text-xl mr-2">💝</span>
+            <h3 className="text-lg font-bold text-gray-800">어울리는 성격 유형</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {getCompatibleTypes(resultType).map((compatibleType) => (
+              <div 
+                key={compatibleType}
+                className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-xl p-3 border border-pink-100/50 hover:shadow-md transition-all duration-200"
+              >
+                <div className="text-center">
+                  <div className="text-xs font-semibold text-pink-600 mb-1">{compatibleType}</div>
+                  <div className="font-bold text-gray-800 text-sm mb-2">{RESULTS[compatibleType].character}</div>
+                  <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-pink-200 to-orange-200 rounded-full flex items-center justify-center">
+                    <span className="text-lg">👥</span>
+                  </div>
+                  <div className="text-xs text-gray-600 leading-tight">
+                    {RESULTS[compatibleType].character}와 잘 맞아요!
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 p-3 bg-gradient-to-r from-pink-100 to-orange-100 rounded-xl">
+            <p className="text-xs text-gray-600 text-center">
+              💡 MBTI 심리학을 바탕으로 선정된 호환성 높은 성격 유형들입니다
+            </p>
+          </div>
         </div>
 
         {/* 다시 테스트 버튼 */}
@@ -254,30 +338,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
         </div>
       )}
 
-      {/* 통계 보기 모달 */}
-      {showStats && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-bold text-center mb-4">📊 테스트 통계</h3>
-            <div className="mb-4 p-4 bg-gradient-to-r from-violet-100 to-pink-100 rounded-2xl">
-              <p className="text-center font-semibold text-gray-800">전체 참여자: {fakeStats.total}명</p>
-              <p className="text-center text-sm text-gray-600 mt-1">당신과 같은 유형: {fakeStats[resultType]}%</p>
-            </div>
-            <div className="space-y-2">
-              {fakeStats.others.slice(0, 5).map((item) => (
-                <div key={item.type} className="flex justify-between items-center p-2 bg-gray-50 rounded-xl">
-                  <span className="text-sm font-medium">{item.character}</span>
-                  <span className="text-sm text-gray-600">{item.percentage}%</span>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setShowStats(false)} className="w-full mt-4 p-3 text-gray-500 text-sm">
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 후기 남기기 모달 */}
       {showComments && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -312,22 +372,112 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ resultType, resultData, err
         </div>
       )}
 
-      {/* 다른 성경인물 보기 모달 */}
+      {/* 성경인물 퀴즈 게임 모달 */}
       {showOtherCharacters && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-bold text-center mb-4">👥 다른 성경인물들</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {ALL_CHARACTERS.filter(type => type !== resultType).slice(0, 8).map((type) => (
-                <div key={type} className="p-3 bg-gray-50 rounded-2xl text-center">
-                  <div className="text-xs font-semibold text-gray-600 mb-1">{type}</div>
-                  <div className="font-bold text-gray-800 text-sm">{RESULTS[type].character}</div>
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
+            
+            <div className="text-center mb-6">
+              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-4 mb-4">
+                <p className="text-sm text-gray-700 mb-2">
+                  🔥 <strong>도전!</strong> 이미지를 보고 성경인물을 맞춰보세요!
+                </p>
+                <p className="text-xs text-gray-500">
+                  정답을 모르겠다면 아래 후보 중에서 선택해보세요 ⬇️
+                </p>
+              </div>
+              
+              {/* 캐릭터 이미지 */}
+              <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">
+                <div className="w-32 h-32 mx-auto mb-3 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+                  {currentQuizType && (
+                    <img 
+                      src={`/${currentQuizType === 'ENFJ' ? 'ENJS 느헤미야' : 
+                           currentQuizType === 'ENTP' ? 'ENFP 아브라함' : 
+                           `${currentQuizType} ${RESULTS[currentQuizType as keyof typeof RESULTS].character}`}.jpg`}
+                      alt="성경인물"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/ENFP 아브라함.jpg';
+                      }}
+                    />
+                  )}
                 </div>
-              ))}
+                <h4 className="text-lg font-bold text-gray-800 mb-2">이 분은 누구일까요? 🤔</h4>
+                
+                {/* 주관식 입력 */}
+                <input
+                  type="text"
+                  value={userGuess}
+                  onChange={(e) => setUserGuess(e.target.value)}
+                  placeholder="성경인물 이름을 입력하세요"
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl text-center font-medium focus:border-purple-400 focus:outline-none"
+                  disabled={quizResult !== null}
+                />
+                
+                {quizResult && (
+                  <div className={`mt-3 p-3 rounded-xl ${quizResult === 'correct' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'}`}>
+                    {quizResult === 'correct' 
+                      ? `🎉 정답입니다! ${quizCharacter}님이 맞네요!` 
+                      : `😅 아쉬워요! 정답은 ${quizCharacter}입니다.`}
+                  </div>
+                )}
+              </div>
             </div>
-            <button onClick={() => setShowOtherCharacters(false)} className="w-full mt-4 p-3 text-gray-500 text-sm">
-              닫기
-            </button>
+
+            {/* 16명 후보 선택지 */}
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                💡 힌트: 아래 후보 중에서 선택하세요!
+              </h4>
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                {ALL_CHARACTERS.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => selectCharacterFromCandidates(RESULTS[type].character)}
+                    disabled={quizResult !== null}
+                    className={`p-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+                      quizResult !== null && RESULTS[type].character === quizCharacter
+                        ? 'bg-green-200 text-green-800'
+                        : quizResult === null
+                        ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700'
+                        : 'bg-gray-50 text-gray-400'
+                    }`}
+                  >
+                    <div className="font-bold">{RESULTS[type].character}</div>
+                    <div className="text-xs opacity-70">{type}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 게임 액션 버튼 */}
+            <div className="flex gap-2">
+              {quizResult === null ? (
+                <button 
+                  onClick={checkQuizAnswer}
+                  className="flex-1 p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-semibold"
+                >
+                  ✅ 답안 제출
+                </button>
+              ) : (
+                <button 
+                  onClick={getRandomCharacter}
+                  className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold"
+                >
+                  🎮 다시 도전
+                </button>
+              )}
+              <button 
+                onClick={() => setShowOtherCharacters(false)} 
+                className="px-6 p-3 text-gray-500 text-sm hover:bg-gray-100 rounded-2xl"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}

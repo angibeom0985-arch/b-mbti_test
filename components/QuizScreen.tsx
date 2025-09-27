@@ -24,15 +24,15 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQues
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-lg mx-auto">
-        {/* 프로그레스 헤더 */}
-        <div className="text-center mb-8">
+        {/* 프로그레스 헤더 - 여백 줄임 */}
+        <div className="text-center mb-4">
           <div className="text-sm text-gray-500 mb-2 font-medium">
-            성경인물 MBTI 테스트<br />성격유형검사 16가지
+            성경인물 MBTI 테스트 성격유형검사 16가지
           </div>
-          <div className="text-4xl font-bold text-gray-800 mb-4">
+          <div className="text-4xl font-bold text-gray-800 mb-3">
             {String(currentQuestion).padStart(2, '0')}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-1 mb-6">
+          <div className="w-full bg-gray-200 rounded-full h-1 mb-4">
             <div 
               className="bg-gradient-to-r from-orange-400 to-red-400 h-1 rounded-full transition-all duration-700 ease-out" 
               style={{ width: `${(currentQuestion / totalQuestions) * 100}%` }}
@@ -40,11 +40,11 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ question, onAnswer, currentQues
           </div>
         </div>
 
-        {/* 질문 카드 */}
-        <div className="bg-white rounded-3xl p-8 mb-8 shadow-lg border border-gray-100 relative">
+        {/* 질문 카드 - 여백 줄임 */}
+        <div className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-gray-100 relative">
           {/* 작은 아이콘 */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mb-4">
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mb-3">
               <span className="text-2xl">🌿</span>
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">

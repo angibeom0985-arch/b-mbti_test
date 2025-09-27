@@ -332,32 +332,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {/* 왼쪽: 텍스트 영역 */}
-          <div className="flex-1">
-            <div className="flex items-center mb-2">
+          {/* 왼쪽: 텍스트 영역 - 중앙정렬로 변경 */}
+          <div className="flex-1 text-center">
+            <div className="mb-2">
               <p className="text-gray-600 font-medium">당신과 닮은 성경인물</p>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 leading-tight flex items-center">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3 leading-tight flex items-center justify-center">
               <span className="text-2xl mr-2">✨</span>
               {resultData.character}
             </h1>
             <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">
               {resultType}
-            </div>
-            
-            {/* 완료한 버전 정보 */}
-            <div className="mt-3 pt-3 border-t border-gray-200/50">
-              <div className="inline-flex items-center bg-white/90 rounded-full px-3 py-1 text-sm">
-                <div className={`w-3 h-3 rounded-full mr-2 ${
-                  completedVersion === 1 ? 'bg-orange-400' :
-                  completedVersion === 2 ? 'bg-purple-400' :
-                  'bg-blue-400'
-                }`}></div>
-                <span className="text-gray-700 font-medium">
-                  {TEST_VERSIONS[completedVersion as keyof typeof TEST_VERSIONS]?.name || '기본 테스트'} 완료
-                </span>
-                <span className="ml-2">✓</span>
-              </div>
             </div>
           </div>
           

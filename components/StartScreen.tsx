@@ -11,11 +11,16 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   const [visitorCount, setVisitorCount] = useState<number>(0);
   const [animatedCount, setAnimatedCount] = useState<number>(0);
   const [selectedVersion, setSelectedVersion] = useState<number>(1);
+  const [mostPopularVersion, setMostPopularVersion] = useState<number>(1);
 
   useEffect(() => {
     // 컴포넌트 마운트 시 방문자수 증가
     const count = VisitorCounter.incrementAndGet();
     setVisitorCount(count);
+    
+    // 가장 인기 있는 테스트 버전 조회
+    const popularVersion = VisitorCounter.getMostPopularVersion();
+    setMostPopularVersion(popularVersion);
     
     // URL 파라미터에서 버전 정보 확인
     const urlParams = new URLSearchParams(window.location.search);
@@ -87,6 +92,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                   onClick={() => {
                     if (selectedVersion === versionNumber) {
                       // 이미 선택된 버전을 다시 클릭하면 해당 테스트 페이지로 이동
+                      // 테스트 시작 통계 업데이트
+                      VisitorCounter.incrementVersionUsage(versionNumber);
+                      
                       const testUrls = {
                         1: 'https://b-mbti.money-hotissue.com/test1',
                         2: 'https://b-mbti.money-hotissue.com/test2',
@@ -118,13 +126,24 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h4 className={`text-lg font-bold mb-2 ${
+                      <h4 className={`text-lg font-bold mb-2 flex items-center ${
                         isSelected ? 'text-white' : 'text-gray-800'
                       }`}>
-                        {versionNumber === 1 && "💝 "}
-                        {versionNumber === 2 && "⚡ "}
-                        {versionNumber === 3 && "🔥 "}
-                        {version.name}
+                        <span>
+                          {versionNumber === 1 && "💝 "}
+                          {versionNumber === 2 && "⚡ "}
+                          {versionNumber === 3 && "🔥 "}
+                          {version.name}
+                        </span>
+                        {versionNumber === mostPopularVersion && (
+                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-bold ${
+                            isSelected 
+                              ? 'bg-white/20 text-white border border-white/30' 
+                              : 'bg-red-500 text-white'
+                          }`}>
+                            BEST
+                          </span>
+                        )}
                       </h4>
                       <p className={`text-sm mb-2 ${
                         isSelected ? 'text-white/90' : 'text-gray-600'

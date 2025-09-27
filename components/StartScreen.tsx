@@ -124,9 +124,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                         } hover:shadow-md`
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className={`text-lg font-bold mb-2 flex items-center ${
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-full">
+                      <h4 className={`text-lg font-bold mb-2 flex items-center justify-center ${
                         isSelected ? 'text-white' : 'text-gray-800'
                       }`}>
                         <span>
@@ -145,14 +145,14 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                           </span>
                         )}
                       </h4>
-                      <p className={`text-sm mb-2 ${
+                      <p className={`text-sm mb-2 text-center ${
                         isSelected ? 'text-white/90' : 'text-gray-600'
                       }`}>
                         {version.description}
                       </p>
                       
                       {/* 각 테스트별 추가 특징 */}
-                      <div className={`text-xs ${
+                      <div className={`text-xs text-center ${
                         isSelected ? 'text-white/80' : 'text-gray-500'
                       }`}>
                         {versionNumber === 1 && "공동체 속 관계를 중요하게 생각하는 분들에게 추천"}
@@ -167,15 +167,6 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                             🚀 시작!
                           </span>
                         </div>
-                      )}
-                    </div>
-                    <div className={`ml-4 w-8 h-8 rounded-full border-2 flex items-center justify-center ${
-                      isSelected
-                        ? 'border-white/50 bg-white/20'
-                        : 'border-gray-300'
-                    }`}>
-                      {isSelected && (
-                        <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
                       )}
                     </div>
                   </div>

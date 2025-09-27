@@ -335,10 +335,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           {/* 왼쪽: 텍스트 영역 */}
           <div className="flex-1">
             <div className="flex items-center mb-2">
-              <span className="text-2xl mr-2">✨</span>
-              <p className="text-gray-600 font-medium">당신과 닮은 성경 인물</p>
+              <p className="text-gray-600 font-medium">당신과 닮은 성경인물</p>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 leading-tight flex items-center">
+              <span className="text-2xl mr-2">✨</span>
               {resultData.character}
             </h1>
             <div className="inline-flex items-center bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 py-2 rounded-full text-lg font-semibold">

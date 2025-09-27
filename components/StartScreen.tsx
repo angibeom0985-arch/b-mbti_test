@@ -65,15 +65,6 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </p>
         </div>
 
-        {/* 2. 대표 이미지 - 전체 너비, 둥근 테두리 제거 */}
-        <div className="mb-6">
-          <img 
-            src="/hero-image.svg" 
-            alt="성경인물과 나의 성격 MBTI 매칭 테스트" 
-            className="w-full h-auto"
-          />
-        </div>
-
         {/* 3. 테스트 선택 - 더블클릭으로 시작 */}
         <div className="mb-6 space-y-4">
           <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
@@ -181,7 +172,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
             <div className="text-xl mb-1">🎮</div>
-            <div className="text-xs font-semibold text-purple-800">인물 퀴즈</div>
+            <div className="text-xs font-semibold text-purple-800">이미지 맞추기 게임</div>
             <div className="text-xs text-purple-600">재미있는 게임</div>
           </div>
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 shadow-sm border border-blue-200">

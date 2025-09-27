@@ -1,0 +1,114 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FED7AA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FECACA;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="titleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="buttonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- 배경 이모지들 -->
+  <!-- 책 이모지 -->
+  <g transform="translate(150, 100)" opacity="0.2">
+    <text x="0" y="0" font-size="40" font-family="Arial, sans-serif">📖</text>
+  </g>
+  <g transform="translate(1000, 150)" opacity="0.2">
+    <text x="0" y="0" font-size="35" font-family="Arial, sans-serif">📚</text>
+  </g>
+  
+  <!-- 기도 이모지 -->
+  <g transform="translate(100, 400)" opacity="0.2">
+    <text x="0" y="0" font-size="45" font-family="Arial, sans-serif">🙏</text>
+  </g>
+  <g transform="translate(1050, 450)" opacity="0.2">
+    <text x="0" y="0" font-size="38" font-family="Arial, sans-serif">🤲</text>
+  </g>
+  
+  <!-- 십자가 이모지 -->
+  <g transform="translate(200, 500)" opacity="0.2">
+    <text x="0" y="0" font-size="42" font-family="Arial, sans-serif">✝️</text>
+  </g>
+  <g transform="translate(950, 300)" opacity="0.2">
+    <text x="0" y="0" font-size="40" font-family="Arial, sans-serif">⛪</text>
+  </g>
+  
+  <!-- 추가 장식 요소 -->
+  <circle cx="80" cy="200" r="25" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="1120" cy="400" r="30" fill="#EF4444" opacity="0.2"/>
+  <circle cx="150" cy="550" r="20" fill="#10B981" opacity="0.2"/>
+  
+  <!-- Main Title -->
+  <text x="600" y="120" text-anchor="middle" fill="url(#titleGradient)" font-family="Arial, sans-serif" font-size="64" font-weight="bold">
+    성경인물 MBTI 테스트
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="170" text-anchor="middle" fill="#374151" font-family="Arial, sans-serif" font-size="28" font-weight="600">
+    성격유형검사 16가지
+  </text>
+  
+  <!-- 4가지 특징 - 중앙정렬된 2x2 그리드 -->
+  <g transform="translate(300, 220)">
+    <!-- 첫 번째 행 -->
+    <!-- 3가지 테스트 -->
+    <g>
+      <rect x="0" y="0" width="280" height="80" rx="15" fill="rgba(236, 72, 153, 0.1)" stroke="#EC4899" stroke-width="2"/>
+      <circle cx="40" cy="40" r="20" fill="#EC4899"/>
+      <text x="40" y="47" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">🎯</text>
+      <text x="80" y="35" fill="#EC4899" font-family="Arial, sans-serif" font-size="18" font-weight="bold">3가지 테스트</text>
+      <text x="80" y="55" fill="#6B7280" font-family="Arial, sans-serif" font-size="14">다양한 관점</text>
+    </g>
+    
+    <!-- 이미지 맞추기 게임 -->
+    <g transform="translate(320, 0)">
+      <rect x="0" y="0" width="280" height="80" rx="15" fill="rgba(139, 92, 246, 0.1)" stroke="#8B5CF6" stroke-width="2"/>
+      <circle cx="40" cy="40" r="20" fill="#8B5CF6"/>
+      <text x="40" y="47" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">🎮</text>
+      <text x="80" y="35" fill="#8B5CF6" font-family="Arial, sans-serif" font-size="16" font-weight="bold">이미지 맞추기 게임</text>
+      <text x="80" y="55" fill="#6B7280" font-family="Arial, sans-serif" font-size="14">재미있는 게임</text>
+    </g>
+    
+    <!-- 두 번째 행 -->
+    <!-- 이미지 저장 -->
+    <g transform="translate(0, 100)">
+      <rect x="0" y="0" width="280" height="80" rx="15" fill="rgba(16, 185, 129, 0.1)" stroke="#10B981" stroke-width="2"/>
+      <circle cx="40" cy="40" r="20" fill="#10B981"/>
+      <text x="40" y="47" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">📷</text>
+      <text x="80" y="35" fill="#10B981" font-family="Arial, sans-serif" font-size="18" font-weight="bold">이미지 저장</text>
+      <text x="80" y="55" fill="#6B7280" font-family="Arial, sans-serif" font-size="14">SNS 공유용</text>
+    </g>
+    
+    <!-- 테스트 결과 공유 -->
+    <g transform="translate(320, 100)">
+      <rect x="0" y="0" width="280" height="80" rx="15" fill="rgba(245, 158, 11, 0.1)" stroke="#F59E0B" stroke-width="2"/>
+      <circle cx="40" cy="40" r="20" fill="#F59E0B"/>
+      <text x="40" y="47" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">👥</text>
+      <text x="80" y="35" fill="#F59E0B" font-family="Arial, sans-serif" font-size="18" font-weight="bold">테스트 결과 공유</text>
+      <text x="80" y="55" fill="#6B7280" font-family="Arial, sans-serif" font-size="14">어울리는 유형</text>
+    </g>
+  </g>
+  
+  <!-- Description - 하단으로 이동 -->
+  <text x="600" y="480" text-anchor="middle" fill="#6B7280" font-family="Arial, sans-serif" font-size="28" font-weight="500">
+    나와 닮은 성경 속 인물을 찾아보세요
+  </text>
+  
+  <!-- CTA 버튼 재추가 -->
+  <rect x="500" y="520" width="200" height="50" rx="25" fill="url(#buttonGradient)"/>
+  <text x="600" y="550" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">
+    무료 테스트 시작
+  </text>
+  
+</svg>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to PNG Converter</title>
+</head>
+<body>
+    <div id="svg-container"></div>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <a id="download-link" style="display: none;">다운로드</a>
+
+    <script>
+        // SVG 콘텐츠를 가져와서 PNG로 변환
+        fetch('/og-image-new.svg')
+            .then(response => response.text())
+            .then(svgText => {
+                // SVG를 DOM에 추가
+                const svgContainer = document.getElementById('svg-container');
+                svgContainer.innerHTML = svgText;
+                
+                const svg = svgContainer.querySelector('svg');
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 캔버스 크기 설정
+                canvas.width = 1200;
+                canvas.height = 630;
+                
+                // SVG를 이미지로 변환
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const svgUrl = URL.createObjectURL(svgBlob);
+                
+                const img = new Image();
+                img.onload = function() {
+                    // 캔버스에 이미지 그리기
+                    ctx.drawImage(img, 0, 0, 1200, 630);
+                    
+                    // PNG로 변환하여 다운로드 링크 생성
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const downloadLink = document.getElementById('download-link');
+                        downloadLink.href = url;
+                        downloadLink.download = 'og-image-new.png';
+                        downloadLink.style.display = 'block';
+                        downloadLink.textContent = 'PNG 이미지 다운로드';
+                        
+                        // 자동 다운로드
+                        downloadLink.click();
+                        
+                        console.log('PNG 변환 완료');
+                    }, 'image/png');
+                    
+                    // 메모리 해제
+                    URL.revokeObjectURL(svgUrl);
+                };
+                img.src = svgUrl;
+            })
+            .catch(error => {
+                console.error('SVG 로드 실패:', error);
+            });
+    </script>
+</body>
+</html>

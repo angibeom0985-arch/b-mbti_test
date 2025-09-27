@@ -336,14 +336,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           {/* 왼쪽: 텍스트 정보 */}
           <div className="flex-1">
             {/* 상단: 당신과 닮은 성경인물 */}
-            <div className="mb-3">
+            <div className="mb-6">
               <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 inline-block text-sm font-medium">
                 당신과 닮은 성경인물
               </div>
             </div>
             
             {/* 중간: 이름 */}
-            <div className="mb-3">
+            <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-800 flex items-center">
                 <span className="text-2xl mr-2">✨</span>
                 {resultData.character}

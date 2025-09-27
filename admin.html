@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 성경인물 MBTI 테스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+            <h2 class="text-2xl font-bold text-center mb-6">관리자 로그인</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
+                    <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="아이디를 입력하세요">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+                    <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="비밀번호를 입력하세요">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+                <button onclick="login()" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+                    로그인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 관리자 페이지 -->
+    <div id="adminPanel" class="hidden">
+        <!-- 헤더 -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">🛠️ 관리자 페이지</h1>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 페이지 선택 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-semibold mb-4">📝 편집할 페이지 선택</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="loadPage('index')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🏠</div>
+                        <div class="font-medium">메인 페이지</div>
+                        <div class="text-sm text-gray-500">index.html</div>
+                    </button>
+                    <button onclick="loadPage('test1')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🙏</div>
+                        <div class="font-medium">테스트 1</div>
+                        <div class="text-sm text-gray-500">test1.html</div>
+                    </button>
+                    <button onclick="loadPage('test2')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">⚡</div>
+                        <div class="font-medium">테스트 2</div>
+                        <div class="text-sm text-gray-500">test2.html</div>
+                    </button>
+                    <button onclick="loadPage('test3')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🔥</div>
+                        <div class="font-medium">테스트 3</div>
+                        <div class="text-sm text-gray-500">test3.html</div>
+                    </button>
+                    <button onclick="loadPage('result')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">📊</div>
+                        <div class="font-medium">결과 페이지</div>
+                        <div class="text-sm text-gray-500">result.html</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 에디터 영역 -->
+            <div id="editorSection" class="hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">✏️ 페이지 편집: <span id="currentPageTitle"></span></h2>
+                        <div class="flex space-x-2">
+                            <button onclick="showPreview()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
+                                👁️ 미리보기
+                            </button>
+                            <button onclick="saveChanges()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                                💾 저장하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 모드 선택 -->
+                    <div class="flex mb-4 border-b">
+                        <button id="basicModeBtn" onclick="switchMode('basic')" class="px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600">
+                            📝 기본모드
+                        </button>
+                        <button id="htmlModeBtn" onclick="switchMode('html')" class="px-4 py-2 font-medium text-gray-500 hover:text-gray-700">
+                            🔧 HTML모드
+                        </button>
+                    </div>
+
+                    <!-- 이미지 업로드 -->
+                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">📷 이미지 업로드</label>
+                        <input type="file" id="imageUpload" accept="image/*" class="mb-2">
+                        <div id="imagePreview" class="hidden">
+                            <img id="uploadedImage" class="max-w-xs h-auto rounded-lg shadow-md">
+                            <button onclick="insertImage()" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                ➕ 이미지 삽입
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 기본모드 에디터 -->
+                    <div id="basicEditor" class="mb-4">
+                        <div id="wysiwyg" class="min-h-96 p-4 border border-gray-300 rounded-lg bg-white" contenteditable="true">
+                            <!-- 편집 가능한 영역 -->
+                        </div>
+                    </div>
+
+                    <!-- HTML모드 에디터 -->
+                    <div id="htmlEditor" class="hidden mb-4">
+                        <textarea id="htmlCode" class="w-full h-96 p-4 font-mono text-sm border border-gray-300 rounded-lg bg-gray-900 text-green-400" placeholder="HTML 코드를 입력하세요..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 관리자 계정 정보
+        const ADMIN_CREDENTIALS = {
+            username: 'akb0811',
+            password: 'rlqja0985!'
+        };
+
+        let currentPage = '';
+        let currentMode = 'basic';
+
+        // 로그인 처리
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        // 로그아웃 처리
+        function logout() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('editorSection').classList.add('hidden');
+        }
+
+        // 페이지 로드
+        function loadPage(pageType) {
+            currentPage = pageType;
+            document.getElementById('currentPageTitle').textContent = getPageTitle(pageType);
+            document.getElementById('editorSection').classList.remove('hidden');
+            
+            // 실제 페이지 내용을 로드하는 부분 (실제 구현에서는 서버에서 가져와야 함)
+            loadPageContent(pageType);
+        }
+
+        // 페이지 제목 반환
+        function getPageTitle(pageType) {
+            const titles = {
+                'index': '메인 페이지 (index.html)',
+                'test1': '테스트 1 - 신앙생활 (test1.html)',
+                'test2': '테스트 2 - 하나님의 일 (test2.html)',
+                'test3': '테스트 3 - 위기상황 (test3.html)',
+                'result': '결과 페이지 (result.html)'
+            };
+            return titles[pageType] || pageType;
+        }
+
+        // 페이지 내용 로드 (실제로는 서버에서 가져와야 함)
+        function loadPageContent(pageType) {
+            const sampleContent = {
+                'index': '<h1>성경인물 MBTI 테스트</h1><p>나와 닮은 성경 속 인물을 찾아보세요!</p>',
+                'test1': '<h1>신앙생활 깊이보기 테스트</h1><p>예배, 기도, 교제를 통해 나만의 신앙 스타일을 발견해보세요.</p>',
+                'test2': '<h1>하나님의 일 속의 나</h1><p>섬김과 사역에서의 성향을 알아보는 테스트입니다.</p>',
+                'test3': '<h1>위기 속의 나</h1><p>어려운 상황에서의 반응을 통해 성격을 파악해보세요.</p>',
+                'result': '<h1>테스트 결과</h1><p>당신과 닮은 성경인물을 확인하세요.</p>'
+            };
+            
+            const content = sampleContent[pageType] || '<h1>페이지 내용</h1><p>편집할 내용을 입력하세요.</p>';
+            document.getElementById('wysiwyg').innerHTML = content;
+            document.getElementById('htmlCode').value = content;
+        }
+
+        // 편집 모드 전환
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'basic') {
+                document.getElementById('basicEditor').classList.remove('hidden');
+                document.getElementById('htmlEditor').classList.add('hidden');
+                document.getElementById('basicModeBtn').className = 'px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+                document.getElementById('htmlModeBtn').className = 'px-4 py-2 font-medium text-gray-500 hover:text-gray-700';
+                
+                // HTML 모드의 내용을 기본 모드로 동기화
+                document.getElementById('wysiwyg').innerHTML = document.getElementById('htmlCode').value;
+            } else {
+                document.getElementById('basicEditor').classList.add('hidden');
+                document.getElementById('htmlEditor').classList.remove('hidden');
+                document.getElementById('basicModeBtn').className = 'px-4 py-2 font-medium text-gray-500 hover:text-gray-700';
+                document.getElementById('htmlModeBtn').className = 'px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+                
+                // 기본 모드의 내용을 HTML 모드로 동기화
+                document.getElementById('htmlCode').value = document.getElementById('wysiwyg').innerHTML;
+                
+                // 코드 하이라이팅 적용
+                setTimeout(() => {
+                    const codeElement = document.getElementById('htmlCode');
+                    codeElement.style.fontFamily = 'monospace';
+                }, 100);
+            }
+        }
+
+        // 이미지 업로드 처리
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('uploadedImage');
+                    img.src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 이미지 삽입
+        function insertImage() {
+            const img = document.getElementById('uploadedImage');
+            const imgHtml = `<img src="${img.src}" alt="업로드된 이미지" style="max-width: 100%; height: auto; margin: 10px 0;">`;
+            
+            if (currentMode === 'basic') {
+                const wysiwyg = document.getElementById('wysiwyg');
+                wysiwyg.innerHTML += imgHtml;
+            } else {
+                const htmlCode = document.getElementById('htmlCode');
+                htmlCode.value += imgHtml;
+            }
+            
+            // 이미지 미리보기 숨기기
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imageUpload').value = '';
+        }
+
+        // 미리보기
+        function showPreview() {
+            let content;
+            if (currentMode === 'basic') {
+                content = document.getElementById('wysiwyg').innerHTML;
+            } else {
+                content = document.getElementById('htmlCode').value;
+            }
+            
+            const previewWindow = window.open('', '_blank', 'width=800,height=600');
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>미리보기 - ${getPageTitle(currentPage)}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+                        img { max-width: 100%; height: auto; }
+                    </style>
+                </head>
+                <body>
+                    <h2>📱 미리보기: ${getPageTitle(currentPage)}</h2>
+                    <hr>
+                    ${content}
+                </body>
+                </html>
+            `);
+            previewWindow.document.close();
+        }
+
+        // 변경사항 저장
+        function saveChanges() {
+            let content;
+            if (currentMode === 'basic') {
+                content = document.getElementById('wysiwyg').innerHTML;
+            } else {
+                content = document.getElementById('htmlCode').value;
+            }
+            
+            // 실제로는 서버로 전송해야 하지만, 여기서는 로컬 스토리지에 저장
+            localStorage.setItem(`page_${currentPage}`, content);
+            
+            alert('✅ 변경사항이 저장되었습니다!\n\n실제 웹사이트에 반영하려면 개발자가 배포 작업을 진행해야 합니다.');
+        }
+
+        // Enter 키로 로그인
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // WYSIWYG 에디터 기본 기능들
+        document.getElementById('wysiwyg').addEventListener('keydown', function(e) {
+            // Ctrl+B: 굵게
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                document.execCommand('bold');
+            }
+            // Ctrl+I: 이탤릭
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                document.execCommand('italic');
+            }
+            // Ctrl+U: 밑줄
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                document.execCommand('underline');
+            }
+        });
+    </script>
+</body>
+</html>

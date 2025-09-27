@@ -4,7 +4,7 @@ import AdBanner from '../components/AdBanner';
 interface AdminPageProps {}
 
 type EditorMode = 'basic' | 'html';
-type EditablePage = 'home' | 'result' | 'about';
+type EditablePage = 'index' | 'test1' | 'test2' | 'test3' | 'result';
 
 const ADMIN_CREDENTIALS = {
   username: 'akb0811',
@@ -18,13 +18,15 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const [loginError, setLoginError] = useState('');
   
   // 에디터 상태
-  const [selectedPage, setSelectedPage] = useState<EditablePage>('home');
+  const [selectedPage, setSelectedPage] = useState<EditablePage>('index');
   const [editorMode, setEditorMode] = useState<EditorMode>('basic');
   const [content, setContent] = useState('');
   const [savedContent, setSavedContent] = useState<Record<EditablePage, string>>({
-    home: '메인 페이지 내용입니다.',
-    result: '결과 페이지 내용입니다.',
-    about: '소개 페이지 내용입니다.'
+    index: '<h1>성경인물 MBTI 테스트</h1><p>나와 닮은 성경 속 인물을 찾아보세요!</p>',
+    test1: '<h1>신앙생활 깊이보기 테스트</h1><p>예배, 기도, 교제를 통해 나만의 신앙 스타일을 발견해보세요.</p>',
+    test2: '<h1>하나님의 일 속의 나</h1><p>섬김과 사역에서의 성향을 알아보는 테스트입니다.</p>',
+    test3: '<h1>위기 속의 나</h1><p>어려운 상황에서의 반응을 통해 성격을 파악해보세요.</p>',
+    result: '<h1>테스트 결과</h1><p>당신과 닮은 성경인물을 확인하세요.</p>'
   });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -222,9 +224,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
               <h2 className="text-lg font-semibold text-gray-800 mb-4">📄 페이지 선택</h2>
               <div className="space-y-2">
                 {[
-                  { key: 'home', label: '🏠 메인 페이지', desc: '첫 화면 내용' },
-                  { key: 'result', label: '📊 결과 페이지', desc: '테스트 결과 내용' },
-                  { key: 'about', label: 'ℹ️ 소개 페이지', desc: '사이트 소개' }
+                  { key: 'index', label: '🏠 메인 페이지', desc: '첫 화면 내용 (index.html)' },
+                  { key: 'test1', label: '� 테스트 1', desc: '신앙생활 테스트 (test1.html)' },
+                  { key: 'test2', label: '⚡ 테스트 2', desc: '하나님의 일 테스트 (test2.html)' },
+                  { key: 'test3', label: '🔥 테스트 3', desc: '위기상황 테스트 (test3.html)' },
+                  { key: 'result', label: '📊 결과 페이지', desc: '테스트 결과 내용 (result.html)' }
                 ].map((page) => (
                   <button
                     key={page.key}

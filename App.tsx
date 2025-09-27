@@ -1,14 +1,8 @@
 import React from 'react';
 import MbtiTestApp from './MbtiTestApp';
-import ApiKeyGuidePage from './pages/ApiKeyGuidePage';
 
 const App: React.FC = () => {
-  const isApiGuide = window.location.pathname === '/guide/api-key';
   const isAdmin = window.location.pathname === '/admin';
-  
-  if (isApiGuide) {
-    return <ApiKeyGuidePage />;
-  }
   
   if (isAdmin) {
     // Admin 페이지는 다음 단계에서 구현

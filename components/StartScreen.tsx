@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { VisitorCounter } from '../utils/visitor';
 import AdBanner from './AdBanner';
-import ApiKeyManager from './ApiKeyManager';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -11,23 +10,12 @@ interface StartScreenProps {
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStart, onViewStats }) => {
   const [visitorCount, setVisitorCount] = useState<number>(0);
-  const [apiKey, setApiKey] = useState<string>('');
 
   useEffect(() => {
     // 컴포넌트 마운트 시 방문자수 증가
     const count = VisitorCounter.incrementAndGet();
     setVisitorCount(count);
-    
-    // 로컬 스토리지에서 API 키 확인
-    const storedApiKey = localStorage.getItem('gemini_api_key');
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    }
   }, []);
-
-  const handleApiKeySet = (newApiKey: string) => {
-    setApiKey(newApiKey);
-  };
   return (
     <div className="text-center p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 relative overflow-hidden max-w-md mx-auto">
       {/* MZ 트렌디한 방문자수 표시 */}
@@ -51,9 +39,6 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart, onViewStats }) => {
         
         <div className="w-16 h-1 bg-gradient-to-r from-violet-400 to-pink-400 rounded-full mx-auto mb-4"></div>
       </div>
-
-      {/* API 키 관리자 */}
-      <ApiKeyManager onApiKeySet={handleApiKeySet} currentApiKey={apiKey} />
       
       {/* 설명 텍스트 - 심플하게 */}
       <div className="mb-8 bg-white/80 rounded-2xl p-4 shadow-sm border border-pink-100/50">

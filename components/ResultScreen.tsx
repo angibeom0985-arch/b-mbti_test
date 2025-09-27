@@ -232,9 +232,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   const handleSaveAsImage = async () => {
     try {
-      // html2canvas를 사용하여 결과 화면을 캡처
-      const resultElement = document.querySelector('.result-container');
-      if (!resultElement) {
+      // 이미지로 저장할 부분만 선택
+      const captureElement = document.querySelector('.image-capture-area');
+      if (!captureElement) {
         alert('결과 화면을 찾을 수 없습니다.');
         return;
       }
@@ -247,18 +247,25 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       script.onload = async () => {
         try {
           // @ts-ignore - html2canvas는 전역 변수로 로드됨
-          const canvas = await html2canvas(resultElement, {
+          const canvas = await html2canvas(captureElement, {
             backgroundColor: '#ffffff',
-            scale: 2,
-            useCORS: true
+            scale: 3, // 고화질을 위해 scale 증가
+            useCORS: true,
+            allowTaint: true,
+            foreignObjectRendering: false,
+            logging: false,
+            width: captureElement.scrollWidth,
+            height: captureElement.scrollHeight,
+            windowWidth: captureElement.scrollWidth,
+            windowHeight: captureElement.scrollHeight
           });
 
           // 캔버스를 이미지로 변환
-          const dataURL = canvas.toDataURL('image/png');
+          const dataURL = canvas.toDataURL('image/png', 1.0);
           
           // 다운로드 링크 생성
           const link = document.createElement('a');
-          link.download = `mbti-result-${resultType}.png`;
+          link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
           link.href = dataURL;
           document.body.appendChild(link);
           link.click();
@@ -318,6 +325,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   return (
     <div className="result-container p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 w-full max-w-lg mx-auto text-center relative overflow-hidden">
+      
+      {/* 이미지 캡처 영역 시작 */}
+      <div className="image-capture-area">
+      
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
         <div className="flex items-center justify-center mb-2">
@@ -348,16 +359,23 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       </div>
 
       {resultData.image ? (
-        <div className="mb-6 bg-white/80 rounded-2xl p-3 shadow-sm border border-pink-100/50">
-          <img 
-            src={resultData.image} 
-            alt={resultData.character} 
-            className="w-full h-auto max-h-[300px] object-contain rounded-xl shadow-md"
-          />
+        <div className="mb-6 flex justify-center">
+          <div className="w-48 h-48 bg-white/80 rounded-2xl p-3 shadow-sm border border-pink-100/50 overflow-hidden">
+            <img 
+              src={resultData.image} 
+              alt={resultData.character} 
+              className="w-full h-full object-cover rounded-xl shadow-md"
+              style={{
+                imageRendering: 'crisp-edges'
+              }}
+            />
+          </div>
         </div>
       ) : (
-        <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm mb-6 flex items-center justify-center">
-          <p className="text-gray-500">이미지를 불러오는 중...</p>
+        <div className="mb-6 flex justify-center">
+          <div className="w-48 h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
+            <p className="text-gray-500 text-sm">이미지 로딩중...</p>
+          </div>
         </div>
       )}
 
@@ -537,6 +555,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             </p>
           </div>
         </div>
+        
+        </div> {/* image-capture-area 끝 */}
 
         {/* 나머지 테스트 추천 섹션 */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
@@ -852,7 +872,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       )}
 
       {/* 하단 장식 */}
-      <div className="mt-6 flex justify-center space-x-1">
+      <div className="mt-2 flex justify-center space-x-1">
         <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></div>
         <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse delay-75"></div>
         <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse delay-150"></div>

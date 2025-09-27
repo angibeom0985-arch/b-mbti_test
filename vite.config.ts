@@ -7,6 +7,15 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: true
+    minify: true,
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        test1: 'test1.html',
+        test2: 'test2.html', 
+        test3: 'test3.html',
+        result: 'result.html'
+      }
+    }
   }
 });

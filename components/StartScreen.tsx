@@ -79,8 +79,13 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                   key={versionNumber}
                   onClick={() => {
                     if (selectedVersion === versionNumber) {
-                      // 이미 선택된 버전을 다시 클릭하면 시작
-                      onStart(versionNumber);
+                      // 이미 선택된 버전을 다시 클릭하면 해당 테스트 페이지로 이동
+                      const testUrls = {
+                        1: 'https://b-mbti.money-hotissue.com/test1',
+                        2: 'https://b-mbti.money-hotissue.com/test2',
+                        3: 'https://b-mbti.money-hotissue.com/test3'
+                      };
+                      window.location.href = testUrls[versionNumber as keyof typeof testUrls];
                     } else {
                       // 다른 버전 선택
                       setSelectedVersion(versionNumber);

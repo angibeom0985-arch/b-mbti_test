@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Dichotomy, MbtiType, MbtiResult } from './types';
 import { QUESTIONS_BY_VERSION, RESULTS } from './constants';
 import StartScreen from './components/StartScreen';
@@ -42,6 +42,44 @@ const App: React.FC = () => {
   const [resultType, setResultType] = useState<MbtiType | null>(null);
   const [generatedResult, setGeneratedResult] = useState<MbtiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // 자동 시작 버전 체크
+  useEffect(() => {
+    const autoStartVersion = (window as any).autoStartVersion;
+    if (autoStartVersion && autoStartVersion >= 1 && autoStartVersion <= 3) {
+      handleStart(autoStartVersion);
+    }
+
+    const showResult = (window as any).showResult;
+    if (showResult) {
+      // sessionStorage에서 저장된 결과 불러오기
+      const savedResult = sessionStorage.getItem('mbtiTestResult');
+      if (savedResult) {
+        try {
+          const parsedResult = JSON.parse(savedResult);
+          setResultType(parsedResult.resultType);
+          setGeneratedResult(parsedResult.resultData);
+          setSelectedVersion(parsedResult.completedVersion || 1);
+          setGameState('result');
+        } catch (error) {
+          console.error('결과 파싱 오류:', error);
+          // 오류 시 샘플 데이터로 폴백
+          const sampleType: MbtiType = 'ENFP';
+          const sampleResult = { ...RESULTS[sampleType], image: getMbtiImage(sampleType) };
+          setResultType(sampleType);
+          setGeneratedResult(sampleResult);
+          setGameState('result');
+        }
+      } else {
+        // 저장된 결과가 없으면 샘플 데이터 표시
+        const sampleType: MbtiType = 'ENFP';
+        const sampleResult = { ...RESULTS[sampleType], image: getMbtiImage(sampleType) };
+        setResultType(sampleType);
+        setGeneratedResult(sampleResult);
+        setGameState('result');
+      }
+    }
+  }, []);
 
   // 선택된 버전의 질문 가져오기
   const currentQuestions = useMemo(() => {
@@ -101,7 +139,18 @@ const App: React.FC = () => {
       // 준비된 이미지를 사용하여 결과 설정
       const imageUrl = getMbtiImage(finalResultType);
       setGeneratedResult({ ...resultData, image: imageUrl });
-      setGameState('result');
+      
+      // 결과를 sessionStorage에 저장
+      const resultToSave = {
+        resultType: finalResultType,
+        resultData: { ...resultData, image: imageUrl },
+        completedVersion: selectedVersion,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem('mbtiTestResult', JSON.stringify(resultToSave));
+      
+      // result 페이지로 리다이렉트
+      window.location.href = 'https://b-mbti.money-hotissue.com/result';
     }
   }, [scores, currentQuestionIndex, calculateResult, currentQuestions.length]);
   

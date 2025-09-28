@@ -164,6 +164,25 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [currentQuizType, setCurrentQuizType] = useState<string>('');
 
+  // 게임 참여 유도 멘트 배열
+  const gamePromptMessages = [
+    "🎯 관찰력이 뛰어난 당신이라면 이 게임 식은 죽 먹기일 거예요!",
+    "😎 성경 지식이 좋은 분들만 도전하는 특별한 게임이에요",
+    "✨ 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
+    "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
+    "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
+    "🎨 아름다운 성경 인물 일러스트와 함께하는 특별한 시간",
+    "🧠 IQ 높은 분들이 선호하는 이미지 퀴즈 게임이에요",
+    "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
+    "🎪 친구들과 점수 경쟁하면 더 재밌어요! 도전해보세요",
+    "🌟 성경 공부도 되고 재미도 있는 일석이조 게임!"
+  ];
+
+  // 랜덤 멘트 선택 (컴포넌트 마운트 시 한 번만 선택)
+  const [randomPrompt] = useState(() => {
+    return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
+  });
+
   // 퀴즈를 위한 랜덤 캐릭터 선택
   const getRandomCharacter = () => {
     const randomType = ALL_CHARACTERS[Math.floor(Math.random() * ALL_CHARACTERS.length)];
@@ -679,6 +698,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               >
                 🖼️ 게임 시작하기
               </button>
+              
+              {/* 랜덤 게임 참여 유도 멘트 */}
+              <div className="mt-3 px-4 py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
+                  {randomPrompt}
+                </p>
+              </div>
             </div>
           </div>
 

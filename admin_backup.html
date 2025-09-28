@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 성경인물 MBTI 테스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+            <h2 class="text-2xl font-bold text-center mb-6">관리자 로그인</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
+                    <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="아이디를 입력하세요">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+                    <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="비밀번호를 입력하세요">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+                <button onclick="login()" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+                    로그인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 관리자 페이지 -->
+    <div id="adminPanel" class="hidden">
+        <!-- 헤더 -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">🛠️ 관리자 페이지</h1>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 페이지 선택 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-semibold mb-4">📝 편집할 페이지 선택</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="loadPage('index')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🏠</div>
+                        <div class="font-medium">메인 페이지</div>
+                        <div class="text-sm text-gray-500">index.html</div>
+                    </button>
+                    <button onclick="loadPage('test1')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🙏</div>
+                        <div class="font-medium">테스트 1</div>
+                        <div class="text-sm text-gray-500">test1.html</div>
+                    </button>
+                    <button onclick="loadPage('test2')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">⚡</div>
+                        <div class="font-medium">테스트 2</div>
+                        <div class="text-sm text-gray-500">test2.html</div>
+                    </button>
+                    <button onclick="loadPage('test3')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">🔥</div>
+                        <div class="font-medium">테스트 3</div>
+                        <div class="text-sm text-gray-500">test3.html</div>
+                    </button>
+                    <button onclick="loadPage('result')" class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="text-2xl mb-2">📊</div>
+                        <div class="font-medium">결과 페이지</div>
+                        <div class="text-sm text-gray-500">result.html</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 에디터 영역 -->
+            <div id="editorSection" class="hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">✏️ 페이지 편집: <span id="currentPageTitle"></span></h2>
+                        <div class="flex space-x-2">
+                            <button onclick="showPreview()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
+                                👁️ 미리보기
+                            </button>
+                            <button onclick="saveChanges()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                                💾 저장하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 모드 선택 -->
+                    <div class="flex mb-4 border-b">
+                        <button id="basicModeBtn" onclick="switchMode('basic')" class="px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600">
+                            📝 기본모드
+                        </button>
+                        <button id="htmlModeBtn" onclick="switchMode('html')" class="px-4 py-2 font-medium text-gray-500 hover:text-gray-700">
+                            🔧 HTML모드
+                        </button>
+                    </div>
+
+                    <!-- 이미지 업로드 -->
+                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">📷 이미지 업로드</label>
+                        <input type="file" id="imageUpload" accept="image/*" class="mb-2">
+                        <div id="imagePreview" class="hidden">
+                            <img id="uploadedImage" class="max-w-xs h-auto rounded-lg shadow-md">
+                            <button onclick="insertImage()" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                ➕ 이미지 삽입
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 기본모드 에디터 -->
+                    <div id="basicEditor" class="mb-4">
+                        <div id="wysiwyg" class="min-h-96 p-4 border border-gray-300 rounded-lg bg-white" contenteditable="true">
+                            <!-- 편집 가능한 영역 -->
+                        </div>
+                    </div>
+
+                    <!-- HTML모드 에디터 -->
+                    <div id="htmlEditor" class="hidden mb-4">
+                        <textarea id="htmlCode" class="w-full h-96 p-4 font-mono text-sm border border-gray-300 rounded-lg bg-gray-900 text-green-400" placeholder="HTML 코드를 입력하세요..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 관리자 계정 정보
+        const ADMIN_CREDENTIALS = {
+            username: 'akb0811',
+            password: 'rlqja0985!'
+        };
+
+        let currentPage = '';
+        let currentMode = 'basic';
+
+        // 로그인 처리
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        // 로그아웃 처리
+        function logout() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('editorSection').classList.add('hidden');
+        }
+
+        // 페이지 로드
+        function loadPage(pageType) {
+            currentPage = pageType;
+            document.getElementById('currentPageTitle').textContent = getPageTitle(pageType);
+            document.getElementById('editorSection').classList.remove('hidden');
+            
+            // 실제 페이지 내용을 로드하는 부분 (실제 구현에서는 서버에서 가져와야 함)
+            loadPageContent(pageType);
+        }
+
+        // 페이지 제목 반환
+        function getPageTitle(pageType) {
+            const titles = {
+                'index': '메인 페이지 (index.html)',
+                'test1': '테스트 1 - 신앙생활 (test1.html)',
+                'test2': '테스트 2 - 하나님의 일 (test2.html)',
+                'test3': '테스트 3 - 위기상황 (test3.html)',
+                'result': '결과 페이지 (result.html)'
+            };
+            return titles[pageType] || pageType;
+        }
+
+        // MBTI 결과 데이터 (constants.ts에서 가져온 데이터)
+        const RESULTS = {
+            ENFP: {
+                character: '아브라함',
+                description: '열정적이고 창의적인 당신은 믿음의 조상 아브라함과 같습니다. 새로운 가능성을 찾아 미지의 땅으로 떠나는 도전을 두려워하지 않으며, 따뜻한 마음으로 사람들을 이끕니다. 당신의 믿음과 개척 정신은 새로운 길을 열어갑니다.',
+                verse: '창세기 12:1',
+                verseText: '여호와께서 아브람에게 이르시되 너는 너의 고향과 친족과 아버지의 집을 떠나 내가 네게 보여 줄 땅으로 가라',
+                image: '/ENFP 아브라함.jpg'
+            },
+            ENFJ: {
+                character: '느헤미야',
+                description: '사람들을 이끄는 카리스마와 깊은 공감 능력을 가진 당신은 느헤미야와 같습니다. 공동체의 성장을 위해 헌신하며, 사람들에게 영감을 주어 함께 목표를 이루어내는 뛰어난 지도자입니다. 당신의 열정과 비전은 사람들을 움직입니다.',
+                verse: '느헤미야 2:18',
+                verseText: '또 그들에게 하나님의 선한 손이 나를 도우신 일과 왕이 내게 이른 말씀을 전하였더니 그들의 말이 일어나 건축하자 하고 모두 힘을 내어 이 선한 일을 하려 하매',
+                image: '/ENJS 느헤미야.jpg'
+            },
+            INFJ: {
+                character: '다니엘',
+                description: '깊은 통찰력과 강한 신념을 가진 당신은 다니엘을 닮았습니다. 이상을 추구하며, 불의와 타협하지 않는 곧은 성품으로 주변에 긍정적인 영향을 미칩니다. 자신의 가치관을 지키기 위해 어떤 위협에도 굴하지 않는 용기를 가졌습니다.',
+                verse: '다니엘 6:10',
+                verseText: '다니엘이 이 조서에 왕의 도장이 찍힌 것을 알고도 자기 집에 돌아가서는 윗방에 올라가 예루살렘으로 향한 창문을 열고 전에 하던 대로 하루 세 번씩 무릎을 꿇고 기도하며 그의 하나님께 감사하였더라',
+                image: '/INFJ 다니엘.jpg'
+            },
+            ISFP: {
+                character: '다윗',
+                description: '겸손하고 따뜻한 마음을 가진 예술가 유형인 당신은 다윗과 같습니다. 섬세한 감수성으로 아름다운 시와 노래를 만들었으며, 현재의 순간을 소중히 여깁니다. 당신의 온화함과 예술적 감성은 주변 사람들에게 위로와 영감을 줍니다.',
+                verse: '시편 23:1',
+                verseText: '여호와는 나의 목자시니 내게 부족함이 없으리로다',
+                image: '/ISFP 다윗.jpg'
+            }
+        };
+
+        // 페이지 내용 로드 (실제로는 서버에서 가져와야 함)
+        function loadPageContent(pageType) {
+            let content;
+            
+            if (pageType === 'result') {
+                // 결과 페이지의 경우 실제 React 컴포넌트와 동일한 구조로 생성
+                const sampleResult = RESULTS.ENFP; // 샘플로 ENFP 결과 사용
+                content = generateResultPageContent(sampleResult, 'ENFP');
+            } else {
+                const sampleContent = {
+                    'index': '<h1>성경인물 MBTI 테스트</h1><p>나와 닮은 성경 속 인물을 찾아보세요!</p>',
+                    'test1': '<h1>신앙생활 깊이보기 테스트</h1><p>예배, 기도, 교제를 통해 나만의 신앙 스타일을 발견해보세요.</p>',
+                    'test2': '<h1>하나님의 일 속의 나</h1><p>섬김과 사역에서의 성향을 알아보는 테스트입니다.</p>',
+                    'test3': '<h1>위기 속의 나</h1><p>어려운 상황에서의 반응을 통해 성격을 파악해보세요.</p>'
+                };
+                content = sampleContent[pageType] || '<h1>페이지 내용</h1><p>편집할 내용을 입력하세요.</p>';
+            }
+            
+            document.getElementById('wysiwyg').innerHTML = content;
+            document.getElementById('htmlCode').value = content;
+        }
+
+        // 실제 React 결과 페이지와 동일한 HTML 구조 생성
+        function generateResultPageContent(resultData, mbtiType) {
+            return `
+                <!-- 결과 페이지 전체 컨테이너 -->
+                <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800 flex flex-col transition-all duration-500">
+                    <!-- MZ 스타일 배경 장식 -->
+                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div class="absolute top-20 left-10 w-32 h-32 bg-violet-200/20 rounded-full blur-3xl"></div>
+                        <div class="absolute bottom-20 right-10 w-40 h-40 bg-pink-200/20 rounded-full blur-3xl"></div>
+                        <div class="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl"></div>
+                    </div>
+                    
+                    <!-- 메인 결과 컨테이너 -->
+                    <main class="flex-1 flex items-center justify-center p-4">
+                        <div class="w-full max-w-lg mx-auto relative z-10">
+                            <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-8 text-center space-y-6">
+                                
+                                <!-- 축하 메시지 -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-center space-x-2 text-2xl">
+                                        <span>🎉</span>
+                                        <span class="font-bold text-violet-600">테스트 완료!</span>
+                                        <span>🎉</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 font-medium">당신과 닮은 성경인물을 발견했어요!</p>
+                                </div>
+
+                                <!-- MBTI 유형 표시 -->
+                                <div class="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-2xl p-4 shadow-lg">
+                                    <div class="text-3xl font-bold mb-1">${mbtiType}</div>
+                                    <div class="text-lg opacity-90">유형</div>
+                                </div>
+
+                                <!-- 캐릭터 이미지 -->
+                                <div class="relative">
+                                    <img 
+                                        src="${resultData.image}" 
+                                        alt="${resultData.character}"
+                                        class="w-48 h-48 object-cover rounded-2xl mx-auto shadow-xl border-4 border-white cursor-pointer hover:opacity-90 transition-opacity"
+                                        onerror="this.src='/favicon.svg'; this.className='w-48 h-48 object-contain rounded-2xl mx-auto shadow-xl border-4 border-white bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity'"
+                                        onclick="showImageModal('${resultData.image}', '${resultData.character}')"
+                                    />
+                                    <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white px-6 py-2 rounded-full shadow-lg border border-gray-100">
+                                        <span class="text-xl font-bold text-gray-800">${resultData.character}</span>
+                                    </div>
+                                    
+                                    <!-- 크게보기 버튼 -->
+                                    <button 
+                                        onclick="showImageModal('${resultData.image}', '${resultData.character}')"
+                                        class="mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-full border border-gray-200 transition-colors duration-200 flex items-center space-x-1 mx-auto"
+                                    >
+                                        <span>🔍</span>
+                                        <span>크게보기</span>
+                                    </button>
+                                </div>
+
+                                <!-- 성격 설명 -->
+                                <div class="bg-gray-50 rounded-2xl p-6 space-y-4 text-left">
+                                    <h3 class="text-xl font-bold text-center text-gray-800 mb-4">✨ 당신의 성격</h3>
+                                    <p class="text-gray-700 leading-relaxed text-sm">${resultData.description}</p>
+                                    
+                                    <!-- 성경 구절 -->
+                                    <div class="bg-white rounded-xl p-4 border-l-4 border-violet-400 mt-4">
+                                        <div class="text-xs text-violet-600 font-semibold mb-2">${resultData.verse}</div>
+                                        <p class="text-sm text-gray-600 italic leading-relaxed">"${resultData.verseText}"</p>
+                                    </div>
+                                </div>
+
+                                <!-- 액션 버튼들 -->
+                                <div class="space-y-3 pt-4">
+                                    <button class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold py-4 px-6 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2">
+                                        <span>📱</span>
+                                        <span>결과 공유하기</span>
+                                    </button>
+                                    
+                                    <button class="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-4 px-6 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2">
+                                        <span>🔄</span>
+                                        <span>다시 테스트하기</span>
+                                    </button>
+                                </div>
+
+                                <!-- 다른 캐릭터들 보기 -->
+                                <div class="pt-4 border-t border-gray-100">
+                                    <button class="text-violet-600 hover:text-violet-800 font-medium text-sm transition-colors">
+                                        📖 다른 성경인물들도 궁금해요!
+                                    </button>
+                                </div>
+
+                                <!-- 이미지 확대 모달 -->
+                                <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="hideImageModal()">
+                                    <div class="relative max-w-4xl max-h-full p-4" onclick="event.stopPropagation()">
+                                        <button 
+                                            onclick="hideImageModal()"
+                                            class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl font-bold bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center"
+                                        >
+                                            ×
+                                        </button>
+                                        <img 
+                                            id="modalImage" 
+                                            src="" 
+                                            alt=""
+                                            class="max-w-full max-h-screen object-contain rounded-lg shadow-2xl"
+                                        />
+                                        <div id="modalCaption" class="text-center text-white font-semibold text-lg mt-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <!-- 하단 카피라이트 -->
+                    <footer class="relative z-10 bg-white/80 backdrop-blur-sm border-t border-gray-200/50 py-2 px-4">
+                        <div class="max-w-4xl mx-auto text-center">
+                            <p class="text-xs text-gray-500 py-1">
+                                "쿠팡파트너스 활동을 통해 일정액의 수수료를 받을 수 있습니다."
+                                <br />
+                                <span class="text-gray-400">© 2025 성경인물 MBTI 테스트. 모든 권리 보유.</span>
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            `;
+        }
+
+        // 이미지 확대 모달 표시
+        function showImageModal(imageSrc, characterName) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = characterName;
+            modalCaption.textContent = characterName;
+            modal.classList.remove('hidden');
+            
+            // body 스크롤 방지
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 이미지 확대 모달 숨김
+        function hideImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            
+            // body 스크롤 복원
+            document.body.style.overflow = 'auto';
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideImageModal();
+            }
+        });
+
+        // 편집 모드 전환
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'basic') {
+                document.getElementById('basicEditor').classList.remove('hidden');
+                document.getElementById('htmlEditor').classList.add('hidden');
+                document.getElementById('basicModeBtn').className = 'px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+                document.getElementById('htmlModeBtn').className = 'px-4 py-2 font-medium text-gray-500 hover:text-gray-700';
+                
+                // HTML 모드의 내용을 기본 모드로 동기화
+                document.getElementById('wysiwyg').innerHTML = document.getElementById('htmlCode').value;
+            } else {
+                document.getElementById('basicEditor').classList.add('hidden');
+                document.getElementById('htmlEditor').classList.remove('hidden');
+                document.getElementById('basicModeBtn').className = 'px-4 py-2 font-medium text-gray-500 hover:text-gray-700';
+                document.getElementById('htmlModeBtn').className = 'px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+                
+                // 기본 모드의 내용을 HTML 모드로 동기화
+                document.getElementById('htmlCode').value = document.getElementById('wysiwyg').innerHTML;
+                
+                // 코드 하이라이팅 적용
+                setTimeout(() => {
+                    const codeElement = document.getElementById('htmlCode');
+                    codeElement.style.fontFamily = 'monospace';
+                }, 100);
+            }
+        }
+
+        // 이미지 업로드 처리
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('uploadedImage');
+                    img.src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 이미지 삽입
+        function insertImage() {
+            const img = document.getElementById('uploadedImage');
+            const imgHtml = `<img src="${img.src}" alt="업로드된 이미지" style="max-width: 100%; height: auto; margin: 10px 0;">`;
+            
+            if (currentMode === 'basic') {
+                const wysiwyg = document.getElementById('wysiwyg');
+                wysiwyg.innerHTML += imgHtml;
+            } else {
+                const htmlCode = document.getElementById('htmlCode');
+                htmlCode.value += imgHtml;
+            }
+            
+            // 이미지 미리보기 숨기기
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imageUpload').value = '';
+        }
+
+        // 미리보기
+        function showPreview() {
+            let content;
+            if (currentMode === 'basic') {
+                content = document.getElementById('wysiwyg').innerHTML;
+            } else {
+                content = document.getElementById('htmlCode').value;
+            }
+            
+            const previewWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            // HTML 내용 생성
+            let htmlContent = '<!DOCTYPE html><html lang="ko"><head>';
+            htmlContent += '<meta charset="UTF-8">';
+            htmlContent += '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+            htmlContent += '<title>미리보기 - ' + getPageTitle(currentPage) + '</title>';
+            
+            // 결과 페이지인 경우 Tailwind CSS와 스타일 추가
+            if (currentPage === 'result') {
+                htmlContent += '<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">';
+                htmlContent += '<style>';
+                htmlContent += 'body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }';
+                htmlContent += '.bg-gradient-to-br { background: linear-gradient(to bottom right, #e0e7ff, #f3e8ff, #fce7f3); }';
+                htmlContent += '.backdrop-blur-sm { backdrop-filter: blur(4px); }';
+                htmlContent += '.transform:hover { transform: scale(1.02); }';
+                htmlContent += '.blur-3xl { filter: blur(48px); }';
+                htmlContent += '.blur-2xl { filter: blur(24px); }';
+                htmlContent += '</style>';
+            } else {
+                htmlContent += '<style>';
+                htmlContent += 'body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }';
+                htmlContent += 'img { max-width: 100%; height: auto; }';
+                htmlContent += '</style>';
+            }
+            
+            htmlContent += '</head><body>';
+            
+            // 결과 페이지가 아닌 경우 제목 추가
+            if (currentPage !== 'result') {
+                htmlContent += '<h2>📱 미리보기: ' + getPageTitle(currentPage) + '</h2><hr>';
+            }
+            
+            htmlContent += content;
+            
+            // 결과 페이지에 JavaScript 함수 추가
+            if (currentPage === 'result') {
+                htmlContent += '<script>';
+                htmlContent += 'function showImageModal(imageSrc, characterName) {';
+                htmlContent += 'const modal = document.getElementById("imageModal");';
+                htmlContent += 'const modalImage = document.getElementById("modalImage");';
+                htmlContent += 'const modalCaption = document.getElementById("modalCaption");';
+                htmlContent += 'modalImage.src = imageSrc;';
+                htmlContent += 'modalImage.alt = characterName;';
+                htmlContent += 'modalCaption.textContent = characterName;';
+                htmlContent += 'modal.classList.remove("hidden");';
+                htmlContent += 'document.body.style.overflow = "hidden";';
+                htmlContent += '}';
+                htmlContent += 'function hideImageModal() {';
+                htmlContent += 'const modal = document.getElementById("imageModal");';
+                htmlContent += 'modal.classList.add("hidden");';
+                htmlContent += 'document.body.style.overflow = "auto";';
+                htmlContent += '}';
+                htmlContent += 'document.addEventListener("keydown", function(e) {';
+                htmlContent += 'if (e.key === "Escape") hideImageModal();';
+                htmlContent += '});';
+                htmlContent += '</script>';
+            }
+            
+            htmlContent += '</body></html>';
+            
+            previewWindow.document.write(htmlContent);
+            previewWindow.document.close();
+        }
+
+        // 변경사항 저장
+        function saveChanges() {
+            let content;
+            if (currentMode === 'basic') {
+                content = document.getElementById('wysiwyg').innerHTML;
+            } else {
+                content = document.getElementById('htmlCode').value;
+            }
+            
+            // 실제로는 서버로 전송해야 하지만, 여기서는 로컬 스토리지에 저장
+            localStorage.setItem(`page_${currentPage}`, content);
+            
+            alert('✅ 변경사항이 저장되었습니다!\n\n실제 웹사이트에 반영하려면 개발자가 배포 작업을 진행해야 합니다.');
+        }
+
+        // Enter 키로 로그인
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // WYSIWYG 에디터 기본 기능들
+        document.getElementById('wysiwyg').addEventListener('keydown', function(e) {
+            // Ctrl+B: 굵게
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                document.execCommand('bold');
+            }
+            // Ctrl+I: 이탤릭
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                document.execCommand('italic');
+            }
+            // Ctrl+U: 밑줄
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                document.execCommand('underline');
+            }
+        });
+    </script>
+</body>
+</html>

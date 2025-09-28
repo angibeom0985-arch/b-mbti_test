@@ -503,7 +503,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   
                   {/* 중앙에 큰 이미지 */}
                   <div className="flex justify-center">
-                    <div className="w-32 h-32 relative cursor-pointer group">
+                    <div className="w-32 h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
@@ -513,11 +513,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           character: RESULTS[compatibleType].character
                         })}
                       />
-                      {/* 이미지 안에 크게보기 버튼 - 완전히 이미지 내부에 오버레이 */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-all duration-200 flex items-center justify-center">
-                        <span className="bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          🔍 크게보기
-                        </span>
+                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
+                        🔍 크게보기
                       </div>
                     </div>
                   </div>
@@ -556,7 +554,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   
                   {/* 중앙에 큰 이미지 */}
                   <div className="flex justify-center">
-                    <div className="w-32 h-32 relative cursor-pointer group">
+                    <div className="w-32 h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
@@ -566,11 +564,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           character: RESULTS[incompatibleType].character
                         })}
                       />
-                      {/* 이미지 안에 크게보기 버튼 - 완전히 이미지 내부에 오버레이 */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-all duration-200 flex items-center justify-center">
-                        <span className="bg-black/70 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          🔍 크게보기
-                        </span>
+                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
+                        🔍 크게보기
                       </div>
                     </div>
                   </div>

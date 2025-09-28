@@ -491,14 +491,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   <div className="flex-1 space-y-3">
                     {/* 제목과 MBTI 유형 */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-lg font-bold text-green-800">어울리는 성격 유형 :</h3>
+                      <h3 className="text-base font-bold text-green-800">어울리는 성격 유형 :</h3>
                       <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                         {compatibleType}
                       </span>
-                      <span className="font-bold text-green-800 text-lg">
+                      <span className="font-bold text-green-800 text-base">
                         {RESULTS[compatibleType].character}
                       </span>
-                      <span className="text-green-600 text-xl">💚</span>
+                      <span className="text-green-600 text-lg">💚</span>
                     </div>
                     
                     {/* 이유 설명 */}
@@ -543,14 +543,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   <div className="flex-1 space-y-3">
                     {/* 제목과 MBTI 유형 */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-lg font-bold text-red-800">주의해야 할 성격 유형 :</h3>
+                      <h3 className="text-base font-bold text-red-800">주의해야 할 성격 유형 :</h3>
                       <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                         {incompatibleType}
                       </span>
-                      <span className="font-bold text-red-800 text-lg">
+                      <span className="font-bold text-red-800 text-base">
                         {RESULTS[incompatibleType].character}
                       </span>
-                      <span className="text-red-600 text-xl">💔</span>
+                      <span className="text-red-600 text-lg">💔</span>
                     </div>
                     
                     {/* 이유 설명 */}

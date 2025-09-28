@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { MbtiType, MbtiResult } from '../types';
 import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from '../constants';
 import RestartIcon from './icons/RestartIcon';
@@ -164,24 +164,39 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [currentQuizType, setCurrentQuizType] = useState<string>('');
 
+  // 게임 점수 관련 상태
+  const [gameScore, setGameScore] = useState(0);
+  const [totalGames, setTotalGames] = useState(0);
+  const [showScoreShare, setShowScoreShare] = useState(false);
+
   // 게임 참여 유도 멘트 배열
   const gamePromptMessages = [
     "🎯 관찰력이 뛰어난 당신이라면 이 게임 식은 죽 먹기일 거예요!",
-    "😎 성경 지식이 좋은 분들만 도전하는 특별한 게임이에요",
-    "✨ 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
+    "🎮 친구들보다 더 빠르게 맞출 자신 있나요? 도전해보세요!",
+    "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
     "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
     "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
-    "🎨 아름다운 성경 인물 일러스트와 함께하는 특별한 시간",
-    "🧠 IQ 높은 분들이 선호하는 이미지 퀴즈 게임이에요",
+    "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
     "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
     "🎪 친구들과 점수 경쟁하면 더 재밌어요! 도전해보세요",
-    "🌟 성경 공부도 되고 재미도 있는 일석이조 게임!"
+    "🌟 재미있는 일러스트와 함께하는 힐링 타임!"
   ];
 
   // 랜덤 멘트 선택 (컴포넌트 마운트 시 한 번만 선택)
   const [randomPrompt] = useState(() => {
     return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
   });
+
+  // 컴포넌트 마운트 시 게임 점수 불러오기
+  useEffect(() => {
+    const savedScore = localStorage.getItem('quizGameScore');
+    const savedTotal = localStorage.getItem('quizGameTotal');
+    
+    if (savedScore && savedTotal) {
+      setGameScore(parseInt(savedScore, 10));
+      setTotalGames(parseInt(savedTotal, 10));
+    }
+  }, []);
 
   // 퀴즈를 위한 랜덤 캐릭터 선택
   const getRandomCharacter = () => {
@@ -246,6 +261,36 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     } else {
       window.open(urls[platform as keyof typeof urls], '_blank');
       setShowShareModal(false);
+    }
+  };
+
+  // 게임 점수 계산 함수
+  const calculateGameScore = () => {
+    if (totalGames === 0) return 0;
+    return Math.round((gameScore / totalGames) * 100);
+  };
+
+  // 게임 점수 공유 함수
+  const handleGameScoreShare = (platform: string) => {
+    const scorePercentage = calculateGameScore();
+    const shareText = `🎮 성경인물 이미지 맞추기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
+    const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
+    
+    const urls = {
+      kakao: `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      copy: 'copy'
+    };
+
+    if (platform === 'copy') {
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+        alert('게임 결과가 클립보드에 복사되었습니다!');
+        setShowScoreShare(false);
+      });
+    } else {
+      window.open(urls[platform as keyof typeof urls], '_blank');
+      setShowScoreShare(false);
     }
   };
 
@@ -699,6 +744,31 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 🖼️ 게임 시작하기
               </button>
               
+              {/* 게임 점수 표시 (게임을 한 번이라도 했을 때만 표시) */}
+              {totalGames > 0 && (
+                <div className="mt-4 p-3 bg-white/80 rounded-xl border border-indigo-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-indigo-800">
+                      🏆 내 게임 기록
+                    </span>
+                    <button
+                      onClick={() => setShowScoreShare(true)}
+                      className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
+                    >
+                      📤 공유
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-indigo-700">
+                      정답률: {calculateGameScore()}%
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      ({gameScore}/{totalGames} 정답)
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {/* 랜덤 게임 참여 유도 멘트 */}
               <div className="mt-3 px-4 py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
                 <p className="text-xs text-gray-600 text-center leading-relaxed">
@@ -755,6 +825,43 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               📋 링크 복사
             </button>
             <button onClick={() => setShowShareModal(false)} className="w-full p-3 text-gray-500 text-sm">
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 게임 점수 공유 모달 */}
+      {showScoreShare && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-lg font-bold text-center mb-4">🏆 게임 결과 공유하기</h3>
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 mb-4 text-center">
+              <div className="text-xl font-bold text-indigo-700 mb-1">
+                정답률: {calculateGameScore()}%
+              </div>
+              <div className="text-sm text-gray-600">
+                ({gameScore}/{totalGames} 문제 정답)
+              </div>
+              <div className="text-xs text-indigo-600 mt-2">
+                친구들과 경쟁해보세요! 💪
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button onClick={() => handleGameScoreShare('kakao')} className="flex items-center justify-center p-3 bg-yellow-400 text-gray-800 rounded-2xl font-semibold">
+                💬 카카오
+              </button>
+              <button onClick={() => handleGameScoreShare('facebook')} className="flex items-center justify-center p-3 bg-blue-600 text-white rounded-2xl font-semibold">
+                📘 페북
+              </button>
+              <button onClick={() => handleGameScoreShare('twitter')} className="flex items-center justify-center p-3 bg-sky-400 text-white rounded-2xl font-semibold col-span-2">
+                🐦 트위터
+              </button>
+            </div>
+            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-3 bg-gray-100 text-gray-700 rounded-2xl font-semibold mb-3">
+              📋 결과 복사
+            </button>
+            <button onClick={() => setShowScoreShare(false)} className="w-full p-3 text-gray-500 text-sm">
               취소
             </button>
           </div>

@@ -177,7 +177,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
     "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
     "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
-    "🎯 친구들과 점수 경쟁하면 더 재밌어요! 도전해보세요",
+    "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
     "🌟 귀여운 일러스트와 함께하는 힐링 타임!"
   ];
 
@@ -1027,7 +1027,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <div className="text-center">
             <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
               <span className="mr-2">🔥</span>
-              다른 테스트도 도전해볼까?
+              다른 테스트도 해보실래요?
             </h3>
             <p className="text-sm text-gray-600 mb-3">
               더 정확한 분석을 위해 추가 테스트 해보세요! 🎯
@@ -1053,24 +1053,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
                     }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center flex-1">
-                        <div className="text-left flex-1">
-                          <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
-                          <div className="text-sm text-gray-600 mb-2">{version.description}</div>
-                          <div className={`text-xs ${
-                            version.color === 'orange' ? 'text-orange-700' :
-                            version.color === 'purple' ? 'text-purple-700' :
-                            'text-blue-700'
-                          }`}>
-                            {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
-                            {parseInt(versionKey) === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
-                            {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
-                          </div>
+                    <div className="text-center">
+                      <div className="text-left mb-3">
+                        <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
+                        <div className="text-sm text-gray-600 mb-2">{version.description}</div>
+                        <div className={`text-xs ${
+                          version.color === 'orange' ? 'text-orange-700' :
+                          version.color === 'purple' ? 'text-purple-700' :
+                          'text-blue-700'
+                        }`}>
+                          {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
+                          {parseInt(versionKey) === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
+                          {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
                         </div>
                       </div>
-                      <div className="flex-shrink-0 ml-4">
-                        <span className={`px-3 py-1 rounded-full font-semibold text-sm ${
+                      <div className="flex justify-center">
+                        <span className={`px-4 py-2 rounded-full font-semibold text-sm ${
                           version.color === 'orange' ? 'bg-orange-500 text-white' :
                           version.color === 'purple' ? 'bg-purple-500 text-white' :
                           'bg-blue-500 text-white'

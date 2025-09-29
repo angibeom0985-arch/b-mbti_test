@@ -510,15 +510,116 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             function shareToKakao() {
               const shareText = \`${shareText}\`;
               const shareUrl = \`${shareUrl}\`;
-              const kakaoUrl = \`https://story.kakao.com/share?url=\${encodeURIComponent(shareUrl)}&text=\${encodeURIComponent(shareText)}\`;
-              window.open(kakaoUrl, '_blank');
+              
+              // 모바일인지 확인
+              const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+              
+              if (isMobile) {
+                // 모바일에서는 카카오톡 앱으로 직접 공유
+                const kakaoTalkUrl = \`kakaotalk://msg?text=\${encodeURIComponent(shareText + '\\n\\n' + shareUrl)}\`;
+                
+                // 먼저 카카오톡 앱 열기 시도
+                window.location.href = kakaoTalkUrl;
+                
+                // 1초 후에 앱이 열리지 않았다면 웹 버전으로 이동
+                setTimeout(() => {
+                  if (confirm('카카오톡 앱이 설치되어 있지 않거나 열리지 않았습니다. 카카오톡 웹 버전으로 이동하시겠습니까?')) {
+                    window.open('https://web.kakao.com/', '_blank');
+                  }
+                }, 1000);
+              } else {
+                // PC에서는 웹 버전 카카오톡으로 이동
+                if (confirm('카카오톡으로 공유하시겠습니까? 웹 버전 카카오톡이 열립니다.')) {
+                  window.open('https://web.kakao.com/', '_blank');
+                  // 텍스트도 클립보드에 복사
+                  navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).catch(() => {});
+                }
+              }
             }
             
             function shareToInstagram() {
-              // 인스타그램은 직접 공유가 불가하므로 앱으로 이동하거나 웹사이트로 이동
-              const instagramUrl = 'https://www.instagram.com/';
-              window.open(instagramUrl, '_blank');
-              alert('인스타그램에서 스토리나 게시물로 공유해주세요!\\n\\n"' + \`${shareText}\` + '"\\n\\n위 내용을 복사해서 사용하세요.');
+              const shareText = \`${shareText}\`;
+              const shareUrl = \`${shareUrl}\`;
+              
+              // 인스타그램 공유 옵션 선택 다이얼로그
+              const options = [
+                '📸 스토리에 공유하기',
+                '📋 피드에 공유하기', 
+                '💬 DM으로 공유하기',
+                '❌ 취소'
+              ];
+              
+              let choice = '';
+              const optionsText = options.map((option, index) => \`\${index + 1}. \${option}\`).join('\\n');
+              const userChoice = prompt(\`인스타그램 공유 방법을 선택해주세요:\\n\\n\${optionsText}\\n\\n번호를 입력하세요 (1-4):\`);
+              
+              if (!userChoice || userChoice === '4') {
+                return; // 취소
+              }
+              
+              const choiceNum = parseInt(userChoice);
+              const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+              
+              switch(choiceNum) {
+                case 1: // 스토리
+                  if (isMobile) {
+                    // 모바일에서 인스타그램 스토리로 직접 이동 시도
+                    window.location.href = 'instagram://story-camera';
+                    setTimeout(() => {
+                      if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                        window.open('https://www.instagram.com/', '_blank');
+                      }
+                    }, 1500);
+                  } else {
+                    window.open('https://www.instagram.com/', '_blank');
+                  }
+                  navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
+                    alert('📋 텍스트가 복사되었습니다! 인스타그램 스토리에 붙여넣어 주세요.');
+                  }).catch(() => {
+                    alert('📸 인스타그램 스토리에 다음 내용을 공유해주세요:\\n\\n' + shareText + '\\n\\n' + shareUrl);
+                  });
+                  break;
+                  
+                case 2: // 피드
+                  if (isMobile) {
+                    window.location.href = 'instagram://camera';
+                    setTimeout(() => {
+                      if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                        window.open('https://www.instagram.com/', '_blank');
+                      }
+                    }, 1500);
+                  } else {
+                    window.open('https://www.instagram.com/', '_blank');
+                  }
+                  navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
+                    alert('📋 텍스트가 복사되었습니다! 인스타그램 피드에 붙여넣어 주세요.');
+                  }).catch(() => {
+                    alert('📋 인스타그램 피드에 다음 내용을 공유해주세요:\\n\\n' + shareText + '\\n\\n' + shareUrl);
+                  });
+                  break;
+                  
+                case 3: // DM
+                  if (isMobile) {
+                    window.location.href = 'instagram://direct-inbox';
+                    setTimeout(() => {
+                      if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                        window.open('https://www.instagram.com/direct/inbox/', '_blank');
+                      }
+                    }, 1500);
+                  } else {
+                    window.open('https://www.instagram.com/direct/inbox/', '_blank');
+                  }
+                  navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
+                    alert('📋 텍스트가 복사되었습니다! 인스타그램 DM에 붙여넣어 주세요.');
+                  }).catch(() => {
+                    alert('💬 인스타그램 DM에 다음 내용을 공유해주세요:\\n\\n' + shareText + '\\n\\n' + shareUrl);
+                  });
+                  break;
+                  
+                default:
+                  alert('올바른 번호를 선택해주세요.');
+                  shareToInstagram(); // 다시 선택할 수 있도록
+              }
             }
             
             function copyLink() {

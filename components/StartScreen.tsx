@@ -136,8 +136,8 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                       </div>
                       
                       {/* 시작 버튼 */}
-                      <div className="flex justify-center">
-                        <span className={`px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                      <div className="w-full">
+                        <span className={`w-full block px-4 py-2 rounded-full text-sm font-semibold text-white text-center ${
                           version.color === 'orange' ? 'bg-orange-500' :
                           version.color === 'purple' ? 'bg-purple-500' : 'bg-blue-500'
                         }`}>

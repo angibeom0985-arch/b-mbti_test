@@ -206,6 +206,129 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     setQuizResult(null);
   };
 
+  // 모바일 최적화된 새창 이미지 보기 함수
+  const openImageInNewWindow = (imageSrc: string, characterName: string) => {
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${characterName} - 성경인물 MBTI</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              margin: 0;
+              padding: 10px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              font-family: system-ui, -apple-system, sans-serif;
+            }
+            .container {
+              text-align: center;
+              background: white;
+              padding: 20px;
+              border-radius: 20px;
+              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+              position: relative;
+              width: 95vw;
+              max-width: 600px;
+            }
+            img {
+              width: 90vw;
+              max-width: 500px;
+              height: auto;
+              border-radius: 15px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            h1 {
+              margin-top: 20px;
+              color: #333;
+              font-size: clamp(24px, 5vw, 32px);
+            }
+            .back-button {
+              margin-top: 20px;
+              padding: 16px 32px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              border-radius: 25px;
+              font-size: clamp(16px, 4vw, 20px);
+              font-weight: bold;
+              cursor: pointer;
+              width: 100%;
+              max-width: 300px;
+              transition: all 0.3s ease;
+              box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            .back-button:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            }
+            .close-button {
+              position: absolute;
+              top: 15px;
+              right: 15px;
+              background: rgba(0,0,0,0.5);
+              color: white;
+              border: none;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .close-button:hover {
+              background: rgba(0,0,0,0.7);
+            }
+            @media (max-width: 768px) {
+              body {
+                padding: 5px;
+              }
+              .container {
+                width: 98vw;
+                padding: 15px;
+              }
+              img {
+                width: 95vw;
+              }
+              h1 {
+                font-size: 28px;
+              }
+              .back-button {
+                font-size: 18px;
+                padding: 18px 36px;
+              }
+              .close-button {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <button class="close-button" onclick="window.close()">×</button>
+            <img src="${window.location.origin}${imageSrc}" alt="${characterName}" />
+            <h1>${characterName}</h1>
+            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+              🏠 결과 페이지로 돌아가기
+            </button>
+          </div>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
+  };
+
   // 가짜 댓글 데이터
   const fakeComments = [
     { id: 1, user: "은혜님", comment: "완전 저네요!! 대박 신기해요 ㅋㅋ", likes: 23 },
@@ -428,97 +551,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 <div 
                   className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
                   onClick={() => {
-                    // 새창에서 이미지 열기
-                    const newWindow = window.open('', '_blank');
-                    if (newWindow && resultData.image) {
-                      newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <title>${resultData.character} - 성경인물 MBTI</title>
-                          <style>
-                            body {
-                              margin: 0;
-                              padding: 20px;
-                              display: flex;
-                              justify-content: center;
-                              align-items: center;
-                              min-height: 100vh;
-                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                              font-family: system-ui, -apple-system, sans-serif;
-                            }
-                            .container {
-                              text-align: center;
-                              background: white;
-                              padding: 30px;
-                              border-radius: 20px;
-                              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                              position: relative;
-                            }
-                            img {
-                              max-width: 500px;
-                              max-height: 500px;
-                              width: auto;
-                              height: auto;
-                              border-radius: 15px;
-                              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                            }
-                            h1 {
-                              margin-top: 20px;
-                              color: #333;
-                              font-size: 24px;
-                            }
-                            .back-button {
-                              margin-top: 20px;
-                              padding: 12px 24px;
-                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                              color: white;
-                              border: none;
-                              border-radius: 25px;
-                              font-size: 16px;
-                              font-weight: bold;
-                              cursor: pointer;
-                              transition: all 0.3s ease;
-                              box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                            }
-                            .back-button:hover {
-                              transform: translateY(-2px);
-                              box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-                            }
-                            .close-button {
-                              position: absolute;
-                              top: 15px;
-                              right: 15px;
-                              background: rgba(0,0,0,0.5);
-                              color: white;
-                              border: none;
-                              width: 30px;
-                              height: 30px;
-                              border-radius: 50%;
-                              cursor: pointer;
-                              font-size: 18px;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                            }
-                            .close-button:hover {
-                              background: rgba(0,0,0,0.7);
-                            }
-                          </style>
-                        </head>
-                        <body>
-                          <div class="container">
-                            <button class="close-button" onclick="window.close()">×</button>
-                            <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
-                            <h1>${resultData.character}</h1>
-                            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-                              🏠 결과 페이지로 돌아가기
-                            </button>
-                          </div>
-                        </body>
-                        </html>
-                      `);
-                      newWindow.document.close();
+                    if (resultData.image) {
+                      openImageInNewWindow(resultData.image, resultData.character);
                     }
                   }}
                 >
@@ -537,97 +571,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
                 <button
                   onClick={() => {
-                    // 새창에서 이미지 열기
-                    const newWindow = window.open('', '_blank');
-                    if (newWindow) {
-                      newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <title>${resultData.character} - 성경인물 MBTI</title>
-                          <style>
-                            body {
-                              margin: 0;
-                              padding: 20px;
-                              display: flex;
-                              justify-content: center;
-                              align-items: center;
-                              min-height: 100vh;
-                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                              font-family: system-ui, -apple-system, sans-serif;
-                            }
-                            .container {
-                              text-align: center;
-                              background: white;
-                              padding: 30px;
-                              border-radius: 20px;
-                              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                              position: relative;
-                            }
-                            img {
-                              max-width: 500px;
-                              max-height: 500px;
-                              width: auto;
-                              height: auto;
-                              border-radius: 15px;
-                              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                            }
-                            h1 {
-                              margin-top: 20px;
-                              color: #333;
-                              font-size: 24px;
-                            }
-                            .back-button {
-                              margin-top: 20px;
-                              padding: 12px 24px;
-                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                              color: white;
-                              border: none;
-                              border-radius: 25px;
-                              font-size: 16px;
-                              font-weight: bold;
-                              cursor: pointer;
-                              transition: all 0.3s ease;
-                              box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                            }
-                            .back-button:hover {
-                              transform: translateY(-2px);
-                              box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-                            }
-                            .close-button {
-                              position: absolute;
-                              top: 15px;
-                              right: 15px;
-                              background: rgba(0,0,0,0.5);
-                              color: white;
-                              border: none;
-                              width: 30px;
-                              height: 30px;
-                              border-radius: 50%;
-                              cursor: pointer;
-                              font-size: 18px;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                            }
-                            .close-button:hover {
-                              background: rgba(0,0,0,0.7);
-                            }
-                          </style>
-                        </head>
-                        <body>
-                          <div class="container">
-                            <button class="close-button" onclick="window.close()">×</button>
-                            <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
-                            <h1>${resultData.character}</h1>
-                            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-                              🏠 결과 페이지로 돌아가기
-                            </button>
-                          </div>
-                        </body>
-                        </html>
-                      `);
-                      newWindow.document.close();
+                    if (resultData.image) {
+                      openImageInNewWindow(resultData.image, resultData.character);
                     }
                   }}
                   className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
@@ -766,98 +711,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         alt={RESULTS[compatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
                         onClick={() => {
-                          // 새창에서 이미지 열기
-                          const newWindow = window.open('', '_blank');
-                          if (newWindow) {
-                            newWindow.document.write(`
-                              <!DOCTYPE html>
-                              <html>
-                              <head>
-                                <title>${RESULTS[compatibleType].character} - 성경인물 MBTI</title>
-                                <style>
-                                  body {
-                                    margin: 0;
-                                    padding: 20px;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    min-height: 100vh;
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    font-family: system-ui, -apple-system, sans-serif;
-                                  }
-                                  .container {
-                                    text-align: center;
-                                    background: white;
-                                    padding: 30px;
-                                    border-radius: 20px;
-                                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                                    position: relative;
-                                  }
-                                  img {
-                                    max-width: 500px;
-                                    max-height: 500px;
-                                    width: auto;
-                                    height: auto;
-                                    border-radius: 15px;
-                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                                  }
-                                  h1 {
-                                    margin-top: 20px;
-                                    color: #333;
-                                    font-size: 24px;
-                                  }
-                                  .back-button {
-                                    margin-top: 20px;
-                                    padding: 12px 24px;
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    color: white;
-                                    border: none;
-                                    border-radius: 25px;
-                                    font-size: 16px;
-                                    font-weight: bold;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                                  }
-                                  .back-button:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-                                  }
-                                  .close-button {
-                                    position: absolute;
-                                    top: 15px;
-                                    right: 15px;
-                                    background: rgba(0,0,0,0.5);
-                                    color: white;
-                                    border: none;
-                                    width: 30px;
-                                    height: 30px;
-                                    border-radius: 50%;
-                                    cursor: pointer;
-                                    font-size: 18px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                  }
-                                  .close-button:hover {
-                                    background: rgba(0,0,0,0.7);
-                                  }
-                                </style>
-                              </head>
-                              <body>
-                                <div class="container">
-                                  <button class="close-button" onclick="window.close()">×</button>
-                                  <img src="${window.location.origin}${getMbtiImage(compatibleType)}" alt="${RESULTS[compatibleType].character}" />
-                                  <h1>${RESULTS[compatibleType].character}</h1>
-                                  <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-                                    🏠 결과 페이지로 돌아가기
-                                  </button>
-                                </div>
-                              </body>
-                              </html>
-                            `);
-                            newWindow.document.close();
-                          }
+                          openImageInNewWindow(getMbtiImage(compatibleType), RESULTS[compatibleType].character);
                         }}
                       />
                       {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
@@ -908,98 +762,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         alt={RESULTS[incompatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
                         onClick={() => {
-                          // 새창에서 이미지 열기
-                          const newWindow = window.open('', '_blank');
-                          if (newWindow) {
-                            newWindow.document.write(`
-                              <!DOCTYPE html>
-                              <html>
-                              <head>
-                                <title>${RESULTS[incompatibleType].character} - 성경인물 MBTI</title>
-                                <style>
-                                  body {
-                                    margin: 0;
-                                    padding: 20px;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    min-height: 100vh;
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    font-family: system-ui, -apple-system, sans-serif;
-                                  }
-                                  .container {
-                                    text-align: center;
-                                    background: white;
-                                    padding: 30px;
-                                    border-radius: 20px;
-                                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                                    position: relative;
-                                  }
-                                  img {
-                                    max-width: 500px;
-                                    max-height: 500px;
-                                    width: auto;
-                                    height: auto;
-                                    border-radius: 15px;
-                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                                  }
-                                  h1 {
-                                    margin-top: 20px;
-                                    color: #333;
-                                    font-size: 24px;
-                                  }
-                                  .back-button {
-                                    margin-top: 20px;
-                                    padding: 12px 24px;
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    color: white;
-                                    border: none;
-                                    border-radius: 25px;
-                                    font-size: 16px;
-                                    font-weight: bold;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                                  }
-                                  .back-button:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-                                  }
-                                  .close-button {
-                                    position: absolute;
-                                    top: 15px;
-                                    right: 15px;
-                                    background: rgba(0,0,0,0.5);
-                                    color: white;
-                                    border: none;
-                                    width: 30px;
-                                    height: 30px;
-                                    border-radius: 50%;
-                                    cursor: pointer;
-                                    font-size: 18px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                  }
-                                  .close-button:hover {
-                                    background: rgba(0,0,0,0.7);
-                                  }
-                                </style>
-                              </head>
-                              <body>
-                                <div class="container">
-                                  <button class="close-button" onclick="window.close()">×</button>
-                                  <img src="${window.location.origin}${getMbtiImage(incompatibleType)}" alt="${RESULTS[incompatibleType].character}" />
-                                  <h1>${RESULTS[incompatibleType].character}</h1>
-                                  <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-                                    🏠 결과 페이지로 돌아가기
-                                  </button>
-                                </div>
-                              </body>
-                              </html>
-                            `);
-                            newWindow.document.close();
-                          }
+                          openImageInNewWindow(getMbtiImage(incompatibleType), RESULTS[incompatibleType].character);
                         }}
                       />
                       {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}

@@ -5,6 +5,26 @@ import RestartIcon from './icons/RestartIcon';
 import LoadingIndicator from './LoadingIndicator';
 import ShareIcon from './icons/ShareIcon';
 
+// 쿠팡 파트너스 링크 배열
+const COUPANG_PARTNERS_URLS = [
+  'https://link.coupang.com/a/cTTkqa',
+  'https://link.coupang.com/a/cTTkLm',
+  'https://link.coupang.com/a/cTTkS7',
+  'https://link.coupang.com/a/cTTkWI',
+  'https://link.coupang.com/a/cTTk02',
+  'https://link.coupang.com/a/cTTk5m',
+  'https://link.coupang.com/a/cTTk7h',
+  'https://link.coupang.com/a/cTTlcr',
+  'https://link.coupang.com/a/cTTldT',
+  'https://link.coupang.com/a/cTTlif'
+];
+
+// 랜덤 쿠팡 파트너스 링크 선택 함수
+const getRandomCoupangUrl = (): string => {
+  const randomIndex = Math.floor(Math.random() * COUPANG_PARTNERS_URLS.length);
+  return COUPANG_PARTNERS_URLS[randomIndex];
+};
+
 interface ResultScreenProps {
   resultType: MbtiType;
   resultData: MbtiResult | null;
@@ -406,11 +426,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     );
   }
 
-  // 쿠팡 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (팝업 차단 방지)
+  // 쿠팡파트너스 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (수익 창출)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
-    // 이미지 저장에서 사용하는 실제 쿠팡 링크 사용
-    const characterName = resultData?.character || '';
-    const coupangUrl = `https://www.coupang.com/np/search?q=${encodeURIComponent(characterName)}`;
+    // 랜덤하게 쿠팡파트너스 링크 선택
+    const coupangPartnersUrl = getRandomCoupangUrl();
     
     // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
     const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
@@ -420,9 +439,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       return;
     }
     
-    // 2. 현재 탭에서 쿠팡 링크로 이동 (수익 창출)
+    // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
     setTimeout(() => {
-      window.location.href = coupangUrl;
+      window.location.href = coupangPartnersUrl;
     }, 100); // 새 탭이 열린 후 현재 탭 이동
   };
 
@@ -639,7 +658,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       kakao: `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-      instagram: `https://www.instagram.com/`, // 인스타그램은 직접 공유 불가하므로 앱으로 이동
       copy: 'copy'
     };
 
@@ -725,11 +743,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           link.click();
           document.body.removeChild(link);
 
-          // 이미지 저장 완료 후 쿠팡 링크 열기 및 사용자 안내
+          // 이미지 저장 완료 후 쿠팡파트너스 링크 열기 및 사용자 안내
           setTimeout(() => {
-            const characterName = resultData?.character || '';
-            const coupangUrl = `https://www.coupang.com/np/search?q=${encodeURIComponent(characterName)}`;
-            window.open(coupangUrl, '_blank');
+            const coupangPartnersUrl = 'https://link.coupang.com/a/cTTkqa';
+            window.open(coupangPartnersUrl, '_blank');
             
             // 사용자에게 다운로드 위치 안내
             alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
@@ -770,6 +787,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   
   const handleLeaveComment = () => {
     setShowComments(true);
+    // 댓글 작성 시에도 쿠팡 파트너스 수익 창출
+    setTimeout(() => {
+      window.open(getRandomCoupangUrl(), '_blank');
+    }, 1000);
   };
 
   const handleSubmitComment = () => {
@@ -1226,9 +1247,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             onClick={() => {
               // completedVersion이 있으면 시작 페이지로 버전 정보와 함께 이동
               if (completedVersion) {
-                window.location.href = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
+                openWithCoupangAd(`https://b-mbti.money-hotissue.com/?version=${completedVersion}`);
               } else {
                 onRestart();
+                // 다시 테스트 시에도 쿠팡 파트너스 수익 창출
+                setTimeout(() => {
+                  window.open(getRandomCoupangUrl(), '_blank');
+                }, 1000);
               }
             }}
             className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
@@ -1250,12 +1275,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
             <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
-            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
-              <button onClick={() => handleSNSShare('kakao')} className="flex items-center justify-center p-4 md:p-6 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                💬 카카오톡
-              </button>
-              <button onClick={() => handleSNSShare('instagram')} className="flex items-center justify-center p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                📸 인스타
+            <div className="mb-4 md:mb-6">
+              <button onClick={() => handleSNSShare('kakao')} className="w-full flex items-center justify-center p-4 md:p-6 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
+                💬 카카오톡으로 공유하기
               </button>
             </div>
             <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">

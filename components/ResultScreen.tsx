@@ -650,58 +650,75 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
+  // 카카오 SDK 초기화 (한 번만 실행)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).Kakao && !(window as any).Kakao.isInitialized()) {
+      (window as any).Kakao.init('YOUR_JAVASCRIPT_KEY'); // 실제 JavaScript 키로 교체 필요
+    }
+  }, []);
+
   const handleSNSShare = (platform: string) => {
     const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com';
 
     if (platform === 'kakao') {
-      // 카카오톡 앱 공유 시도
-      const kakaoAppUrl = `kakao://msg?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
-      const kakaoWebUrl = `https://web.kakao.com/`;
-      
-      // 먼저 카카오톡 앱으로 공유 시도
-      const tempLink = document.createElement('a');
-      tempLink.href = kakaoAppUrl;
-      tempLink.style.display = 'none';
-      document.body.appendChild(tempLink);
-      
-      // 카카오톡 앱이 설치되어 있는지 확인하는 타이머
-      let appOpenTimer: NodeJS.Timeout;
-      let fallbackTimer: NodeJS.Timeout;
-      
-      const startTime = Date.now();
-      
-      // 앱이 열리지 않으면 웹 버전으로 fallback
-      fallbackTimer = setTimeout(() => {
-        const elapsedTime = Date.now() - startTime;
-        // 앱이 2초 내에 열리지 않으면 클립보드에 복사하고 알림
-        if (elapsedTime < 3000) {
+      // 카카오 공식 SDK 사용
+      try {
+        if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+          (window as any).Kakao.Link.sendDefault({
+            objectType: 'feed',
+            content: {
+              title: `🙏 ${resultData?.character}(${resultType}) - 성경인물 MBTI 결과`,
+              description: shareText,
+              imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
+              link: {
+                mobileWebUrl: shareUrl,
+                webUrl: shareUrl,
+              },
+            },
+            buttons: [
+              {
+                title: '나도 테스트하기',
+                link: {
+                  mobileWebUrl: shareUrl,
+                  webUrl: shareUrl,
+                },
+              },
+            ],
+            success: () => {
+              console.log('카카오톡 공유 성공');
+              // 쿠팡 파트너스 수익 창출
+              setTimeout(() => {
+                window.open(getRandomCoupangUrl(), '_blank');
+              }, 1000);
+            },
+            fail: (error: any) => {
+              console.error('카카오톡 공유 실패:', error);
+              // 실패 시 클립보드 복사로 fallback
+              navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+                alert('📱 카카오톡 공유가 실패하여 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
+              }).catch(() => {
+                alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
+              });
+            }
+          });
+        } else {
+          // 카카오 SDK가 로드되지 않은 경우 fallback
           navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-            alert('📱 카카오톡 앱으로 공유할 수 없어 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
+            alert('📱 카카오톡 SDK 로딩 중입니다. 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
           }).catch(() => {
             alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
           });
         }
-      }, 2500);
-      
-      // 페이지가 숨겨지면(앱이 열림) fallback 타이머 취소
-      const handleVisibilityChange = () => {
-        if (document.hidden) {
-          clearTimeout(fallbackTimer);
-          document.removeEventListener('visibilitychange', handleVisibilityChange);
-        }
-      };
-      
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      
-      // 카카오톡 앱 실행 시도
-      tempLink.click();
-      document.body.removeChild(tempLink);
-      
-      // 쿠팡 파트너스 수익 창출
-      setTimeout(() => {
-        window.open(getRandomCoupangUrl(), '_blank');
-      }, 1000);
+      } catch (error) {
+        console.error('카카오톡 공유 중 오류:', error);
+        // 오류 발생 시 클립보드 복사로 fallback
+        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+          alert('📱 카카오톡 공유 중 오류가 발생하여 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
+        }).catch(() => {
+          alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
+        });
+      }
       
       setShowShareModal(false);
       

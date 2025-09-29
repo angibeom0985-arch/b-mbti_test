@@ -652,22 +652,71 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   const handleSNSShare = (platform: string) => {
     const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
-    const shareUrl = 'https://gowith153.com';
-    
-    const urls = {
-      kakao: `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-      copy: 'copy'
-    };
+    const shareUrl = 'https://b-mbti.money-hotissue.com';
 
-    if (platform === 'copy') {
+    if (platform === 'kakao') {
+      // 카카오톡 앱 공유 시도
+      const kakaoAppUrl = `kakao://msg?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
+      const kakaoWebUrl = `https://web.kakao.com/`;
+      
+      // 먼저 카카오톡 앱으로 공유 시도
+      const tempLink = document.createElement('a');
+      tempLink.href = kakaoAppUrl;
+      tempLink.style.display = 'none';
+      document.body.appendChild(tempLink);
+      
+      // 카카오톡 앱이 설치되어 있는지 확인하는 타이머
+      let appOpenTimer: NodeJS.Timeout;
+      let fallbackTimer: NodeJS.Timeout;
+      
+      const startTime = Date.now();
+      
+      // 앱이 열리지 않으면 웹 버전으로 fallback
+      fallbackTimer = setTimeout(() => {
+        const elapsedTime = Date.now() - startTime;
+        // 앱이 2초 내에 열리지 않으면 클립보드에 복사하고 알림
+        if (elapsedTime < 3000) {
+          navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+            alert('📱 카카오톡 앱으로 공유할 수 없어 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
+          }).catch(() => {
+            alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
+          });
+        }
+      }, 2500);
+      
+      // 페이지가 숨겨지면(앱이 열림) fallback 타이머 취소
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          clearTimeout(fallbackTimer);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      // 카카오톡 앱 실행 시도
+      tempLink.click();
+      document.body.removeChild(tempLink);
+      
+      // 쿠팡 파트너스 수익 창출
+      setTimeout(() => {
+        window.open(getRandomCoupangUrl(), '_blank');
+      }, 1000);
+      
+      setShowShareModal(false);
+      
+    } else if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         setShowShareModal(false);
       });
     } else {
+      const urls = {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+        twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
+      };
+      
       openWithCoupangAd(urls[platform as keyof typeof urls]);
       setShowShareModal(false);
     }

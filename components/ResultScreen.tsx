@@ -652,9 +652,23 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   // 카카오 SDK 초기화 (한 번만 실행)
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).Kakao && !(window as any).Kakao.isInitialized()) {
-      (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
-    }
+    const initKakao = () => {
+      if (typeof window !== 'undefined' && (window as any).Kakao) {
+        if (!(window as any).Kakao.isInitialized()) {
+          try {
+            (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
+            console.log('카카오 SDK 초기화 성공');
+          } catch (error) {
+            console.error('카카오 SDK 초기화 실패:', error);
+          }
+        }
+      } else {
+        // SDK가 아직 로드되지 않았으면 잠시 후 다시 시도
+        setTimeout(initKakao, 100);
+      }
+    };
+    
+    initKakao();
   }, []);
 
   const handleSNSShare = (platform: string) => {
@@ -662,62 +676,87 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     const shareUrl = 'https://b-mbti.money-hotissue.com';
 
     if (platform === 'kakao') {
-      // 카카오 공식 SDK 사용
-      try {
-        if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-          (window as any).Kakao.Link.sendDefault({
-            objectType: 'feed',
-            content: {
-              title: `🙏 ${resultData?.character}(${resultType}) - 성경인물 MBTI 결과`,
-              description: shareText,
-              imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-              link: {
-                mobileWebUrl: shareUrl,
-                webUrl: shareUrl,
-              },
-            },
-            buttons: [
-              {
-                title: '나도 테스트하기',
+      // 모바일 환경 감지
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // 모바일: 카카오톡 앱 스키마 직접 사용 (더 안정적)
+        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+        
+        try {
+          // 카카오톡 앱 열기 시도
+          window.location.href = kakaoAppScheme;
+          
+          // 1초 후 쿠팡 파트너스 링크 열기
+          setTimeout(() => {
+            window.open(getRandomCoupangUrl(), '_blank');
+          }, 1000);
+          
+          // 앱이 열리지 않을 경우 대비해 3초 후 안내
+          setTimeout(() => {
+            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 내용을 복사하세요.');
+            if (confirmation) {
+              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+                alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+              }).catch(() => {
+                alert('📱 다음 내용을 수동으로 복사해주세요:\n\n' + shareText + '\n\n' + shareUrl);
+              });
+            }
+          }, 3000);
+          
+        } catch (error) {
+          console.error('카카오톡 앱 스키마 실행 실패:', error);
+          // 실패 시 바로 클립보드 복사
+          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+            alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+          });
+        }
+      } else {
+        // PC: 카카오 SDK 시도, 실패 시 클립보드 복사
+        try {
+          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+            (window as any).Kakao.Link.sendDefault({
+              objectType: 'feed',
+              content: {
+                title: `🙏 ${resultData?.character}(${resultType}) - 성경인물 MBTI 결과`,
+                description: shareText,
+                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
                 link: {
                   mobileWebUrl: shareUrl,
                   webUrl: shareUrl,
                 },
               },
-            ],
-            success: () => {
-              console.log('카카오톡 공유 성공');
-              // 쿠팡 파트너스 수익 창출
-              setTimeout(() => {
-                window.open(getRandomCoupangUrl(), '_blank');
-              }, 1000);
-            },
-            fail: (error: any) => {
-              console.error('카카오톡 공유 실패:', error);
-              // 실패 시 클립보드 복사로 fallback
-              navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-                alert('📱 카카오톡 공유가 실패하여 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
-              }).catch(() => {
-                alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
-              });
-            }
-          });
-        } else {
-          // 카카오 SDK가 로드되지 않은 경우 fallback
-          navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-            alert('📱 카카오톡 SDK 로딩 중입니다. 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
-          }).catch(() => {
-            alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
+              buttons: [
+                {
+                  title: '나도 테스트하기',
+                  link: {
+                    mobileWebUrl: shareUrl,
+                    webUrl: shareUrl,
+                  },
+                },
+              ],
+              success: () => {
+                console.log('카카오톡 공유 성공');
+                setTimeout(() => {
+                  window.open(getRandomCoupangUrl(), '_blank');
+                }, 1000);
+              },
+              fail: (error: any) => {
+                console.error('카카오톡 공유 실패:', error);
+                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+                  alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+                });
+              }
+            });
+          } else {
+            throw new Error('카카오 SDK 미초기화');
+          }
+        } catch (error) {
+          console.error('PC 카카오톡 공유 오류:', error);
+          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+            alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
           });
         }
-      } catch (error) {
-        console.error('카카오톡 공유 중 오류:', error);
-        // 오류 발생 시 클립보드 복사로 fallback
-        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-          alert('📱 카카오톡 공유 중 오류가 발생하여 내용이 클립보드에 복사되었습니다!\n\n카카오톡을 열고 원하는 곳에 붙여넣기 해주세요. 📋');
-        }).catch(() => {
-          alert('📱 카카오톡 공유를 위해 다음 내용을 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
-        });
       }
       
       setShowShareModal(false);
@@ -744,57 +783,76 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
     
     if (platform === 'kakao') {
-      // 카카오 공식 SDK 사용 (게임 점수 공유)
-      try {
-        if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-          (window as any).Kakao.Link.sendDefault({
-            objectType: 'feed',
-            content: {
-              title: `🎮 ${resultData?.character}(${resultType}) - 게임 점수 ${scorePercentage}%`,
-              description: shareText,
-              imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-              link: {
-                mobileWebUrl: shareUrl,
-                webUrl: shareUrl,
-              },
-            },
-            buttons: [
-              {
-                title: '나도 도전하기',
+      // 모바일 환경 감지
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // 모바일: 카카오톡 앱 스키마 직접 사용
+        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+        
+        try {
+          window.location.href = kakaoAppScheme;
+          
+          setTimeout(() => {
+            window.open(getRandomCoupangUrl(), '_blank');
+          }, 1000);
+          
+          setTimeout(() => {
+            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 게임 결과를 복사하세요.');
+            if (confirmation) {
+              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+                alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+              });
+            }
+          }, 3000);
+        } catch (error) {
+          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+            alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+          });
+        }
+      } else {
+        // PC: 카카오 SDK 시도
+        try {
+          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+            (window as any).Kakao.Link.sendDefault({
+              objectType: 'feed',
+              content: {
+                title: `🎮 ${resultData?.character}(${resultType}) - 게임 점수 ${scorePercentage}%`,
+                description: shareText,
+                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
                 link: {
                   mobileWebUrl: shareUrl,
                   webUrl: shareUrl,
                 },
               },
-            ],
-            success: () => {
-              console.log('카카오톡 게임 점수 공유 성공');
-              // 쿠팡 파트너스 수익 창출
-              setTimeout(() => {
-                window.open(getRandomCoupangUrl(), '_blank');
-              }, 1000);
-            },
-            fail: (error: any) => {
-              console.error('카카오톡 게임 점수 공유 실패:', error);
-              // 실패 시 클립보드 복사로 fallback
-              navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-                alert('📱 카카오톡 공유가 실패하여 게임 결과가 클립보드에 복사되었습니다!');
-              }).catch(() => {
-                alert('📱 게임 결과를 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
-              });
-            }
-          });
-        } else {
-          // 카카오 SDK가 로드되지 않은 경우 fallback
-          navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-            alert('📱 카카오톡 SDK 로딩 중입니다. 게임 결과가 클립보드에 복사되었습니다!');
+              buttons: [
+                {
+                  title: '나도 도전하기',
+                  link: {
+                    mobileWebUrl: shareUrl,
+                    webUrl: shareUrl,
+                  },
+                },
+              ],
+              success: () => {
+                setTimeout(() => {
+                  window.open(getRandomCoupangUrl(), '_blank');
+                }, 1000);
+              },
+              fail: (error: any) => {
+                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+                  alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
+                });
+              }
+            });
+          } else {
+            throw new Error('카카오 SDK 미초기화');
+          }
+        } catch (error) {
+          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+            alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
           });
         }
-      } catch (error) {
-        // 오류 발생 시 클립보드 복사로 fallback
-        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-          alert('📱 카카오톡 공유 중 오류가 발생하여 게임 결과가 클립보드에 복사되었습니다!');
-        });
       }
     } else if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {

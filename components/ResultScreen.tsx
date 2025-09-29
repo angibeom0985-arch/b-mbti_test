@@ -653,7 +653,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   // 카카오 SDK 초기화 (한 번만 실행)
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).Kakao && !(window as any).Kakao.isInitialized()) {
-      (window as any).Kakao.init('YOUR_JAVASCRIPT_KEY'); // 실제 JavaScript 키로 교체 필요
+      (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
     }
   }, []);
 

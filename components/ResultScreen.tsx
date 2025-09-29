@@ -545,31 +545,39 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             function shareToKakao() {
               const shareText = \`${shareText}\`;
               const shareUrl = \`${shareUrl}\`;
+              const fullText = shareText + '\\n\\n' + shareUrl;
               
-              // 모바일인지 확인
-              const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-              
-              if (isMobile) {
-                // 모바일에서는 카카오톡 앱으로 직접 공유
-                const kakaoTalkUrl = \`kakaotalk://msg?text=\${encodeURIComponent(shareText + '\\n\\n' + shareUrl)}\`;
+              // 클립보드에 텍스트 복사
+              navigator.clipboard.writeText(fullText).then(() => {
+                // 모바일인지 확인
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 
-                // 먼저 카카오톡 앱 열기 시도
-                window.location.href = kakaoTalkUrl;
-                
-                // 1초 후에 앱이 열리지 않았다면 웹 버전으로 이동
-                setTimeout(() => {
-                  if (confirm('카카오톡 앱이 설치되어 있지 않거나 열리지 않았습니다. 카카오톡 웹 버전으로 이동하시겠습니까?')) {
+                if (isMobile) {
+                  // 모바일에서는 카카오톡 앱으로 직접 이동 시도
+                  try {
+                    // 안전한 방식으로 카카오톡 앱 실행 시도
+                    const link = document.createElement('a');
+                    link.href = \`kakaotalk://msg?text=\${encodeURIComponent(fullText)}\`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // 성공 메시지
+                    alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 앱이 열리지 않으면 카카오톡에서 붙여넣기 해주세요.');
+                  } catch (error) {
+                    // 카카오톡 앱 실행 실패시 대안 제공
+                    alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 앱에서 붙여넣기 해주세요.');
+                  }
+                } else {
+                  // PC에서는 웹 카카오톡으로 이동
+                  if (confirm('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 웹 버전을 열어서 붙여넣기 하시겠습니까?')) {
                     window.open('https://web.kakao.com/', '_blank');
                   }
-                }, 1000);
-              } else {
-                // PC에서는 웹 버전 카카오톡으로 이동
-                if (confirm('카카오톡으로 공유하시겠습니까? 웹 버전 카카오톡이 열립니다.')) {
-                  window.open('https://web.kakao.com/', '_blank');
-                  // 텍스트도 클립보드에 복사
-                  navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).catch(() => {});
                 }
-              }
+              }).catch(() => {
+                // 클립보드 복사 실패시 대체 방법
+                alert('📱 카카오톡으로 공유하기:\\n\\n1. 아래 텍스트를 복사하세요\\n2. 카카오톡을 열어서 붙여넣기 하세요\\n\\n' + fullText);
+              });
             }
             
             function shareToInstagram() {

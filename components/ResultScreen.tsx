@@ -728,14 +728,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         setTimeout(() => setCopied(false), 2000);
         setShowShareModal(false);
       });
-    } else {
-      const urls = {
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-        twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
-      };
-      
-      openWithCoupangAd(urls[platform as keyof typeof urls]);
-      setShowShareModal(false);
     }
   };
 
@@ -751,20 +743,67 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     const shareText = `🎮 성경인물 맞히기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
     
-    const urls = {
-      kakao: `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-      copy: 'copy'
-    };
-
-    if (platform === 'copy') {
+    if (platform === 'kakao') {
+      // 카카오 공식 SDK 사용 (게임 점수 공유)
+      try {
+        if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+          (window as any).Kakao.Link.sendDefault({
+            objectType: 'feed',
+            content: {
+              title: `🎮 ${resultData?.character}(${resultType}) - 게임 점수 ${scorePercentage}%`,
+              description: shareText,
+              imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
+              link: {
+                mobileWebUrl: shareUrl,
+                webUrl: shareUrl,
+              },
+            },
+            buttons: [
+              {
+                title: '나도 도전하기',
+                link: {
+                  mobileWebUrl: shareUrl,
+                  webUrl: shareUrl,
+                },
+              },
+            ],
+            success: () => {
+              console.log('카카오톡 게임 점수 공유 성공');
+              // 쿠팡 파트너스 수익 창출
+              setTimeout(() => {
+                window.open(getRandomCoupangUrl(), '_blank');
+              }, 1000);
+            },
+            fail: (error: any) => {
+              console.error('카카오톡 게임 점수 공유 실패:', error);
+              // 실패 시 클립보드 복사로 fallback
+              navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+                alert('📱 카카오톡 공유가 실패하여 게임 결과가 클립보드에 복사되었습니다!');
+              }).catch(() => {
+                alert('📱 게임 결과를 복사해주세요:\n\n' + shareText + '\n' + shareUrl);
+              });
+            }
+          });
+        } else {
+          // 카카오 SDK가 로드되지 않은 경우 fallback
+          navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+            alert('📱 카카오톡 SDK 로딩 중입니다. 게임 결과가 클립보드에 복사되었습니다!');
+          });
+        }
+      } catch (error) {
+        // 오류 발생 시 클립보드 복사로 fallback
+        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+          alert('📱 카카오톡 공유 중 오류가 발생하여 게임 결과가 클립보드에 복사되었습니다!');
+        });
+      }
+    } else if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
         alert('게임 결과가 클립보드에 복사되었습니다!');
         setShowScoreShare(false);
       });
-    } else {
-      openWithCoupangAd(urls[platform as keyof typeof urls]);
+    }
+    
+    if (platform !== 'copy') {
       setShowScoreShare(false);
     }
   };
@@ -1372,15 +1411,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 친구들과 경쟁해보세요! 💪
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4">
-              <button onClick={() => handleGameScoreShare('kakao')} className="flex items-center justify-center p-2 md:p-3 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
-                💬 카카오
-              </button>
-              <button onClick={() => handleGameScoreShare('facebook')} className="flex items-center justify-center p-2 md:p-3 bg-blue-600 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
-                📘 페북
-              </button>
-              <button onClick={() => handleGameScoreShare('twitter')} className="flex items-center justify-center p-2 md:p-3 bg-sky-400 text-white rounded-xl md:rounded-2xl font-semibold col-span-2 text-xs md:text-sm">
-                🐦 트위터
+            <div className="mb-3 md:mb-4">
+              <button onClick={() => handleGameScoreShare('kakao')} className="w-full flex items-center justify-center p-3 md:p-4 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
+                💬 카카오톡으로 공유하기
               </button>
             </div>
             <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">

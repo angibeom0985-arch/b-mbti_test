@@ -152,7 +152,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showOtherCharacters, setShowOtherCharacters] = useState(false);
+  // showOtherCharacters 상태 제거됨
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
@@ -408,8 +408,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   // 쿠팡 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (팝업 차단 방지)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
-    // 쿠팡 파트너스 링크 (실제 링크로 교체 필요)
-    const coupangUrl = 'https://coupa.ng/your-affiliate-link';
+    // 이미지 저장에서 사용하는 실제 쿠팡 링크 사용
+    const characterName = resultData?.character || '';
+    const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
     
     // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
     const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
@@ -800,10 +801,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
-  const handleViewOtherCharacters = () => {
-    getRandomCharacter();
-    setShowOtherCharacters(true);
-  };
+  // handleViewOtherCharacters 함수 제거됨
   
   const handleLeaveComment = () => {
     setShowComments(true);
@@ -1204,14 +1202,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </div>
                   </div>
                   <div className="mt-2 flex gap-2">
-                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">{previewCharacter.character}</div>
-                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">다른 인물</div>
+                    <div className="w-full text-center py-1.5 bg-white rounded text-xs text-gray-600 border">{previewCharacter.character}</div>
                   </div>
                 </div>
               </div>
               
               <button
-                onClick={onQuizGame || (() => {
+                onClick={() => {
                   // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
                   localStorage.setItem('tempResult', JSON.stringify({
                     type: resultType,
@@ -1219,7 +1216,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     timestamp: Date.now()
                   }));
                   openWithCoupangAd('/game');
-                })}
+                }}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
               >
                 🖼️ 게임 시작하기
@@ -1377,8 +1374,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 성경인물 맞히기 게임 모달 */}
-      {showOtherCharacters && (
+      {/* 결과 페이지로 돌아가기 버튼 (맨 하단) */}
+      <div className="mt-8 mb-4 text-center">
+        <button
+          onClick={() => window.location.href = 'https://b-mbti.money-hotissue.com'}
+          className="bg-gradient-to-r from-gray-500 to-gray-700 text-white font-semibold py-3 px-8 rounded-2xl hover:from-gray-600 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-md"
+        >
+          🏠 결과 페이지로 돌아가기
+        </button>
+      </div>
+
+      {/* 삭제된 게임 모달 섹션 - 더 이상 필요 없음 */}
+      {false && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
@@ -1400,7 +1407,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     />
                   )}
                 </div>
-                <h4 className="text-lg font-bold text-gray-800 mb-2">이 분은 누구일까요? 🤔</h4>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">이 사람은 누구일까요? 🤔</h4>
                 
                 {/* 선택된 답안 표시 */}
                 {userGuess && quizResult === null && (
@@ -1472,7 +1479,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 </button>
               )}
               <button 
-                onClick={() => setShowOtherCharacters(false)} 
+                onClick={() => {}} 
                 className="px-6 p-3 text-gray-500 text-sm hover:bg-gray-100 rounded-2xl"
               >
                 닫기

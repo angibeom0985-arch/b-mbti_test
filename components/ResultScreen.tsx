@@ -186,6 +186,41 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
   });
 
+  // 미리보기용 랜덤 캐릭터 선택 (컴포넌트 마운트 시 한 번만 선택)
+  const [previewCharacter] = useState(() => {
+    const allTypes = Object.keys(RESULTS) as (keyof typeof RESULTS)[];
+    const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
+    
+    // 이미지 경로 매핑
+    const getImagePath = (type: string) => {
+      const imageMap: Record<string, string> = {
+        'ISTJ': '/ISTJ 요셉.jpg',
+        'ISFJ': '/ISFJ 룻.jpg', 
+        'INFJ': '/INFJ 다니엘.jpg',
+        'INTJ': '/INTJ 바울.jpg',
+        'ISTP': '/ISTP 삼손.jpg',
+        'ISFP': '/ISFP 다윗.jpg',
+        'INFP': '/INFP 마리아.jpg',
+        'INTP': '/INTP 솔로몬.jpg',
+        'ESTP': '/ESTP 베드로.jpg',
+        'ESFP': '/ESFP 에스더.jpg',
+        'ENFP': '/ENFP 아브라함.jpg',
+        'ENTP': '/ENJS 느헤미야.jpg',
+        'ESTJ': '/ESTJ 모세.jpg',
+        'ESFJ': '/ESFJ 막달라 마리아.jpg',
+        'ENFJ': '/ENFJ 예수님.jpg',
+        'ENTJ': '/ENTJ 드보라.jpg'
+      };
+      return imageMap[type] || '/ENFP 아브라함.jpg';
+    };
+    
+    return {
+      type: randomType,
+      character: RESULTS[randomType].character,
+      image: getImagePath(randomType)
+    };
+  });
+
   // 컴포넌트 마운트 시 게임 점수 불러오기
   useEffect(() => {
     const savedScore = localStorage.getItem('quizGameScore');
@@ -1004,8 +1039,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 </div>
                 <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center">
-                      <span className="text-lg">🤔</span>
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
+                      <img 
+                        src={previewCharacter.image} 
+                        alt={previewCharacter.character}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/ENFP 아브라함.jpg'; // 기본 이미지로 대체
+                        }}
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
@@ -1013,8 +1056,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </div>
                   </div>
                   <div className="mt-2 flex gap-2">
-                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">선택지 1</div>
-                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">선택지 2</div>
+                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">{previewCharacter.character}</div>
+                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">다른 인물</div>
                   </div>
                 </div>
               </div>

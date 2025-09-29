@@ -378,11 +378,29 @@
       }
       
       function goBack() {
+        // URL 파라미터에서 결과 정보 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const resultType = urlParams.get('type');
+        const character = urlParams.get('character');
+        
         if (window.opener && !window.opener.closed) {
+          // 부모 창이 있으면 닫고 부모 창에 포커스
           window.close();
           window.opener.focus();
         } else {
-          window.location.href = 'https://b-mbti.money-hotissue.com';
+          // 부모 창이 없으면 결과 페이지로 이동 (결과 유지)
+          if (resultType && character) {
+            // 결과 정보를 localStorage에 저장해서 결과 페이지에서 사용할 수 있도록
+            localStorage.setItem('tempResult', JSON.stringify({
+              type: resultType,
+              character: character,
+              timestamp: Date.now()
+            }));
+            window.location.href = `https://b-mbti.money-hotissue.com/result.html?type=${resultType}&character=${encodeURIComponent(character)}`;
+          } else {
+            // 결과 정보가 없으면 메인 페이지로
+            window.location.href = 'https://b-mbti.money-hotissue.com';
+          }
         }
       }
     </script>

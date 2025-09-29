@@ -67,12 +67,26 @@
       
       // 게임 페이지 컴포넌트
       const GamePage = () => {
-        const handleBackToMain = () => {
-          window.close();
+        const handleBackToResult = () => {
           if (window.opener && !window.opener.closed) {
+            window.close();
             window.opener.focus();
           } else {
-            window.location.href = 'https://b-mbti.money-hotissue.com';
+            // localStorage에서 최근 결과 정보 가져오기
+            const tempResult = localStorage.getItem('tempResult');
+            const savedResult = localStorage.getItem('mbtiResult');
+            
+            if (tempResult) {
+              const result = JSON.parse(tempResult);
+              // 결과 페이지로 이동 (결과 유지)
+              window.location.href = `https://b-mbti.money-hotissue.com/result.html?type=${result.type}&character=${encodeURIComponent(result.character)}`;
+            } else if (savedResult) {
+              const result = JSON.parse(savedResult);
+              window.location.href = `https://b-mbti.money-hotissue.com/result.html?type=${result.type}&character=${encodeURIComponent(result.character)}`;
+            } else {
+              // 결과 정보가 없으면 메인 페이지로
+              window.location.href = 'https://b-mbti.money-hotissue.com';
+            }
           }
         };
 
@@ -127,9 +141,9 @@
           }, [
             React.createElement('button', {
               key: 'back-btn',
-              onClick: handleBackToMain,
+              onClick: handleBackToResult,
               className: 'bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300'
-            }, '🏠 메인으로 돌아가기')
+            }, '🏠 결과 페이지로 돌아가기')
           ])
         ]);
       };

@@ -406,34 +406,33 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     );
   }
 
-  // 쿠팡 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수
+  // 쿠팡 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (팝업 차단 방지)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
     // 쿠팡 파트너스 링크 (실제 링크로 교체 필요)
     const coupangUrl = 'https://coupa.ng/your-affiliate-link';
     
-    // 1. 쿠팡 링크를 먼저 열기
-    const coupangWindow = window.open(coupangUrl, '_blank');
+    // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
+    const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
     
-    // 2. 짧은 지연 후 목적지 URL 열기 (쿠팡 링크가 먼저 로드되도록)
-    setTimeout(() => {
-      const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
-      
-      if (!targetWindow) {
-        alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-      }
-      
-      // 목적지 창에 포커스 (사용자가 보고 싶은 페이지)
-      if (targetWindow) {
-        targetWindow.focus();
-      }
-    }, 500); // 0.5초 지연
-    
-    if (!coupangWindow) {
+    if (!targetWindow) {
       alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+      return;
     }
+    
+    // 2. 현재 탭에서 쿠팡 링크로 이동 (수익 창출)
+    setTimeout(() => {
+      window.location.href = coupangUrl;
+    }, 100); // 새 탭이 열린 후 현재 탭 이동
   };
 
   const handleShare = () => {
+    // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
+    localStorage.setItem('tempResult', JSON.stringify({
+      type: resultType,
+      character: resultData?.character || '',
+      timestamp: Date.now()
+    }));
+    
     // 결과 데이터를 URL 파라미터로 전달하여 /share 페이지 열기
     const shareUrl = `/share?type=${encodeURIComponent(resultType)}&character=${encodeURIComponent(resultData?.character || '')}`;
     
@@ -1212,7 +1211,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </div>
               
               <button
-                onClick={onQuizGame || (() => { openWithCoupangAd('/game'); })}
+                onClick={onQuizGame || (() => {
+                  // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
+                  localStorage.setItem('tempResult', JSON.stringify({
+                    type: resultType,
+                    character: resultData?.character || '',
+                    timestamp: Date.now()
+                  }));
+                  openWithCoupangAd('/game');
+                })}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
               >
                 🖼️ 게임 시작하기

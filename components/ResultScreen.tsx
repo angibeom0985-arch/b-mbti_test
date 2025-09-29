@@ -410,7 +410,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
     // 이미지 저장에서 사용하는 실제 쿠팡 링크 사용
     const characterName = resultData?.character || '';
-    const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
+    const coupangUrl = `https://www.coupang.com/np/search?q=${encodeURIComponent(characterName)}`;
     
     // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
     const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
@@ -778,7 +778,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           // 이미지 저장 완료 후 쿠팡 링크 열기 및 사용자 안내
           setTimeout(() => {
             const characterName = resultData?.character || '';
-            const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
+            const coupangUrl = `https://www.coupang.com/np/search?q=${encodeURIComponent(characterName)}`;
             window.open(coupangUrl, '_blank');
             
             // 사용자에게 다운로드 위치 안내

@@ -191,11 +191,10 @@
       
       const shareUrl = 'https://b-mbti.money-hotissue.com';
       
-      // 카카오 SDK 초기화 (실제 서비스에서는 카카오 개발자센터에서 발급받은 JavaScript 키 사용)
-      // TODO: https://developers.kakao.com 에서 앱 등록 후 JavaScript 키로 교체 필요
-      const KAKAO_JS_KEY = 'YOUR_KAKAO_JS_KEY_HERE'; // 실제 JavaScript 키로 교체
+      // 카카오 SDK 초기화
+      const KAKAO_JS_KEY = 'c438f71c1e23117be73071fd2bcc5fa6'; // JavaScript 키 사용
       
-      if (window.Kakao && KAKAO_JS_KEY !== 'YOUR_KAKAO_JS_KEY_HERE') {
+      if (window.Kakao) {
         if (!Kakao.isInitialized()) {
           try {
             Kakao.init(KAKAO_JS_KEY);
@@ -205,7 +204,7 @@
           }
         }
       } else {
-        console.warn('카카오 앱 키가 설정되지 않았습니다. 실제 서비스에서는 https://developers.kakao.com 에서 키를 발급받아 설정해주세요.');
+        console.error('카카오 SDK 로드 실패');
       }
       
       function showSuccess() {

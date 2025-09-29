@@ -6,15 +6,15 @@
     <title>공유하기 - 성경인물 MBTI 테스트</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="성경인물 MBTI 테스트 결과를 카카오톡, 인스타그램 등으로 공유해보세요!" />
-    <meta name="keywords" content="성경인물 MBTI 공유, 카카오톡 공유, 인스타그램 공유, 테스트 결과 공유" />
+    <meta name="description" content="성경인물 MBTI 테스트 결과를 카카오톡으로 공유해보세요!" />
+    <meta name="keywords" content="성경인물 MBTI 공유, 카카오톡 공유, 테스트 결과 공유" />
     <meta name="author" content="성경인물 MBTI 테스트" />
     <meta name="robots" content="index, follow" />
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="공유하기 - 성경인물 MBTI 테스트" />
-    <meta property="og:description" content="성경인물 MBTI 테스트 결과를 카카오톡, 인스타그램 등으로 공유해보세요!" />
+    <meta property="og:description" content="성경인물 MBTI 테스트 결과를 카카오톡으로 공유해보세요!" />
     <meta property="og:url" content="https://b-mbti.money-hotissue.com/share" />
     <meta property="og:site_name" content="성경인물 MBTI 테스트" />
     <meta property="og:image" content="https://b-mbti.money-hotissue.com/og-image-new.png" />
@@ -100,15 +100,6 @@
       .kakao:hover { 
         transform: translateY(-3px); 
         box-shadow: 0 8px 25px rgba(254, 229, 0, 0.4); 
-      }
-      .instagram { 
-        background: linear-gradient(135deg, #e1306c, #fd1d1d, #fcb045); 
-        color: white; 
-        box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);
-      }
-      .instagram:hover { 
-        transform: translateY(-3px); 
-        box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4); 
       }
       .copy { 
         background: linear-gradient(135deg, #667eea, #764ba2); 
@@ -284,81 +275,7 @@
         }
       }
       
-      function shareToInstagram() {
-        const options = [
-          '📸 스토리에 공유하기',
-          '📋 피드에 공유하기', 
-          '💬 DM으로 공유하기',
-          '❌ 취소'
-        ];
-        
-        const optionsText = options.map((option, index) => `${index + 1}. ${option}`).join('\\n');
-        const userChoice = prompt(`인스타그램 공유 방법을 선택해주세요:\\n\\n${optionsText}\\n\\n번호를 입력하세요 (1-4):`);
-        
-        if (!userChoice || userChoice === '4') {
-          return;
-        }
-        
-        const choiceNum = parseInt(userChoice);
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        switch(choiceNum) {
-          case 1: // 스토리
-            if (isMobile) {
-              window.location.href = 'instagram://story-camera';
-              setTimeout(() => {
-                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
-                  window.open('https://www.instagram.com/', '_blank');
-                }
-              }, 1500);
-            } else {
-              window.open('https://www.instagram.com/', '_blank');
-            }
-            copyToClipboard();
-            break;
-            
-          case 2: // 피드
-            if (isMobile) {
-              window.location.href = 'instagram://camera';
-              setTimeout(() => {
-                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
-                  window.open('https://www.instagram.com/', '_blank');
-                }
-              }, 1500);
-            } else {
-              window.open('https://www.instagram.com/', '_blank');
-            }
-            copyToClipboard();
-            break;
-            
-          case 3: // DM
-            if (isMobile) {
-              window.location.href = 'instagram://direct-inbox';
-              setTimeout(() => {
-                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
-                  window.open('https://www.instagram.com/direct/inbox/', '_blank');
-                }
-              }, 1500);
-            } else {
-              window.open('https://www.instagram.com/direct/inbox/', '_blank');
-            }
-            copyToClipboard();
-            break;
-            
-          default:
-            alert('올바른 번호를 선택해주세요.');
-            shareToInstagram();
-        }
-      }
-      
-      function copyToClipboard() {
-        navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
-          alert('📋 텍스트가 복사되었습니다! 인스타그램에 붙여넣어 주세요.');
-          showSuccess();
-        }).catch(() => {
-          alert('📋 다음 내용을 복사해서 공유해주세요:\\n\\n' + shareText + '\\n\\n' + shareUrl);
-        });
-      }
+
       
       function copyLink() {
         const fullText = shareText + '\\n\\n' + shareUrl;

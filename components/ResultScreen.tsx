@@ -156,7 +156,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
-  const [enlargedImage, setEnlargedImage] = useState<{ src: string; character: string } | null>(null);
+
   
   // 퀴즈 게임 상태
   const [quizCharacter, setQuizCharacter] = useState<string>('');
@@ -427,7 +427,59 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               <div className="space-y-2">
                 <div 
                   className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
-                  onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
+                  onClick={() => {
+                    // 새창에서 이미지 열기
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow && resultData.image) {
+                      newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                          <title>${resultData.character} - 성경인물 MBTI</title>
+                          <style>
+                            body {
+                              margin: 0;
+                              padding: 20px;
+                              display: flex;
+                              justify-content: center;
+                              align-items: center;
+                              min-height: 100vh;
+                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                              font-family: system-ui, -apple-system, sans-serif;
+                            }
+                            .container {
+                              text-align: center;
+                              background: white;
+                              padding: 30px;
+                              border-radius: 20px;
+                              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                            }
+                            img {
+                              max-width: 500px;
+                              max-height: 500px;
+                              width: auto;
+                              height: auto;
+                              border-radius: 15px;
+                              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                            }
+                            h1 {
+                              margin-top: 20px;
+                              color: #333;
+                              font-size: 24px;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="container">
+                            <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
+                            <h1>${resultData.character}</h1>
+                          </div>
+                        </body>
+                        </html>
+                      `);
+                      newWindow.document.close();
+                    }
+                  }}
                 >
                   <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
                     <img 
@@ -443,7 +495,59 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 
                 {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
                 <button
-                  onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
+                  onClick={() => {
+                    // 새창에서 이미지 열기
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                      newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                          <title>${resultData.character} - 성경인물 MBTI</title>
+                          <style>
+                            body {
+                              margin: 0;
+                              padding: 20px;
+                              display: flex;
+                              justify-content: center;
+                              align-items: center;
+                              min-height: 100vh;
+                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                              font-family: system-ui, -apple-system, sans-serif;
+                            }
+                            .container {
+                              text-align: center;
+                              background: white;
+                              padding: 30px;
+                              border-radius: 20px;
+                              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                            }
+                            img {
+                              max-width: 500px;
+                              max-height: 500px;
+                              width: auto;
+                              height: auto;
+                              border-radius: 15px;
+                              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                            }
+                            h1 {
+                              margin-top: 20px;
+                              color: #333;
+                              font-size: 24px;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="container">
+                            <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
+                            <h1>${resultData.character}</h1>
+                          </div>
+                        </body>
+                        </html>
+                      `);
+                      newWindow.document.close();
+                    }
+                  }}
                   className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
                 >
                   <span>🔍</span>
@@ -579,10 +683,59 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
-                        onClick={() => setEnlargedImage({
-                          src: getMbtiImage(compatibleType),
-                          character: RESULTS[compatibleType].character
-                        })}
+                        onClick={() => {
+                          // 새창에서 이미지 열기
+                          const newWindow = window.open('', '_blank');
+                          if (newWindow) {
+                            newWindow.document.write(`
+                              <!DOCTYPE html>
+                              <html>
+                              <head>
+                                <title>${RESULTS[compatibleType].character} - 성경인물 MBTI</title>
+                                <style>
+                                  body {
+                                    margin: 0;
+                                    padding: 20px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                  }
+                                  .container {
+                                    text-align: center;
+                                    background: white;
+                                    padding: 30px;
+                                    border-radius: 20px;
+                                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                                  }
+                                  img {
+                                    max-width: 500px;
+                                    max-height: 500px;
+                                    width: auto;
+                                    height: auto;
+                                    border-radius: 15px;
+                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                                  }
+                                  h1 {
+                                    margin-top: 20px;
+                                    color: #333;
+                                    font-size: 24px;
+                                  }
+                                </style>
+                              </head>
+                              <body>
+                                <div class="container">
+                                  <img src="${window.location.origin}${getMbtiImage(compatibleType)}" alt="${RESULTS[compatibleType].character}" />
+                                  <h1>${RESULTS[compatibleType].character}</h1>
+                                </div>
+                              </body>
+                              </html>
+                            `);
+                            newWindow.document.close();
+                          }
+                        }}
                       />
                       {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
@@ -631,10 +784,59 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
-                        onClick={() => setEnlargedImage({
-                          src: getMbtiImage(incompatibleType),
-                          character: RESULTS[incompatibleType].character
-                        })}
+                        onClick={() => {
+                          // 새창에서 이미지 열기
+                          const newWindow = window.open('', '_blank');
+                          if (newWindow) {
+                            newWindow.document.write(`
+                              <!DOCTYPE html>
+                              <html>
+                              <head>
+                                <title>${RESULTS[incompatibleType].character} - 성경인물 MBTI</title>
+                                <style>
+                                  body {
+                                    margin: 0;
+                                    padding: 20px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                  }
+                                  .container {
+                                    text-align: center;
+                                    background: white;
+                                    padding: 30px;
+                                    border-radius: 20px;
+                                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                                  }
+                                  img {
+                                    max-width: 500px;
+                                    max-height: 500px;
+                                    width: auto;
+                                    height: auto;
+                                    border-radius: 15px;
+                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                                  }
+                                  h1 {
+                                    margin-top: 20px;
+                                    color: #333;
+                                    font-size: 24px;
+                                  }
+                                </style>
+                              </head>
+                              <body>
+                                <div class="container">
+                                  <img src="${window.location.origin}${getMbtiImage(incompatibleType)}" alt="${RESULTS[incompatibleType].character}" />
+                                  <h1>${RESULTS[incompatibleType].character}</h1>
+                                </div>
+                              </body>
+                              </html>
+                            `);
+                            newWindow.document.close();
+                          }
+                        }}
                       />
                       {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
@@ -1006,29 +1208,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 닫기
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* 이미지 확대 모달 - 350px 정사각형 */}
-      {enlargedImage && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setEnlargedImage(null)}>
-          <div className="relative">
-            <img 
-              src={enlargedImage.src} 
-              alt={enlargedImage.character}
-              className="w-[350px] h-[350px] object-cover rounded-2xl shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
-              {enlargedImage.character}
-            </div>
-            <button 
-              onClick={() => setEnlargedImage(null)}
-              className="absolute top-4 right-4 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/90 transition-colors"
-            >
-              ✕
-            </button>
           </div>
         </div>
       )}

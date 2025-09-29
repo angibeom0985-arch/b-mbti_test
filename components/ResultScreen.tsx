@@ -689,11 +689,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center flex-1">
-                        <div className={`w-4 h-4 rounded-full mr-3 ${
-                          version.color === 'orange' ? 'bg-orange-400' :
-                          version.color === 'purple' ? 'bg-purple-400' :
-                          'bg-blue-400'
-                        }`}></div>
                         <div className="text-left flex-1">
                           <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
                           <div className="text-sm text-gray-600 mb-2">{version.description}</div>

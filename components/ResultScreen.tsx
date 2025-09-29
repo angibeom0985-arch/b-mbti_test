@@ -457,11 +457,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           link.click();
           document.body.removeChild(link);
 
-          // 이미지 저장 완료 후 쿠팡 링크 열기
+          // 이미지 저장 완료 후 쿠팡 링크 열기 및 사용자 안내
           setTimeout(() => {
             const characterName = resultData?.character || '';
             const coupangUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(characterName)}&traceId=mg2blw6m&channel=user`;
             window.open(coupangUrl, '_blank');
+            
+            // 사용자에게 다운로드 위치 안내
+            alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
           }, 500);
           
         } catch (error) {
@@ -926,26 +929,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* SNS 공유 모달 */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
-          <div className="bg-white rounded-3xl p-4 md:p-6 max-w-sm w-full max-w-xs md:max-w-sm shadow-2xl mx-3">
-            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">📤 결과 공유하기</h3>
-            <div className="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4">
-              <button onClick={() => handleSNSShare('kakao')} className="flex items-center justify-center p-2 md:p-3 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
+            <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
+            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+              <button onClick={() => handleSNSShare('kakao')} className="flex items-center justify-center p-4 md:p-6 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
                 💬 카카오톡
               </button>
-              <button onClick={() => handleSNSShare('instagram')} className="flex items-center justify-center p-2 md:p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
+              <button onClick={() => handleSNSShare('instagram')} className="flex items-center justify-center p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
                 📸 인스타
               </button>
-              <button onClick={() => handleSNSShare('facebook')} className="flex items-center justify-center p-2 md:p-3 bg-blue-600 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
-                👥 페이스북
-              </button>
-              <button onClick={() => handleSNSShare('twitter')} className="flex items-center justify-center p-2 md:p-3 bg-sky-400 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
-                🐦 트위터
-              </button>
             </div>
-            <button onClick={() => handleSNSShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
+            <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">
               📋 링크 복사
             </button>
-            <button onClick={() => setShowShareModal(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">
+            <button onClick={() => setShowShareModal(false)} className="w-full p-3 md:p-4 text-gray-500 text-sm md:text-base">
               취소
             </button>
           </div>

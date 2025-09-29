@@ -1241,15 +1241,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
             
             <div className="text-center mb-6">
-              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-4 mb-4">
-                <p className="text-sm text-gray-700 mb-2">
-                  🔥 <strong>도전!</strong> 이미지를 보고 성경인물을 맞춰보세요!
-                </p>
-                <p className="text-xs text-gray-500">
-                  정답을 모르겠다면 아래 후보 중에서 선택해보세요 ⬇️
-                </p>
-              </div>
-              
               {/* 캐릭터 이미지 */}
               <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">
                 <div className="w-32 h-32 mx-auto mb-3 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">

@@ -359,7 +359,141 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   }
 
   const handleShare = () => {
-    setShowShareModal(true);
+    // 새창에서 공유 옵션을 보여주는 함수
+    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
+    const shareUrl = 'https://gowith153.com';
+    
+    const newWindow = window.open('', '_blank', 'width=500,height=600,scrollbars=yes,resizable=yes');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>공유하기</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            body { 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+              color: #333; 
+              padding: 20px; 
+              min-height: 100vh; 
+              display: flex; 
+              flex-direction: column; 
+              align-items: center; 
+              justify-content: center; 
+            }
+            .container { 
+              background: white; 
+              border-radius: 16px; 
+              padding: 24px; 
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+              max-width: 400px; 
+              width: 100%; 
+            }
+            h1 { 
+              text-align: center; 
+              margin-bottom: 24px; 
+              color: #333; 
+              font-size: 24px; 
+            }
+            .share-button { 
+              display: block; 
+              width: 100%; 
+              padding: 16px; 
+              margin: 12px 0; 
+              border: none; 
+              border-radius: 12px; 
+              font-size: 16px; 
+              font-weight: 600; 
+              cursor: pointer; 
+              transition: all 0.3s ease; 
+              text-decoration: none; 
+              text-align: center; 
+            }
+            .kakao { background: linear-gradient(135deg, #fee500, #fccc02); color: #3c1e1e; }
+            .kakao:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 229, 0, 0.3); }
+            .instagram { background: linear-gradient(135deg, #e1306c, #fd1d1d, #fcb045); color: white; }
+            .instagram:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(225, 48, 108, 0.3); }
+            .copy { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            .copy:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+            .back-button { 
+              background: linear-gradient(135deg, #f093fb, #f5576c); 
+              color: white; 
+              padding: 12px 20px; 
+              border: none; 
+              border-radius: 8px; 
+              margin-top: 20px; 
+              cursor: pointer; 
+              font-size: 14px; 
+              width: 100%; 
+            }
+            .back-button:hover { transform: translateY(-2px); }
+            @media (max-width: 480px) {
+              body { padding: 16px; }
+              .container { padding: 20px; }
+              h1 { font-size: 20px; }
+              .share-button { padding: 14px; font-size: 15px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>📤 공유하기</h1>
+            
+            <button class="share-button kakao" onclick="shareToKakao()">
+              💬 카카오톡으로 공유
+            </button>
+            
+            <button class="share-button instagram" onclick="shareToInstagram()">
+              📷 인스타그램으로 공유
+            </button>
+            
+            <button class="share-button copy" onclick="copyLink()">
+              🔗 링크 복사
+            </button>
+            
+            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+              🏠 결과 페이지로 돌아가기
+            </button>
+          </div>
+          
+          <script>
+            function shareToKakao() {
+              const shareText = \`${shareText}\`;
+              const shareUrl = \`${shareUrl}\`;
+              const kakaoUrl = \`https://story.kakao.com/share?url=\${encodeURIComponent(shareUrl)}&text=\${encodeURIComponent(shareText)}\`;
+              window.open(kakaoUrl, '_blank');
+            }
+            
+            function shareToInstagram() {
+              // 인스타그램은 직접 공유가 불가하므로 앱으로 이동하거나 웹사이트로 이동
+              const instagramUrl = 'https://www.instagram.com/';
+              window.open(instagramUrl, '_blank');
+              alert('인스타그램에서 스토리나 게시물로 공유해주세요!\\n\\n"' + \`${shareText}\` + '"\\n\\n위 내용을 복사해서 사용하세요.');
+            }
+            
+            function copyLink() {
+              const fullText = \`${shareText}\\n${shareUrl}\`;
+              navigator.clipboard.writeText(fullText).then(() => {
+                alert('📋 링크가 복사되었습니다!');
+              }).catch(() => {
+                // 복사 실패 시 대체 방법
+                const textArea = document.createElement('textarea');
+                textArea.value = fullText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('📋 링크가 복사되었습니다!');
+              });
+            }
+          </script>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
   };
 
   const handleSNSShare = (platform: string) => {
@@ -781,7 +915,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           
           <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 심리학을 바탕으로 선정된 궁합입니다. 개인차가 있을 수 있어요!
+              💡 MBTI 기반 궁합 분석 (개인차 있음)
             </p>
           </div>
         </div>
@@ -833,8 +967,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
                         </div>
                       </div>
-                      <div className="flex justify-center">
-                        <span className={`px-4 py-2 rounded-full font-semibold text-sm ${
+                      <div className="w-full">
+                        <span className={`w-full block px-4 py-3 rounded-xl font-semibold text-sm text-center ${
                           version.color === 'orange' ? 'bg-orange-500 text-white' :
                           version.color === 'purple' ? 'bg-purple-500 text-white' :
                           'bg-blue-500 text-white'
@@ -861,9 +995,33 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               <p className="text-xs md:text-sm text-indigo-600 mb-3">
                 성경인물 이미지를 보고 누구인지 맞춰보세요! ✨
               </p>
+              
+              {/* 게임 미리보기 */}
+              <div className="mb-4 p-3 bg-white/70 rounded-xl border border-indigo-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-600">게임 미리보기</span>
+                  <span className="text-xs text-indigo-600 font-medium">👀 이런 식으로 진행돼요!</span>
+                </div>
+                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center">
+                      <span className="text-lg">🤔</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
+                      <div className="text-sm font-medium text-gray-800">이 캐릭터는 누구일까요?</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">선택지 1</div>
+                    <div className="flex-1 text-center py-1.5 bg-white rounded text-xs text-gray-600 border">선택지 2</div>
+                  </div>
+                </div>
+              </div>
+              
               <button
                 onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
               >
                 🖼️ 게임 시작하기
               </button>

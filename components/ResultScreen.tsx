@@ -1361,15 +1361,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 결과 페이지로 돌아가기 버튼 (맨 하단) */}
-      <div className="mt-8 mb-4 text-center">
-        <button
-          onClick={() => window.location.href = 'https://b-mbti.money-hotissue.com'}
-          className="bg-gradient-to-r from-gray-500 to-gray-700 text-white font-semibold py-3 px-8 rounded-2xl hover:from-gray-600 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-md"
-        >
-          🏠 결과 페이지로 돌아가기
-        </button>
-      </div>
+
 
       {/* 삭제된 게임 모달 섹션 - 더 이상 필요 없음 */}
       {false && (

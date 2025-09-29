@@ -76,7 +76,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ onBack }) => {
         <div className="w-full max-w-md mx-auto">
           {/* 헤더 */}
           <div className="bg-white/90 rounded-3xl p-6 mb-6 shadow-xl border border-white/30 text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">🎮 성경인물 맞히기</h1>
+            <h1 className="text-lg font-bold text-gray-800 mb-2">🎮 성경인물 맞히기</h1>
             <div className="flex justify-center items-center space-x-4 text-sm">
               <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
                 정답: {score}개

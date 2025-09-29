@@ -15,7 +15,9 @@ export default defineConfig({
         test1: 'test1.html',
         test2: 'test2.html', 
         test3: 'test3.html',
-        result: 'result.html'
+        result: 'result.html',
+        game: 'game.html',
+        share: 'share.html'
       }
     }
   }

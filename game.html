@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>인물 맞추기 게임 - 성경인물 MBTI 테스트</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="성경인물 인물 맞추기 게임! 이미지를 보고 어떤 성경인물인지 맞춰보세요. 재미있는 퀴즈 게임으로 성경 지식을 테스트해보세요!" />
+    <meta name="keywords" content="성경인물 게임, 인물 맞추기, 성경 퀴즈, 성경인물 이미지 게임, 크리스천 게임" />
+    <meta name="author" content="성경인물 MBTI 테스트" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="Korean" />
+    <meta name="geo.country" content="KR" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="인물 맞추기 게임 - 성경인물 MBTI 테스트" />
+    <meta property="og:description" content="성경인물 인물 맞추기 게임! 이미지를 보고 어떤 성경인물인지 맞춰보세요. 재미있는 퀴즈 게임으로 성경 지식을 테스트해보세요!" />
+    <meta property="og:url" content="https://b-mbti.money-hotissue.com/game" />
+    <meta property="og:site_name" content="성경인물 MBTI 테스트" />
+    <meta property="og:image" content="https://b-mbti.money-hotissue.com/og-image-new.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="인물 맞추기 게임 - 성경인물 MBTI 테스트" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="인물 맞추기 게임 - 성경인물 MBTI 테스트" />
+    <meta name="twitter:description" content="성경인물 인물 맞추기 게임! 이미지를 보고 어떤 성경인물인지 맞춰보세요." />
+    <meta name="twitter:image" content="https://b-mbti.money-hotissue.com/og-image-new.png" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://b-mbti.money-hotissue.com/game" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://b-mbti.money-hotissue.com/favicon.ico" />
+    <link rel="shortcut icon" href="https://b-mbti.money-hotissue.com/favicon.ico" />
+    <link rel="apple-touch-icon" href="https://b-mbti.money-hotissue.com/favicon.ico" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/og-image-new.png" as="image" />
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2686975437928535"
+         crossorigin="anonymous"></script>
+    
+    <!-- JSON-LD for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Game",
+      "name": "인물 맞추기 게임",
+      "description": "성경인물 인물 맞추기 게임! 이미지를 보고 어떤 성경인물인지 맞춰보세요.",
+      "url": "https://b-mbti.money-hotissue.com/game",
+      "genre": "Educational Game",
+      "gamePlatform": "Web Browser"
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import { createRoot } from 'https://cdn.skypack.dev/react-dom/client';
+      import React from 'https://cdn.skypack.dev/react';
+      
+      // 게임 페이지 컴포넌트
+      const GamePage = () => {
+        const handleBackToMain = () => {
+          window.close();
+          if (window.opener && !window.opener.closed) {
+            window.opener.focus();
+          } else {
+            window.location.href = 'https://b-mbti.money-hotissue.com';
+          }
+        };
+
+        return React.createElement('div', {
+          className: 'min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-4'
+        }, [
+          // 헤더
+          React.createElement('div', {
+            key: 'header',
+            className: 'max-w-2xl mx-auto mb-6'
+          }, [
+            React.createElement('div', {
+              key: 'header-content',
+              className: 'bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg text-center'
+            }, [
+              React.createElement('h1', {
+                key: 'title',
+                className: 'text-2xl font-bold text-gray-800 mb-2'
+              }, '🎮 인물 맞추기 게임'),
+              React.createElement('p', {
+                key: 'subtitle',
+                className: 'text-gray-600 text-sm'
+              }, '이미지를 보고 어떤 성경인물인지 맞춰보세요!')
+            ])
+          ]),
+          
+          // 게임 영역
+          React.createElement('div', {
+            key: 'game-area',
+            className: 'max-w-2xl mx-auto'
+          }, [
+            React.createElement('div', {
+              key: 'game-content',
+              className: 'bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg'
+            }, [
+              React.createElement('div', {
+                key: 'game-placeholder',
+                className: 'text-center py-20'
+              }, [
+                React.createElement('div', {
+                  key: 'loading',
+                  className: 'text-gray-500'
+                }, '게임 로딩 중...')
+              ])
+            ])
+          ]),
+          
+          // 돌아가기 버튼
+          React.createElement('div', {
+            key: 'back-button',
+            className: 'max-w-2xl mx-auto mt-6 text-center'
+          }, [
+            React.createElement('button', {
+              key: 'back-btn',
+              onClick: handleBackToMain,
+              className: 'bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300'
+            }, '🏠 메인으로 돌아가기')
+          ])
+        ]);
+      };
+
+      // React 앱 마운트
+      const container = document.getElementById('root');
+      const root = createRoot(container);
+      root.render(React.createElement(GamePage));
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </body>
+</html>

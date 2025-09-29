@@ -577,7 +577,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   // 게임 점수 공유 함수
   const handleGameScoreShare = (platform: string) => {
     const scorePercentage = calculateGameScore();
-    const shareText = `🎮 성경인물 이미지 맞추기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
+    const shareText = `🎮 인물 맞추기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
     
     const urls = {
@@ -1033,12 +1033,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
         {/* 액션 버튼들을 감싸는 컨테이너 */}
         <div className="space-y-3 md:space-y-4">
-          {/* 이미지 맞추기 게임 - 참여 유도 문구로 변경 */}
+          {/* 인물 맞추기 게임 - 참여 유도 문구로 변경 */}
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
             <div className="text-center">
               <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
                 <span className="mr-2">🖼️</span>
-                성경인물 맞추기 게임!
+                인물 맞추기 게임!
               </h3>
               <p className="text-xs md:text-sm text-indigo-600 mb-3">
                 이미지를 보고 누구인지 맞춰보세요 ✨
@@ -1076,7 +1076,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </div>
               
               <button
-                onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
+                onClick={onQuizGame || (() => { window.open('https://b-mbti.money-hotissue.com/game', '_blank'); })}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
               >
                 🖼️ 게임 시작하기
@@ -1234,11 +1234,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
       )}
 
-      {/* 성경인물 이미지 맞추기 게임 모달 */}
+      {/* 인물 맞추기 게임 모달 */}
       {showOtherCharacters && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
+            <h3 className="text-xl font-bold text-center mb-4">🎮 인물 맞추기 게임</h3>
             
             <div className="text-center mb-6">
               {/* 캐릭터 이미지 */}

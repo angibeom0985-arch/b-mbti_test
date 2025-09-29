@@ -4,7 +4,7 @@ import type { Question, MbtiResult, MbtiType } from './types';
 export const TEST_VERSIONS = {
   1: { 
     name: "사람들 속의 나", 
-    description: "공동체와 대인관계에서 드러나는 나의 성향 발견",
+    description: "공동체에서 드러나는 나의 성향 발견",
     color: "orange"
   },
   2: { 
@@ -64,10 +64,10 @@ export const QUESTIONS_V1: Question[] = [
     ],
   },
   {
-    text: "공동체에서 의견 충돌이 있을 때\n나는 어떻게 접근하나요?",
+    text: "교회에서 중요한 결정을 내려야 할 때\n나는 무엇을 우선시하나요?",
     answers: [
-      { text: "객관적 사실을 근거로 공정하고 논리적인 해결책을 제시한다", type: 'T' },
-      { text: "모든 사람의 감정을 고려해 서로 상처받지 않는 방법을 찾는다", type: 'F' },
+      { text: "객관적인 데이터와 실용적인 효과를 중심으로 판단한다", type: 'T' },
+      { text: "성도들의 마음과 공동체의 화합을 먼저 생각한다", type: 'F' },
     ],
   },
   {
@@ -99,10 +99,10 @@ export const QUESTIONS_V1: Question[] = [
     ],
   },
   {
-    text: "교회 행사를 계획할 때\n나는 어떤 스타일인가요?",
+    text: "주일 예배 후 식사를 함께할 때\n나는 어떤 모습인가요?",
     answers: [
-      { text: "세부사항까지 미리 계획하여 차질 없이 진행되도록 준비한다", type: 'J' },
-      { text: "기본 틀만 정하고 상황에 따라 임기응변으로 조정한다", type: 'P' },
+      { text: "정해진 시간에 맞춰 정리하고 다음 일정을 계획한다", type: 'J' },
+      { text: "분위기가 좋으면 시간에 구애받지 않고 더 함께한다", type: 'P' },
     ],
   },
 ];

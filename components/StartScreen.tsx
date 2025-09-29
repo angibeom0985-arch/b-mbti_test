@@ -76,9 +76,9 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </div>
         </div>
 
-        {/* 3. 테스트 선택 - 더블클릭으로 시작 */}
+        {/* 3. 테스트 선택 - 클릭으로 바로 시작 */}
         <div className="mb-6 space-y-4">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">
             🎯 나에게 딱 맞는 테스트를 선택해보세요!
           </h3>
           <div className="space-y-3">
@@ -90,84 +90,60 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                 <button
                   key={versionNumber}
                   onClick={() => {
-                    if (selectedVersion === versionNumber) {
-                      // 이미 선택된 버전을 다시 클릭하면 해당 테스트 페이지로 이동
-                      // 테스트 시작 통계 업데이트
-                      VisitorCounter.incrementVersionUsage(versionNumber);
-                      
-                      const testUrls = {
-                        1: 'https://b-mbti.money-hotissue.com/test1',
-                        2: 'https://b-mbti.money-hotissue.com/test2',
-                        3: 'https://b-mbti.money-hotissue.com/test3'
-                      };
-                      window.location.href = testUrls[versionNumber as keyof typeof testUrls];
-                    } else {
-                      // 다른 버전 선택
-                      setSelectedVersion(versionNumber);
-                    }
+                    // 클릭 시 바로 해당 테스트 페이지로 이동
+                    // 테스트 시작 통계 업데이트
+                    VisitorCounter.incrementVersionUsage(versionNumber);
+                    
+                    const testUrls = {
+                      1: 'https://b-mbti.money-hotissue.com/test1',
+                      2: 'https://b-mbti.money-hotissue.com/test2',
+                      3: 'https://b-mbti.money-hotissue.com/test3'
+                    };
+                    window.location.href = testUrls[versionNumber as keyof typeof testUrls];
                   }}
-                  className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.01] ${
-                    isSelected
-                      ? `border-${version.color}-400 bg-gradient-to-r ${
-                          version.color === 'orange' 
-                            ? 'from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-200' 
-                            : version.color === 'purple'
-                            ? 'from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-200'
-                            : 'from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200'
-                        }`
-                      : `bg-gradient-to-r ${
-                          version.color === 'orange' 
-                            ? 'from-orange-50 to-amber-50 border-orange-200 hover:border-orange-300' 
-                            : version.color === 'purple'
-                            ? 'from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300'
-                            : 'from-blue-50 to-cyan-50 border-blue-200 hover:border-blue-300'
-                        } hover:shadow-md`
-                  }`}
+                  className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.01] bg-gradient-to-r ${
+                    version.color === 'orange' 
+                      ? 'from-orange-50 to-amber-50 border-orange-200 hover:border-orange-300' 
+                      : version.color === 'purple'
+                      ? 'from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300'
+                      : 'from-blue-50 to-cyan-50 border-blue-200 hover:border-blue-300'
+                  } hover:shadow-md`}
                 >
                   <div className="flex flex-col items-center justify-center text-center">
                     <div className="w-full">
-                      <h4 className={`text-lg font-bold mb-2 flex items-center justify-center ${
-                        isSelected ? 'text-white' : 'text-gray-800'
-                      }`}>
+                      <h4 className="text-lg font-bold mb-2 flex items-center justify-center text-gray-800">
                         <span>
                           {versionNumber === 1 && "💝 "}
                           {versionNumber === 2 && "⚡ "}
                           {versionNumber === 3 && "🔥 "}
                           {version.name}
                         </span>
-                        {versionNumber === mostPopularVersion && (
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-bold ${
-                            isSelected 
-                              ? 'bg-white/20 text-white border border-white/30' 
-                              : 'bg-red-500 text-white'
-                          }`}>
+                        {versionNumber === 1 && (
+                          <span className="ml-2 px-2 py-1 rounded-full text-xs font-bold bg-red-500 text-white">
                             BEST
                           </span>
                         )}
                       </h4>
-                      <p className={`text-sm mb-2 text-center ${
-                        isSelected ? 'text-white/90' : 'text-gray-600'
-                      }`}>
+                      <p className="text-sm mb-2 text-center text-gray-600">
                         {version.description}
                       </p>
                       
                       {/* 각 테스트별 추가 특징 */}
-                      <div className={`text-xs text-center ${
-                        isSelected ? 'text-white/80' : 'text-gray-500'
-                      }`}>
+                      <div className="text-xs text-center text-gray-500 mb-3">
                         {versionNumber === 1 && "공동체 속 관계를 중요하게 생각하는 분들에게 추천"}
                         {versionNumber === 2 && "사명과 비전을 품고 있는 분들에게 추천"}
                         {versionNumber === 3 && "인생의 시련을 겪고 계신 분들에게 추천"}
                       </div>
                       
-                      {isSelected && (
-                        <div className="mt-3 flex items-center justify-center">
-                          <span className="text-white/90 text-sm mr-2">👆 한번 더 클릭하면</span>
-                          <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
-                            🚀 시작!
-                          </span>
-                        </div>
-                      )}
+                      {/* 시작 버튼 */}
+                      <div className="flex justify-center">
+                        <span className={`px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                          version.color === 'orange' ? 'bg-orange-500' :
+                          version.color === 'purple' ? 'bg-purple-500' : 'bg-blue-500'
+                        }`}>
+                          시작
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </button>

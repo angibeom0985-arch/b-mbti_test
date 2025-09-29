@@ -169,6 +169,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [totalGames, setTotalGames] = useState(0);
   const [showScoreShare, setShowScoreShare] = useState(false);
 
+  // 중복 방지를 위한 사용된 캐릭터 추적
+  const [usedCharacters, setUsedCharacters] = useState<string[]>([]);
+
   // 게임 참여 유도 멘트 배열
   const gamePromptMessages = [
     "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
@@ -232,11 +235,21 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   }, []);
 
-  // 퀴즈를 위한 랜덤 캐릭터 선택
+  // 퀴즈를 위한 랜덤 캐릭터 선택 (중복 방지)
   const getRandomCharacter = () => {
-    const randomType = ALL_CHARACTERS[Math.floor(Math.random() * ALL_CHARACTERS.length)];
+    // 모든 캐릭터를 사용했다면 목록을 초기화
+    let availableCharacters = ALL_CHARACTERS.filter(type => !usedCharacters.includes(type));
+    
+    if (availableCharacters.length === 0) {
+      // 모든 캐릭터를 사용했으면 초기화하고 현재 캐릭터만 제외
+      setUsedCharacters([]);
+      availableCharacters = ALL_CHARACTERS.filter(type => type !== currentQuizType);
+    }
+    
+    const randomType = availableCharacters[Math.floor(Math.random() * availableCharacters.length)];
     setCurrentQuizType(randomType);
     setQuizCharacter(RESULTS[randomType].character);
+    setUsedCharacters(prev => [...prev, randomType]);
     setUserGuess('');
     setQuizResult(null);
   };
@@ -1025,10 +1038,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             <div className="text-center">
               <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
                 <span className="mr-2">🖼️</span>
-                이미지 맞추기 게임에 도전해보세요!
+                성경인물 맞추기 게임!
               </h3>
               <p className="text-xs md:text-sm text-indigo-600 mb-3">
-                성경인물 이미지를 보고 누구인지 맞춰보세요! ✨
+                이미지를 보고 누구인지 맞춰보세요 ✨
               </p>
               
               {/* 게임 미리보기 */}
@@ -1052,7 +1065,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </div>
                     <div className="flex-1">
                       <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
-                      <div className="text-sm font-medium text-gray-800">이 캐릭터는 누구일까요?</div>
+                      <div className="text-sm font-medium text-gray-800">이 사람은 누구일까요?</div>
                     </div>
                   </div>
                   <div className="mt-2 flex gap-2">

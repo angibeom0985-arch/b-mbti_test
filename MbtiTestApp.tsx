@@ -44,8 +44,28 @@ const App: React.FC = () => {
   const [generatedResult, setGeneratedResult] = useState<MbtiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 자동 시작 버전 체크
+  // 자동 시작 버전 체크 및 URL 파라미터 처리
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const versionParam = urlParams.get('version');
+    const questionParam = urlParams.get('question');
+    
+    // URL 파라미터가 있으면 해당 버전과 질문으로 바로 이동
+    if (versionParam && questionParam) {
+      const version = parseInt(versionParam, 10);
+      const questionNumber = parseInt(questionParam, 10);
+      
+      if (version >= 1 && version <= 3 && questionNumber >= 1 && questionNumber <= 12) {
+        setSelectedVersion(version);
+        setCurrentQuestionIndex(questionNumber - 1); // 0-based index
+        setGameState('quiz');
+        
+        // URL을 깔끔하게 변경 (파라미터 제거)
+        window.history.replaceState({}, '', window.location.pathname);
+        return;
+      }
+    }
+
     const autoStartVersion = (window as any).autoStartVersion;
     if (autoStartVersion && autoStartVersion >= 1 && autoStartVersion <= 3) {
       handleStart(autoStartVersion);
@@ -81,6 +101,19 @@ const App: React.FC = () => {
       }
     }
   }, []);
+
+  // 퀴즈 진행 중 URL 업데이트
+  useEffect(() => {
+    if (gameState === 'quiz' && selectedVersion && currentQuestionIndex >= 0) {
+      const questionNumber = currentQuestionIndex + 1;
+      const newPath = `/test${selectedVersion}-${questionNumber}`;
+      
+      // 현재 URL과 다른 경우에만 업데이트
+      if (window.location.pathname !== newPath) {
+        window.history.replaceState({}, '', newPath);
+      }
+    }
+  }, [gameState, selectedVersion, currentQuestionIndex]);
 
   // 선택된 버전의 질문 가져오기
   const currentQuestions = useMemo(() => {

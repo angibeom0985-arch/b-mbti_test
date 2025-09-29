@@ -23,7 +23,8 @@
     <link rel="icon" type="image/x-icon" href="https://b-mbti.money-hotissue.com/favicon.ico" />
     
     <!-- 카카오 JavaScript SDK -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+            integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
     
     <style>
       * { 
@@ -191,8 +192,8 @@
       
       const shareUrl = 'https://b-mbti.money-hotissue.com';
       
-      // 카카오 SDK 초기화
-      const KAKAO_JS_KEY = 'c438f71c1e23117be73071fd2bcc5fa6'; // JavaScript 키 사용
+      // 카카오 SDK 초기화 (새로운 앱 키 사용)
+      const KAKAO_JS_KEY = '8e24012c3a70657f43f76742dcce245c'; // JavaScript 키 사용
       
       if (window.Kakao) {
         if (!Kakao.isInitialized()) {

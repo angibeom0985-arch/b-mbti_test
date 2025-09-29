@@ -454,6 +454,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>공유하기</title>
+          <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+                  integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             body { 
@@ -542,42 +544,72 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
           
           <script>
+            // 카카오 SDK 초기화
+            const KAKAO_JS_KEY = '8e24012c3a70657f43f76742dcce245c'; // JavaScript 키 사용
+            
+            if (window.Kakao && !window.Kakao.isInitialized()) {
+              try {
+                window.Kakao.init(KAKAO_JS_KEY);
+                console.log('카카오 SDK 초기화 성공');
+              } catch (error) {
+                console.error('카카오 SDK 초기화 실패:', error);
+              }
+            }
+            
             function shareToKakao() {
               const shareText = \`${shareText}\`;
               const shareUrl = \`${shareUrl}\`;
-              const fullText = shareText + '\\n\\n' + shareUrl;
               
-              // 클립보드에 텍스트 복사
-              navigator.clipboard.writeText(fullText).then(() => {
-                // 모바일인지 확인
-                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                
-                if (isMobile) {
-                  // 모바일에서는 카카오톡 앱으로 직접 이동 시도
-                  try {
-                    // 안전한 방식으로 카카오톡 앱 실행 시도
-                    const link = document.createElement('a');
-                    link.href = \`kakaotalk://msg?text=\${encodeURIComponent(fullText)}\`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    // 성공 메시지
-                    alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 앱이 열리지 않으면 카카오톡에서 붙여넣기 해주세요.');
-                  } catch (error) {
-                    // 카카오톡 앱 실행 실패시 대안 제공
-                    alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 앱에서 붙여넣기 해주세요.');
-                  }
-                } else {
-                  // PC에서는 웹 카카오톡으로 이동
-                  if (confirm('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡 웹 버전을 열어서 붙여넣기 하시겠습니까?')) {
-                    window.open('https://web.kakao.com/', '_blank');
-                  }
+              // 카카오 SDK가 정상 초기화되어 있는지 확인
+              if (window.Kakao && window.Kakao.isInitialized() && window.Kakao.Link) {
+                try {
+                  window.Kakao.Link.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                      title: '🙏 성경인물 MBTI 테스트 결과',
+                      description: shareText,
+                      imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
+                      link: {
+                        mobileWebUrl: shareUrl,
+                        webUrl: shareUrl,
+                      },
+                    },
+                    buttons: [
+                      {
+                        title: '✨ 나도 테스트 해보기',
+                        link: {
+                          mobileWebUrl: shareUrl,
+                          webUrl: shareUrl,
+                        },
+                      },
+                    ],
+                    success: function(response) {
+                      console.log('카카오 공유 성공:', response);
+                      alert('✅ 카카오톡으로 공유되었습니다!');
+                    },
+                    fail: function(error) {
+                      console.log('카카오 공유 실패:', error);
+                      fallbackKakaoShare();
+                    }
+                  });
+                } catch (error) {
+                  console.error('카카오 링크 전송 오류:', error);
+                  fallbackKakaoShare();
                 }
-              }).catch(() => {
-                // 클립보드 복사 실패시 대체 방법
-                alert('📱 카카오톡으로 공유하기:\\n\\n1. 아래 텍스트를 복사하세요\\n2. 카카오톡을 열어서 붙여넣기 하세요\\n\\n' + fullText);
-              });
+              } else {
+                console.log('카카오 SDK 미초기화 - 대안 방법 사용');
+                fallbackKakaoShare();
+              }
+              
+              function fallbackKakaoShare() {
+                const fullText = shareText + '\\n\\n' + shareUrl;
+                // 클립보드에 텍스트 복사
+                navigator.clipboard.writeText(fullText).then(() => {
+                  alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡에서 붙여넣기 해주세요.');
+                }).catch(() => {
+                  alert('📱 카카오톡으로 공유하기:\\n\\n' + fullText + '\\n\\n위 텍스트를 복사해서 카카오톡에 붙여넣기 해주세요.');
+                });
+              }
             }
             
             function shareToInstagram() {

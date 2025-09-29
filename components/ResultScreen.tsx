@@ -453,6 +453,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                               padding: 30px;
                               border-radius: 20px;
                               box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                              position: relative;
                             }
                             img {
                               max-width: 500px;
@@ -467,12 +468,52 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                               color: #333;
                               font-size: 24px;
                             }
+                            .back-button {
+                              margin-top: 20px;
+                              padding: 12px 24px;
+                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                              color: white;
+                              border: none;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                              cursor: pointer;
+                              transition: all 0.3s ease;
+                              box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                            }
+                            .back-button:hover {
+                              transform: translateY(-2px);
+                              box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                            }
+                            .close-button {
+                              position: absolute;
+                              top: 15px;
+                              right: 15px;
+                              background: rgba(0,0,0,0.5);
+                              color: white;
+                              border: none;
+                              width: 30px;
+                              height: 30px;
+                              border-radius: 50%;
+                              cursor: pointer;
+                              font-size: 18px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                            }
+                            .close-button:hover {
+                              background: rgba(0,0,0,0.7);
+                            }
                           </style>
                         </head>
                         <body>
                           <div class="container">
+                            <button class="close-button" onclick="window.close()">×</button>
                             <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
                             <h1>${resultData.character}</h1>
+                            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+                              🏠 결과 페이지로 돌아가기
+                            </button>
                           </div>
                         </body>
                         </html>
@@ -521,6 +562,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                               padding: 30px;
                               border-radius: 20px;
                               box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                              position: relative;
                             }
                             img {
                               max-width: 500px;
@@ -535,12 +577,52 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                               color: #333;
                               font-size: 24px;
                             }
+                            .back-button {
+                              margin-top: 20px;
+                              padding: 12px 24px;
+                              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                              color: white;
+                              border: none;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                              cursor: pointer;
+                              transition: all 0.3s ease;
+                              box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                            }
+                            .back-button:hover {
+                              transform: translateY(-2px);
+                              box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                            }
+                            .close-button {
+                              position: absolute;
+                              top: 15px;
+                              right: 15px;
+                              background: rgba(0,0,0,0.5);
+                              color: white;
+                              border: none;
+                              width: 30px;
+                              height: 30px;
+                              border-radius: 50%;
+                              cursor: pointer;
+                              font-size: 18px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                            }
+                            .close-button:hover {
+                              background: rgba(0,0,0,0.7);
+                            }
                           </style>
                         </head>
                         <body>
                           <div class="container">
+                            <button class="close-button" onclick="window.close()">×</button>
                             <img src="${window.location.origin}${resultData.image}" alt="${resultData.character}" />
                             <h1>${resultData.character}</h1>
+                            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+                              🏠 결과 페이지로 돌아가기
+                            </button>
                           </div>
                         </body>
                         </html>
@@ -709,6 +791,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                                     padding: 30px;
                                     border-radius: 20px;
                                     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                                    position: relative;
                                   }
                                   img {
                                     max-width: 500px;
@@ -723,12 +806,52 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                                     color: #333;
                                     font-size: 24px;
                                   }
+                                  .back-button {
+                                    margin-top: 20px;
+                                    padding: 12px 24px;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 25px;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    transition: all 0.3s ease;
+                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                                  }
+                                  .back-button:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                                  }
+                                  .close-button {
+                                    position: absolute;
+                                    top: 15px;
+                                    right: 15px;
+                                    background: rgba(0,0,0,0.5);
+                                    color: white;
+                                    border: none;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    cursor: pointer;
+                                    font-size: 18px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                  }
+                                  .close-button:hover {
+                                    background: rgba(0,0,0,0.7);
+                                  }
                                 </style>
                               </head>
                               <body>
                                 <div class="container">
+                                  <button class="close-button" onclick="window.close()">×</button>
                                   <img src="${window.location.origin}${getMbtiImage(compatibleType)}" alt="${RESULTS[compatibleType].character}" />
                                   <h1>${RESULTS[compatibleType].character}</h1>
+                                  <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+                                    🏠 결과 페이지로 돌아가기
+                                  </button>
                                 </div>
                               </body>
                               </html>
@@ -810,6 +933,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                                     padding: 30px;
                                     border-radius: 20px;
                                     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                                    position: relative;
                                   }
                                   img {
                                     max-width: 500px;
@@ -824,12 +948,52 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                                     color: #333;
                                     font-size: 24px;
                                   }
+                                  .back-button {
+                                    margin-top: 20px;
+                                    padding: 12px 24px;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 25px;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    transition: all 0.3s ease;
+                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                                  }
+                                  .back-button:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                                  }
+                                  .close-button {
+                                    position: absolute;
+                                    top: 15px;
+                                    right: 15px;
+                                    background: rgba(0,0,0,0.5);
+                                    color: white;
+                                    border: none;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    cursor: pointer;
+                                    font-size: 18px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                  }
+                                  .close-button:hover {
+                                    background: rgba(0,0,0,0.7);
+                                  }
                                 </style>
                               </head>
                               <body>
                                 <div class="container">
+                                  <button class="close-button" onclick="window.close()">×</button>
                                   <img src="${window.location.origin}${getMbtiImage(incompatibleType)}" alt="${RESULTS[incompatibleType].character}" />
                                   <h1>${RESULTS[incompatibleType].character}</h1>
+                                  <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+                                    🏠 결과 페이지로 돌아가기
+                                  </button>
                                 </div>
                               </body>
                               </html>

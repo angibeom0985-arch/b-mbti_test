@@ -171,15 +171,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   // 게임 참여 유도 멘트 배열
   const gamePromptMessages = [
-    "🎯 관찰력이 뛰어난 당신이라면 이 게임 식은 죽 먹기일 거예요!",
-    "🎮 친구들보다 더 빠르게 맞출 자신 있나요? 도전해보세요!",
+    "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
     "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
     "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
     "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
     "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
     "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
-    "🎪 친구들과 점수 경쟁하면 더 재밌어요! 도전해보세요",
-    "🌟 재미있는 일러스트와 함께하는 힐링 타임!"
+    "🎯 친구들과 점수 경쟁하면 더 재밌어요! 도전해보세요",
+    "🌟 귀여운 일러스트와 함께하는 힐링 타임!"
   ];
 
   // 랜덤 멘트 선택 (컴포넌트 마운트 시 한 번만 선택)
@@ -388,49 +387,49 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   return (
-    <div className="result-container p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 w-full max-w-lg mx-auto text-center relative overflow-hidden">
+    <div className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden">
       
       {/* 이미지 캡처 영역 시작 */}
       <div className="image-capture-area">
       
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-        {/* 성경인물 정보 - 나란히 배치 */}
-        <div className="flex items-center space-x-6">
-          {/* 왼쪽: 텍스트 정보 */}
-          <div className="flex-1">
+        {/* 성경인물 정보 - 모바일 반응형 배치 */}
+        <div className="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0">
+          {/* 텍스트 정보 */}
+          <div className="flex-1 order-2 md:order-1">
             {/* 상단: 당신과 닮은 성경인물 */}
-            <div className="mb-6 flex justify-center">
-              <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium">
+            <div className="mb-4 md:mb-6 flex justify-center">
+              <div className="bg-blue-100 text-blue-700 rounded-full px-3 md:px-4 py-1 text-xs md:text-sm font-medium">
                 당신과 닮은 성경인물
               </div>
             </div>
             
             {/* 중간: 이름 */}
-            <div className="mb-6 flex justify-center">
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-                <span className="text-2xl mr-2">✨</span>
+            <div className="mb-4 md:mb-6 flex justify-center">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
+                <span className="text-xl md:text-2xl mr-2">✨</span>
                 {resultData.character}
               </h1>
             </div>
             
             {/* 하단: MBTI 유형 */}
             <div className="flex justify-center">
-              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold">
+              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-bold">
                 {resultType}
               </div>
             </div>
           </div>
           
-          {/* 오른쪽: 이미지 */}
-          <div className="flex-shrink-0">
+          {/* 이미지 */}
+          <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
             {resultData.image ? (
               <div className="space-y-2">
                 <div 
                   className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
                 >
-                  <div className="w-48 h-48 md:w-56 md:h-56 bg-white/80 rounded-2xl p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
+                  <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
                     <img 
                       src={resultData.image} 
                       alt={resultData.character} 
@@ -445,7 +444,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
                 <button
                   onClick={() => setEnlargedImage({ src: resultData.image!, character: resultData.character })}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
                 >
                   <span>🔍</span>
                   <span>크게보기</span>
@@ -545,37 +544,37 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
       <div className="mb-6 space-y-4 mt-6">
           {/* 어울리는 성격 유형 */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 shadow-sm border border-green-200">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-3 md:p-4 shadow-sm border border-green-200">
             {(() => {
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
-                <div className="flex items-center gap-4">
-                  {/* 왼쪽: 제목, 설명, 이유 */}
-                  <div className="flex-1 space-y-3">
+                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  {/* 텍스트 정보 */}
+                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
                     {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
-                      <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                      <h3 className="text-xs md:text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
+                      <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
                         {compatibleType}
                       </span>
-                      <span className="font-bold text-green-800 text-sm">
+                      <span className="font-bold text-green-800 text-xs md:text-sm">
                         {RESULTS[compatibleType].character}
                       </span>
-                      <span className="text-green-600 text-base">💚</span>
+                      <span className="text-green-600 text-sm md:text-base">💚</span>
                     </div>
                     
                     {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-3 border border-green-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
                         {getCompatibilityReason(resultType, compatibleType)}
                       </p>
                     </div>
                   </div>
                   
-                  {/* 오른쪽: 이미지 */}
-                  <div className="flex-shrink-0">
-                    <div className="w-32 h-32 relative cursor-pointer">
+                  {/* 이미지 */}
+                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
+                    <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
@@ -597,37 +596,37 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
 
           {/* 어울리지 않는 성격 유형 */}
-          <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-4 shadow-sm border border-red-200">
+          <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-3 md:p-4 shadow-sm border border-red-200">
             {(() => {
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
-                <div className="flex items-center gap-4">
-                  {/* 왼쪽: 제목, 설명, 이유 */}
-                  <div className="flex-1 space-y-3">
+                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  {/* 텍스트 정보 */}
+                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
                     {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
-                      <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                      <h3 className="text-xs md:text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
+                      <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
                         {incompatibleType}
                       </span>
-                      <span className="font-bold text-red-800 text-sm">
+                      <span className="font-bold text-red-800 text-xs md:text-sm">
                         {RESULTS[incompatibleType].character}
                       </span>
-                      <span className="text-red-600 text-base">💔</span>
+                      <span className="text-red-600 text-sm md:text-base">💔</span>
                     </div>
                     
                     {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-3 border border-red-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
                         {getIncompatibilityReason(resultType, incompatibleType)}
                       </p>
                     </div>
                   </div>
                   
-                  {/* 오른쪽: 이미지 */}
-                  <div className="flex-shrink-0">
-                    <div className="w-32 h-32 relative cursor-pointer">
+                  {/* 이미지 */}
+                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
+                    <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
@@ -726,29 +725,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </div>
 
         {/* 액션 버튼들을 감싸는 컨테이너 */}
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {/* 이미지 맞추기 게임 - 참여 유도 문구로 변경 */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 mb-6 border-2 border-indigo-200 shadow-md">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
             <div className="text-center">
-              <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center">
+              <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
                 <span className="mr-2">🖼️</span>
                 이미지 맞추기 게임에 도전해보세요!
               </h3>
-              <p className="text-sm text-indigo-600 mb-3">
+              <p className="text-xs md:text-sm text-indigo-600 mb-3">
                 성경인물 이미지를 보고 누구인지 맞춰보세요! ✨
               </p>
               <button
                 onClick={onQuizGame || (() => { window.location.href = 'https://b-mbti.money-hotissue.com/quizgame'; })}
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm"
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
               >
                 🖼️ 게임 시작하기
               </button>
               
               {/* 게임 점수 표시 (게임을 한 번이라도 했을 때만 표시) */}
               {totalGames > 0 && (
-                <div className="mt-4 p-3 bg-white/80 rounded-xl border border-indigo-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-indigo-800">
+                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-white/80 rounded-xl border border-indigo-200">
+                  <div className="flex items-center justify-between mb-1 md:mb-2">
+                    <span className="text-xs md:text-sm font-semibold text-indigo-800">
                       🏆 내 게임 기록
                     </span>
                     <button
@@ -759,7 +758,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </button>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-bold text-indigo-700">
+                    <div className="text-base md:text-lg font-bold text-indigo-700">
                       정답률: {calculateGameScore()}%
                     </div>
                     <div className="text-xs text-gray-600">
@@ -770,7 +769,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               )}
               
               {/* 랜덤 게임 참여 유도 멘트 */}
-              <div className="mt-3 px-4 py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
+              <div className="mt-2 md:mt-3 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
                 <p className="text-xs text-gray-600 text-center leading-relaxed">
                   {randomPrompt}
                 </p>
@@ -788,7 +787,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 onRestart();
               }
             }}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm"
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
           >
             🔁 다시 테스트하기
           </button>
@@ -796,7 +795,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           {/* 후기 남기기 */}
           <button
             onClick={handleLeaveComment}
-            className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-3 px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm"
+            className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm md:text-base"
           >
             💬 후기 남기기
           </button>
@@ -804,27 +803,27 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
       {/* SNS 공유 모달 */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-center mb-4">📤 결과 공유하기</h3>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <button onClick={() => handleSNSShare('kakao')} className="flex items-center justify-center p-3 bg-yellow-400 text-gray-800 rounded-2xl font-semibold">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
+          <div className="bg-white rounded-3xl p-4 md:p-6 max-w-sm w-full max-w-xs md:max-w-sm shadow-2xl mx-3">
+            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">📤 결과 공유하기</h3>
+            <div className="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4">
+              <button onClick={() => handleSNSShare('kakao')} className="flex items-center justify-center p-2 md:p-3 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 💬 카카오톡
               </button>
-              <button onClick={() => handleSNSShare('instagram')} className="flex items-center justify-center p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-semibold">
+              <button onClick={() => handleSNSShare('instagram')} className="flex items-center justify-center p-2 md:p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 📸 인스타
               </button>
-              <button onClick={() => handleSNSShare('facebook')} className="flex items-center justify-center p-3 bg-blue-600 text-white rounded-2xl font-semibold">
+              <button onClick={() => handleSNSShare('facebook')} className="flex items-center justify-center p-2 md:p-3 bg-blue-600 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 👥 페이스북
               </button>
-              <button onClick={() => handleSNSShare('twitter')} className="flex items-center justify-center p-3 bg-sky-400 text-white rounded-2xl font-semibold">
+              <button onClick={() => handleSNSShare('twitter')} className="flex items-center justify-center p-2 md:p-3 bg-sky-400 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 🐦 트위터
               </button>
             </div>
-            <button onClick={() => handleSNSShare('copy')} className="w-full p-3 bg-gray-100 text-gray-700 rounded-2xl font-semibold mb-3">
+            <button onClick={() => handleSNSShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
               📋 링크 복사
             </button>
-            <button onClick={() => setShowShareModal(false)} className="w-full p-3 text-gray-500 text-sm">
+            <button onClick={() => setShowShareModal(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">
               취소
             </button>
           </div>
@@ -833,35 +832,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
       {/* 게임 점수 공유 모달 */}
       {showScoreShare && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-center mb-4">🏆 게임 결과 공유하기</h3>
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 mb-4 text-center">
-              <div className="text-xl font-bold text-indigo-700 mb-1">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
+          <div className="bg-white rounded-3xl p-4 md:p-6 max-w-xs md:max-w-sm w-full shadow-2xl mx-3">
+            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">🏆 게임 결과 공유하기</h3>
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-3 md:p-4 mb-3 md:mb-4 text-center">
+              <div className="text-lg md:text-xl font-bold text-indigo-700 mb-1">
                 정답률: {calculateGameScore()}%
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs md:text-sm text-gray-600">
                 ({gameScore}/{totalGames} 문제 정답)
               </div>
-              <div className="text-xs text-indigo-600 mt-2">
+              <div className="text-xs text-indigo-600 mt-1 md:mt-2">
                 친구들과 경쟁해보세요! 💪
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <button onClick={() => handleGameScoreShare('kakao')} className="flex items-center justify-center p-3 bg-yellow-400 text-gray-800 rounded-2xl font-semibold">
+            <div className="grid grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4">
+              <button onClick={() => handleGameScoreShare('kakao')} className="flex items-center justify-center p-2 md:p-3 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 💬 카카오
               </button>
-              <button onClick={() => handleGameScoreShare('facebook')} className="flex items-center justify-center p-3 bg-blue-600 text-white rounded-2xl font-semibold">
+              <button onClick={() => handleGameScoreShare('facebook')} className="flex items-center justify-center p-2 md:p-3 bg-blue-600 text-white rounded-xl md:rounded-2xl font-semibold text-xs md:text-sm">
                 📘 페북
               </button>
-              <button onClick={() => handleGameScoreShare('twitter')} className="flex items-center justify-center p-3 bg-sky-400 text-white rounded-2xl font-semibold col-span-2">
+              <button onClick={() => handleGameScoreShare('twitter')} className="flex items-center justify-center p-2 md:p-3 bg-sky-400 text-white rounded-xl md:rounded-2xl font-semibold col-span-2 text-xs md:text-sm">
                 🐦 트위터
               </button>
             </div>
-            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-3 bg-gray-100 text-gray-700 rounded-2xl font-semibold mb-3">
+            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
               📋 결과 복사
             </button>
-            <button onClick={() => setShowScoreShare(false)} className="w-full p-3 text-gray-500 text-sm">
+            <button onClick={() => setShowScoreShare(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">
               취소
             </button>
           </div>

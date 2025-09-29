@@ -743,25 +743,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         return;
       }
 
-      // 동적으로 html2canvas 라이브러리 로드
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-      document.head.appendChild(script);
-
-      script.onload = async () => {
+      // 이미지 캡처 처리 함수
+      const processCapture = async () => {
         try {
           // @ts-ignore - html2canvas는 전역 변수로 로드됨
-          const canvas = await html2canvas(captureElement, {
+          const canvas = await (window as any).html2canvas(captureElement, {
             backgroundColor: '#ffffff',
-            scale: 3, // 고화질을 위해 scale 증가
-            useCORS: true,
-            allowTaint: true,
-            foreignObjectRendering: false,
+            scale: 2, // scale을 낮춰서 안정성 향상
+            useCORS: false, // CORS 비활성화
+            allowTaint: false, // Taint 비활성화
+            foreignObjectRendering: true, // SVG 등 외부 객체 렌더링 허용
             logging: false,
-            width: captureElement.scrollWidth,
-            height: captureElement.scrollHeight,
-            windowWidth: captureElement.scrollWidth,
-            windowHeight: captureElement.scrollHeight
+            ignoreElements: (element: HTMLElement) => {
+              // 외부 이미지나 문제가 될 수 있는 요소 제외
+              return element.tagName === 'IFRAME' || 
+                     element.classList.contains('ad-banner') ||
+                     (element.tagName === 'IMG' && (element as HTMLImageElement).src && 
+                      !(element as HTMLImageElement).src.startsWith(window.location.origin));
+            }
           });
 
           // 캔버스를 이미지로 변환
@@ -791,9 +790,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         }
       };
 
-      script.onerror = () => {
-        alert('이미지 저장 라이브러리 로드에 실패했습니다.');
-      };
+      // html2canvas가 이미 로드되었는지 확인
+      if ((window as any).html2canvas) {
+        await processCapture();
+      } else {
+        // 동적으로 html2canvas 라이브러리 로드
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.crossOrigin = 'anonymous'; // CORS 설정 추가
+        document.head.appendChild(script);
+
+        script.onload = async () => {
+          await processCapture();
+        };
+
+        script.onerror = () => {
+          alert('이미지 저장 라이브러리 로드에 실패했습니다.');
+        };
+      }
 
     } catch (error) {
       console.error('이미지 저장 중 오류:', error);

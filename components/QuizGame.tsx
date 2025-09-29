@@ -76,7 +76,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ onBack }) => {
         <div className="w-full max-w-md mx-auto">
           {/* 헤더 */}
           <div className="bg-white/90 rounded-3xl p-6 mb-6 shadow-xl border border-white/30 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">🎮 성경인물 맞히기</h1>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">🎮 성경인물 맞히기</h1>
             <div className="flex justify-center items-center space-x-4 text-sm">
               <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
                 정답: {score}개
@@ -95,14 +95,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ onBack }) => {
           {/* 게임 영역 */}
           <div className="bg-white/90 rounded-3xl p-6 shadow-xl border border-white/30">
             <div className="text-center mb-6">
-              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-4 mb-4">
-                <p className="text-sm text-gray-700 mb-2">
-                  🔥 <strong>도전!</strong> 이미지를 보고 성경인물을 맞춰보세요!
-                </p>
-                <p className="text-xs text-gray-500">
-                  아래 후보 중에서 선택해보세요 ⬇️
-                </p>
-              </div>
+
               
               {/* 캐릭터 이미지 */}
               <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">

@@ -394,35 +394,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-        {/* 성경인물 정보 - 모바일 반응형 배치 */}
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0">
-          {/* 텍스트 정보 */}
-          <div className="flex-1 order-2 md:order-1">
+        {/* 성경인물 정보 - 텍스트(왼쪽) / 이미지(오른쪽) 배치 */}
+        <div className="flex items-center space-x-6">
+          {/* 왼쪽: 텍스트 정보 */}
+          <div className="flex-1">
             {/* 상단: 당신과 닮은 성경인물 */}
-            <div className="mb-4 md:mb-6 flex justify-center">
-              <div className="bg-blue-100 text-blue-700 rounded-full px-3 md:px-4 py-1 text-xs md:text-sm font-medium">
+            <div className="mb-6">
+              <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium inline-block">
                 당신과 닮은 성경인물
               </div>
             </div>
             
             {/* 중간: 이름 */}
-            <div className="mb-4 md:mb-6 flex justify-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
-                <span className="text-xl md:text-2xl mr-2">✨</span>
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+                <span className="text-2xl mr-2">✨</span>
                 {resultData.character}
               </h1>
             </div>
             
             {/* 하단: MBTI 유형 */}
-            <div className="flex justify-center">
-              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-bold">
+            <div>
+              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold inline-block">
                 {resultType}
               </div>
             </div>
           </div>
           
-          {/* 이미지 */}
-          <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
+          {/* 오른쪽: 이미지 */}
+          <div className="flex-shrink-0">
             {resultData.image ? (
               <div className="space-y-2">
                 <div 

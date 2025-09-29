@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공유하기 - 성경인물 MBTI 테스트</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="성경인물 MBTI 테스트 결과를 카카오톡, 인스타그램 등으로 공유해보세요!" />
+    <meta name="keywords" content="성경인물 MBTI 공유, 카카오톡 공유, 인스타그램 공유, 테스트 결과 공유" />
+    <meta name="author" content="성경인물 MBTI 테스트" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="공유하기 - 성경인물 MBTI 테스트" />
+    <meta property="og:description" content="성경인물 MBTI 테스트 결과를 카카오톡, 인스타그램 등으로 공유해보세요!" />
+    <meta property="og:url" content="https://b-mbti.money-hotissue.com/share" />
+    <meta property="og:site_name" content="성경인물 MBTI 테스트" />
+    <meta property="og:image" content="https://b-mbti.money-hotissue.com/og-image-new.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://b-mbti.money-hotissue.com/favicon.ico" />
+    
+    <!-- 카카오 JavaScript SDK -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    
+    <style>
+      * { 
+        margin: 0; 
+        padding: 0; 
+        box-sizing: border-box; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      }
+      body { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        color: #333; 
+        padding: 20px; 
+        min-height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+      }
+      .container { 
+        background: white; 
+        border-radius: 20px; 
+        padding: 32px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+        max-width: 450px; 
+        width: 100%; 
+        text-align: center;
+      }
+      h1 { 
+        margin-bottom: 8px; 
+        color: #333; 
+        font-size: 28px; 
+        font-weight: 700;
+      }
+      .subtitle {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 32px;
+      }
+      .share-button { 
+        display: block; 
+        width: 100%; 
+        padding: 18px 24px; 
+        margin: 16px 0; 
+        border: none; 
+        border-radius: 16px; 
+        font-size: 16px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s ease; 
+        text-decoration: none; 
+        text-align: center; 
+        position: relative;
+        overflow: hidden;
+      }
+      .share-button:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+      .share-button:hover:before {
+        left: 100%;
+      }
+      .kakao { 
+        background: linear-gradient(135deg, #fee500, #fccc02); 
+        color: #3c1e1e; 
+        box-shadow: 0 4px 15px rgba(254, 229, 0, 0.3);
+      }
+      .kakao:hover { 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 25px rgba(254, 229, 0, 0.4); 
+      }
+      .instagram { 
+        background: linear-gradient(135deg, #e1306c, #fd1d1d, #fcb045); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);
+      }
+      .instagram:hover { 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4); 
+      }
+      .copy { 
+        background: linear-gradient(135deg, #667eea, #764ba2); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+      .copy:hover { 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); 
+      }
+      .back-button { 
+        background: linear-gradient(135deg, #f093fb, #f5576c); 
+        color: white; 
+        padding: 14px 24px; 
+        border: none; 
+        border-radius: 12px; 
+        margin-top: 24px; 
+        cursor: pointer; 
+        font-size: 14px; 
+        width: 100%; 
+        transition: all 0.3s ease;
+      }
+      .back-button:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+      }
+      @media (max-width: 480px) {
+        body { padding: 16px; }
+        .container { padding: 24px; border-radius: 16px; }
+        h1 { font-size: 24px; }
+        .share-button { padding: 16px 20px; font-size: 15px; }
+      }
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 16px 0;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📤 공유하기</h1>
+      <p class="subtitle">테스트 결과를 친구들과 공유해보세요!</p>
+      
+      <div class="success-message" id="successMessage">
+        ✅ 성공적으로 공유되었습니다!
+      </div>
+      
+      <button class="share-button kakao" onclick="shareToKakao()">
+        💬 카카오톡으로 공유
+      </button>
+      
+      <button class="share-button instagram" onclick="shareToInstagram()">
+        📷 인스타그램으로 공유
+      </button>
+      
+      <button class="share-button copy" onclick="copyLink()">
+        🔗 링크 복사
+      </button>
+      
+      <button class="back-button" onclick="goBack()">
+        🏠 결과 페이지로 돌아가기
+      </button>
+    </div>
+    
+    <script>
+      // URL에서 공유 데이터 가져오기
+      const urlParams = new URLSearchParams(window.location.search);
+      const resultType = urlParams.get('type') || 'ENFP';
+      const character = urlParams.get('character') || '아브라함';
+      
+      // 기본 공유 텍스트
+      const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏
+
+저는 '${character}(${resultType})' 유형이에요!
+
+여러분도 테스트해보세요!`;
+      
+      const shareUrl = 'https://b-mbti.money-hotissue.com';
+      
+      // 카카오 SDK 초기화 (실제 서비스에서는 카카오 개발자센터에서 발급받은 JavaScript 키 사용)
+      // TODO: https://developers.kakao.com 에서 앱 등록 후 JavaScript 키로 교체 필요
+      const KAKAO_JS_KEY = 'YOUR_KAKAO_JS_KEY_HERE'; // 실제 JavaScript 키로 교체
+      
+      if (window.Kakao && KAKAO_JS_KEY !== 'YOUR_KAKAO_JS_KEY_HERE') {
+        if (!Kakao.isInitialized()) {
+          try {
+            Kakao.init(KAKAO_JS_KEY);
+            console.log('카카오 SDK 초기화 성공');
+          } catch (error) {
+            console.error('카카오 SDK 초기화 실패:', error);
+          }
+        }
+      } else {
+        console.warn('카카오 앱 키가 설정되지 않았습니다. 실제 서비스에서는 https://developers.kakao.com 에서 키를 발급받아 설정해주세요.');
+      }
+      
+      function showSuccess() {
+        const message = document.getElementById('successMessage');
+        message.style.display = 'block';
+        setTimeout(() => {
+          message.style.display = 'none';
+        }, 3000);
+      }
+      
+      function shareToKakao() {
+        // 카카오 SDK가 정상 초기화되어 있는지 확인
+        if (window.Kakao && Kakao.isInitialized() && Kakao.Link) {
+          try {
+            Kakao.Link.sendDefault({
+              objectType: 'feed',
+              content: {
+                title: '성경인물 MBTI 테스트 결과',
+                description: shareText,
+                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
+                link: {
+                  mobileWebUrl: shareUrl,
+                  webUrl: shareUrl,
+                },
+              },
+              buttons: [
+                {
+                  title: '테스트 해보기',
+                  link: {
+                    mobileWebUrl: shareUrl,
+                    webUrl: shareUrl,
+                  },
+                },
+              ],
+              success: function(response) {
+                console.log('카카오 공유 성공:', response);
+                showSuccess();
+              },
+              fail: function(error) {
+                console.log('카카오 공유 실패:', error);
+                fallbackKakaoShare();
+              }
+            });
+          } catch (error) {
+            console.error('카카오 링크 전송 오류:', error);
+            fallbackKakaoShare();
+          }
+        } else {
+          console.log('카카오 SDK 미초기화 - 대안 방법 사용');
+          fallbackKakaoShare();
+        }
+      }
+      
+      function fallbackKakaoShare() {
+        // SDK를 사용할 수 없을 때의 대안
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          // 모바일에서는 카카오톡 앱 스킴 사용
+          const kakaoTalkUrl = `kakaotalk://msg?text=${encodeURIComponent(shareText + '\\n\\n' + shareUrl)}`;
+          window.location.href = kakaoTalkUrl;
+          
+          setTimeout(() => {
+            if (confirm('카카오톡 앱이 설치되어 있지 않거나 열리지 않았습니다. 카카오톡 웹 버전으로 이동하시겠습니까?')) {
+              window.open('https://web.kakao.com/', '_blank');
+            }
+          }, 1000);
+        } else {
+          // PC에서는 웹 버전으로 이동
+          if (confirm('카카오톡으로 공유하시겠습니까? 웹 버전 카카오톡이 열립니다.')) {
+            window.open('https://web.kakao.com/', '_blank');
+            navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
+              alert('📋 텍스트가 복사되었습니다! 카카오톡에 붙여넣어 주세요.');
+            }).catch(() => {});
+          }
+        }
+      }
+      
+      function shareToInstagram() {
+        const options = [
+          '📸 스토리에 공유하기',
+          '📋 피드에 공유하기', 
+          '💬 DM으로 공유하기',
+          '❌ 취소'
+        ];
+        
+        const optionsText = options.map((option, index) => `${index + 1}. ${option}`).join('\\n');
+        const userChoice = prompt(`인스타그램 공유 방법을 선택해주세요:\\n\\n${optionsText}\\n\\n번호를 입력하세요 (1-4):`);
+        
+        if (!userChoice || userChoice === '4') {
+          return;
+        }
+        
+        const choiceNum = parseInt(userChoice);
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        switch(choiceNum) {
+          case 1: // 스토리
+            if (isMobile) {
+              window.location.href = 'instagram://story-camera';
+              setTimeout(() => {
+                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                  window.open('https://www.instagram.com/', '_blank');
+                }
+              }, 1500);
+            } else {
+              window.open('https://www.instagram.com/', '_blank');
+            }
+            copyToClipboard();
+            break;
+            
+          case 2: // 피드
+            if (isMobile) {
+              window.location.href = 'instagram://camera';
+              setTimeout(() => {
+                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                  window.open('https://www.instagram.com/', '_blank');
+                }
+              }, 1500);
+            } else {
+              window.open('https://www.instagram.com/', '_blank');
+            }
+            copyToClipboard();
+            break;
+            
+          case 3: // DM
+            if (isMobile) {
+              window.location.href = 'instagram://direct-inbox';
+              setTimeout(() => {
+                if (confirm('인스타그램 앱이 열리지 않았나요? 웹으로 이동하시겠습니까?')) {
+                  window.open('https://www.instagram.com/direct/inbox/', '_blank');
+                }
+              }, 1500);
+            } else {
+              window.open('https://www.instagram.com/direct/inbox/', '_blank');
+            }
+            copyToClipboard();
+            break;
+            
+          default:
+            alert('올바른 번호를 선택해주세요.');
+            shareToInstagram();
+        }
+      }
+      
+      function copyToClipboard() {
+        navigator.clipboard.writeText(shareText + '\\n\\n' + shareUrl).then(() => {
+          alert('📋 텍스트가 복사되었습니다! 인스타그램에 붙여넣어 주세요.');
+          showSuccess();
+        }).catch(() => {
+          alert('📋 다음 내용을 복사해서 공유해주세요:\\n\\n' + shareText + '\\n\\n' + shareUrl);
+        });
+      }
+      
+      function copyLink() {
+        const fullText = shareText + '\\n\\n' + shareUrl;
+        navigator.clipboard.writeText(fullText).then(() => {
+          alert('📋 링크가 복사되었습니다!');
+          showSuccess();
+        }).catch(() => {
+          // 복사 실패 시 대체 방법
+          const textArea = document.createElement('textarea');
+          textArea.value = fullText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          alert('📋 링크가 복사되었습니다!');
+          showSuccess();
+        });
+      }
+      
+      function goBack() {
+        if (window.opener && !window.opener.closed) {
+          window.close();
+          window.opener.focus();
+        } else {
+          window.location.href = 'https://b-mbti.money-hotissue.com';
+        }
+      }
+    </script>
+  </body>
+</html>

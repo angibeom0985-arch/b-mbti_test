@@ -407,6 +407,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   }
 
   const handleShare = () => {
+    // 결과 데이터를 URL 파라미터로 전달하여 /share 페이지 열기
+    const shareUrl = `/share?type=${encodeURIComponent(resultType)}&character=${encodeURIComponent(resultData?.character || '')}`;
+    
+    const popup = window.open(shareUrl, 'share', 'width=450,height=650,scrollbars=yes,resizable=yes');
+    
+    if (!popup) {
+      alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+    }
+  };
+
+  const handleShareOld = () => {
     // 새창에서 공유 옵션을 보여주는 함수
     const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
     const shareUrl = 'https://gowith153.com';

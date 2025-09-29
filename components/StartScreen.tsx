@@ -152,34 +152,50 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </div>
           <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
             <p className="text-sm text-blue-700 text-center">
-              <span className="font-semibold">💡 팁:</span> 각각 다른 관점에서 분석하여 더 정확한 결과를 얻어요!
+              <span className="font-semibold">💡 팁:</span> 다른 관점에서 분석해 정확한 결과를 얻어요!
             </p>
           </div>
         </div>
 
         
-        {/* 특징 미리보기 - 색상 조화롭게 조정 */}
-        <div className="grid grid-cols-2 gap-3 mb-6 px-2">
-          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
-            <div className="text-xl mb-1">🎯</div>
-            <div className="text-xs font-semibold text-pink-800">3가지 테스트</div>
-            <div className="text-xs text-pink-600">다양한 관점</div>
+        {/* 특징 섹션 */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">
+            ✨ 특징
+          </h3>
+          <div className="grid grid-cols-2 gap-3 px-2">
+            <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-3 shadow-sm border border-pink-200">
+              <div className="text-xl mb-1">🎯</div>
+              <div className="text-xs font-semibold text-pink-800">3가지 테스트</div>
+              <div className="text-xs text-pink-600">다양한 관점</div>
+            </div>
+            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
+              <div className="text-xl mb-1">🎮</div>
+              <div className="text-xs font-semibold text-purple-800">이미지 맞추기 게임</div>
+              <div className="text-xs text-purple-600">재미있는 게임</div>
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 shadow-sm border border-blue-200">
+              <div className="text-xl mb-1">📸</div>
+              <div className="text-xs font-semibold text-blue-800">이미지 저장</div>
+              <div className="text-xs text-blue-600">SNS 공유용</div>
+            </div>
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-3 shadow-sm border border-orange-200">
+              <div className="text-xl mb-1">👥</div>
+              <div className="text-xs font-semibold text-orange-800">테스트 결과 공유</div>
+              <div className="text-xs text-orange-600">어울리는 유형</div>
+            </div>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-3 shadow-sm border border-purple-200">
-            <div className="text-xl mb-1">🎮</div>
-            <div className="text-xs font-semibold text-purple-800">이미지 맞추기 게임</div>
-            <div className="text-xs text-purple-600">재미있는 게임</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 shadow-sm border border-blue-200">
-            <div className="text-xl mb-1">📸</div>
-            <div className="text-xs font-semibold text-blue-800">이미지 저장</div>
-            <div className="text-xs text-blue-600">SNS 공유용</div>
-          </div>
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-3 shadow-sm border border-orange-200">
-            <div className="text-xl mb-1">👥</div>
-            <div className="text-xs font-semibold text-orange-800">테스트 결과 공유</div>
-            <div className="text-xs text-orange-600">어울리는 유형</div>
-          </div>
+        </div>
+
+        {/* 웹사이트 소개 */}
+        <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-3xl p-4 shadow-lg border border-green-200">
+          <h3 className="text-lg font-bold text-gray-800 mb-3 text-center">
+            📖 웹사이트 소개
+          </h3>
+          <p className="text-sm text-green-700 text-center leading-relaxed">
+            MBTI 성격유형검사와 성경 속 인물들을 결합한 의미있는 테스트입니다. 
+            16가지 MBTI 유형을 바탕으로 당신과 가장 닮은 성경 인물을 찾아드립니다.
+          </p>
         </div>
 
         {/* 하단 식물 장식 힌트 */}

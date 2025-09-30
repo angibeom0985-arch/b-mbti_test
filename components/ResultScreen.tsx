@@ -1322,22 +1322,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 <span className="mr-2">🖼️</span>
                 성경인물 맞히기 게임!
               </h3>
-              <p className="text-xs md:text-sm text-indigo-600 mb-3">
-                이미지를 보고 누구인지 맞춰보세요 ✨
-              </p>
-              
-              {/* 게임 미리보기 */}
+              {/* 문제 예시 */}
               <div className="mb-4 p-3 bg-white/70 rounded-xl border border-indigo-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-600">게임 미리보기</span>
-                  <span className="text-xs text-indigo-600 font-medium">👀 이런 식으로 진행돼요!</span>
-                </div>
                 <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
                       <img 
-                        src={previewCharacter.image} 
-                        alt={previewCharacter.character}
+                        src="/ESTJ 모세.jpg" 
+                        alt="문제 예시"
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -1347,11 +1339,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </div>
                     <div className="flex-1">
                       <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
-                      <div className="text-sm font-medium text-gray-800">이 사람은 누구일까요?</div>
+                      <div className="text-sm font-medium text-gray-800">이 분은 누구일까요?</div>
                     </div>
                   </div>
-                  <div className="mt-2 flex gap-2">
-                    <div className="w-full text-center py-1.5 bg-white rounded text-xs text-gray-600 border">{previewCharacter.character}</div>
+                  <div className="grid grid-cols-2 gap-1">
+                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">모세</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">다윗</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">아브라함</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">솔로몬</div>
                   </div>
                 </div>
               </div>

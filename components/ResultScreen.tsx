@@ -684,8 +684,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
       if (isMobile) {
+        // 모바일 디버깅 로그
+        console.log('📱 모바일 카카오톡 공유 시작');
+        console.log('  - User Agent:', navigator.userAgent);
+        console.log('  - 카카오 SDK 존재:', !!(window as any).Kakao);
+        console.log('  - 카카오 SDK 초기화:', (window as any).Kakao?.isInitialized());
+        console.log('  - shareText 길이:', shareText.length);
+        
         // 모바일: 카카오톡 앱 스키마 직접 사용 (더 안정적)
         const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+        console.log('  - 앱 스키마:', kakaoAppScheme);
         
         try {
           // 카카오톡 앱 열기 시도
@@ -709,10 +717,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           }, 3000);
           
         } catch (error) {
-          console.error('카카오톡 앱 스키마 실행 실패:', error);
+          console.error('❌ 카카오톡 앱 스키마 실행 실패:', error);
+          console.error('  - 오류 타입:', typeof error);
+          console.error('  - 오류 메시지:', (error as any)?.message || error);
+          console.error('  - 스택:', (error as any)?.stack);
+          
           // 실패 시 바로 클립보드 복사
           navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
+            alert(`❌ 카카오톡 실행 실패\n� 내용이 클립보드에 복사되었습니다!\n\n오류: ${error?.message || error}\n\n카카오톡을 열고 붙여넣기 해주세요.`);
+          }).catch((clipError) => {
+            console.error('❌ 클립보드 복사도 실패:', clipError);
+            alert(`❌ 카카오톡 및 클립보드 모두 실패\n\n카카오톡 오류: ${error?.message || error}\n클립보드 오류: ${clipError?.message || clipError}\n\n다음 내용을 수동으로 복사하세요:\n\n${shareText}\n\n${shareUrl}`);
           });
         }
       } else {

@@ -657,12 +657,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         if (!(window as any).Kakao.isInitialized()) {
           try {
             (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
-            console.log('카카오 SDK 초기화 성공');
+            console.log('✅ 카카오 SDK 초기화 성공! API 키: 8e24012c3a70657f43f76742dcce245c');
+            console.log('🔧 SDK 상태:', (window as any).Kakao.isInitialized());
           } catch (error) {
-            console.error('카카오 SDK 초기화 실패:', error);
+            console.error('❌ 카카오 SDK 초기화 실패:', error);
           }
+        } else {
+          console.log('✅ 카카오 SDK 이미 초기화됨');
         }
       } else {
+        console.log('⏳ 카카오 SDK 로딩 중... 재시도');
         // SDK가 아직 로드되지 않았으면 잠시 후 다시 시도
         setTimeout(initKakao, 100);
       }
@@ -714,7 +718,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       } else {
         // PC: 카카오 SDK 시도, 실패 시 클립보드 복사
         try {
+          console.log('🔍 카카오 SDK 상태 체크:');
+          console.log('  - window 존재:', typeof window !== 'undefined');
+          console.log('  - Kakao 존재:', !!(window as any).Kakao);
+          console.log('  - 초기화 상태:', (window as any).Kakao?.isInitialized());
+          
           if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+            console.log('🚀 카카오 SDK로 공유 시도 중...');
             (window as any).Kakao.Link.sendDefault({
               objectType: 'feed',
               content: {

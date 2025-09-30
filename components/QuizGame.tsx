@@ -192,35 +192,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ onBack }) => {
           {/* 결과 페이지로 돌아가기 버튼 */}
           <div className="mt-6 text-center">
             <button
-              onClick={() => {
-                // 쿠팡 파트너스 링크 배열
-                const coupangPartnersUrls = [
-                  'https://link.coupang.com/a/cTTkqa',
-                  'https://link.coupang.com/a/cTTkLm',
-                  'https://link.coupang.com/a/cTTkS7',
-                  'https://link.coupang.com/a/cTTkWI',
-                  'https://link.coupang.com/a/cTTk02',
-                  'https://link.coupang.com/a/cTTk5m',
-                  'https://link.coupang.com/a/cTTk7h',
-                  'https://link.coupang.com/a/cTTlcr',
-                  'https://link.coupang.com/a/cTTldT',
-                  'https://link.coupang.com/a/cTTlif'
-                ];
-                
-                // 랜덤 링크 선택 후 홈페이지로 이동
-                const randomIndex = Math.floor(Math.random() * coupangPartnersUrls.length);
-                const targetWindow = window.open('https://b-mbti.money-hotissue.com', '_blank');
-                
-                if (!targetWindow) {
-                  alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-                  return;
-                }
-                
-                // 현재 탭에서 쿠팡파트너스 링크로 이동
-                setTimeout(() => {
-                  window.location.href = coupangPartnersUrls[randomIndex];
-                }, 100);
-              }}
+              onClick={onBack}
               className="bg-gradient-to-r from-gray-500 to-gray-700 text-white font-semibold py-3 px-8 rounded-2xl hover:from-gray-600 hover:to-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-md"
             >
               🏠 결과 페이지로 돌아가기

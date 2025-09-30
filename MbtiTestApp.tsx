@@ -102,7 +102,7 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // 퀴즈 진행 중 URL 업데이트
+  // 퀴즈 진행 중 URL 업데이트 (결과 상태가 아닐 때만)
   useEffect(() => {
     if (gameState === 'quiz' && selectedVersion && currentQuestionIndex >= 0) {
       const questionNumber = currentQuestionIndex + 1;
@@ -111,6 +111,11 @@ const App: React.FC = () => {
       // 현재 URL과 다른 경우에만 업데이트
       if (window.location.pathname !== newPath) {
         window.history.replaceState({}, '', newPath);
+      }
+    } else if (gameState === 'result') {
+      // 결과 페이지일 때는 /result로 설정
+      if (window.location.pathname !== '/result') {
+        window.history.replaceState({}, '', '/result');
       }
     }
   }, [gameState, selectedVersion, currentQuestionIndex]);
@@ -204,8 +209,11 @@ const App: React.FC = () => {
       };
       sessionStorage.setItem('mbtiTestResult', JSON.stringify(resultToSave));
       
-      // result 페이지로 리다이렉트
-      window.location.href = 'https://b-mbti.money-hotissue.com/result';
+      // URL을 먼저 /result로 변경
+      window.history.replaceState({}, '', '/result');
+      
+      // gameState를 result로 변경
+      setGameState('result');
     }
   }, [scores, currentQuestionIndex, calculateResult, currentQuestions.length]);
   

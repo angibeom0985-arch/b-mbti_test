@@ -543,10 +543,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <div class="container">
             <h1>📤 공유하기</h1>
             
-            <button class="share-button kakao" onclick="shareToKakao()">
-              💬 카카오톡으로 공유
-            </button>
-            
             <button class="share-button copy" onclick="copyLink()">
               🔗 링크 복사
             </button>
@@ -557,21 +553,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
           
           <script>
-            // 카카오 SDK 초기화
-            const KAKAO_JS_KEY = '8e24012c3a70657f43f76742dcce245c'; // JavaScript 키 사용
-            
-            if (window.Kakao && !window.Kakao.isInitialized()) {
-              try {
-                window.Kakao.init(KAKAO_JS_KEY);
-                console.log('카카오 SDK 초기화 성공');
-              } catch (error) {
-                console.error('카카오 SDK 초기화 실패:', error);
-              }
-            }
-            
-            function shareToKakao() {
-              const shareText = \`${shareText}\`;
-              const shareUrl = \`${shareUrl}\`;
               
               // 카카오 SDK가 정상 초기화되어 있는지 확인
               if (window.Kakao && window.Kakao.isInitialized() && window.Kakao.Link) {
@@ -1458,11 +1439,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
             <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
-            <div className="mb-4 md:mb-6">
-              <button onClick={() => handleSNSShare('kakao')} className="w-full flex items-center justify-center p-4 md:p-6 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                💬 카카오톡으로 공유하기
-              </button>
-            </div>
             <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">
               📋 링크 복사
             </button>
@@ -1488,11 +1464,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               <div className="text-xs text-indigo-600 mt-1 md:mt-2">
                 친구들과 경쟁해보세요! 💪
               </div>
-            </div>
-            <div className="mb-3 md:mb-4">
-              <button onClick={() => handleGameScoreShare('kakao')} className="w-full flex items-center justify-center p-3 md:p-4 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                💬 카카오톡으로 공유하기
-              </button>
             </div>
             <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
               📋 결과 복사

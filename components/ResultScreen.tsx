@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import type { MbtiType, MbtiResult } from '../types';
-import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from '../constants';
-import RestartIcon from './icons/RestartIcon';
+import { MbtiType, MbtiResult } from '../types';
+import { RESULTS } from '../constants';
 import LoadingIndicator from './LoadingIndicator';
-import ShareIcon from './icons/ShareIcon';
 
 // 쿠팡 파트너스 링크 배열
 const COUPANG_PARTNERS_URLS = [
@@ -39,7 +37,6 @@ const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
 
 // 어울리는 성격 유형 추천 로직
 const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
-  // 각 유형별로 어울리는 유형들을 정의 (심리학적 호환성 기반)
   const compatibilityMap: Record<MbtiType, MbtiType[]> = {
     'ENFP': ['INFJ', 'INTJ', 'ENFJ', 'INFP'],
     'ENFJ': ['INFP', 'ISFP', 'ENFP', 'INFJ'],
@@ -172,11 +169,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  // showOtherCharacters 상태 제거됨
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
-
   
   // 퀴즈 게임 상태
   const [quizCharacter, setQuizCharacter] = useState<string>('');
@@ -406,21 +401,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   ];
 
   if (!resultData) {
-    // Show loading indicator if data is not yet available
     return <LoadingIndicator />;
   }
   
   if (error && !resultData?.image) {
     return (
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-red-100 w-full max-w-md mx-auto text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-4">오류 발생</h2>
-        <p className="text-gray-600 mb-6 text-sm">{error}</p>
+        <div className="text-red-500 mb-4">오류가 발생했습니다</div>
         <button
           onClick={onRestart}
-          className="mt-6 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-md flex items-center justify-center mx-auto"
+          className="w-full p-3 bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
         >
-          <RestartIcon className="w-5 h-5 mr-2" />
-          Test Again
+          다시 시작하기
         </button>
       </div>
     );
@@ -428,10 +420,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   // 쿠팡파트너스 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (수익 창출)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
-    // 랜덤하게 쿠팡파트너스 링크 선택
     const coupangPartnersUrl = getRandomCoupangUrl();
     
-    // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
     const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
     
     if (!targetWindow) {
@@ -439,335 +429,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       return;
     }
     
-    // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
     setTimeout(() => {
       window.location.href = coupangPartnersUrl;
-    }, 100); // 새 탭이 열린 후 현재 탭 이동
+    }, 100);
   };
 
   const handleShare = () => {
-    // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
     localStorage.setItem('tempResult', JSON.stringify({
       type: resultType,
       character: resultData?.character || '',
       timestamp: Date.now()
     }));
     
-    // 결과 데이터를 URL 파라미터로 전달하여 /share 페이지 열기
     const shareUrl = `/share?type=${encodeURIComponent(resultType)}&character=${encodeURIComponent(resultData?.character || '')}`;
     
-    // 쿠팡 링크를 먼저 열고 그 다음에 공유 페이지 열기
     openWithCoupangAd(shareUrl, 'width=450,height=650,scrollbars=yes,resizable=yes');
   };
 
-  const handleShareOld = () => {
-    // 새창에서 공유 옵션을 보여주는 함수
-    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
-    const shareUrl = 'https://gowith153.com';
-    
-    const newWindow = window.open('', '_blank', 'width=500,height=600,scrollbars=yes,resizable=yes');
-    if (newWindow) {
-      newWindow.document.write(`
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>공유하기</title>
-          <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
-                  integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-            body { 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-              color: #333; 
-              padding: 20px; 
-              min-height: 100vh; 
-              display: flex; 
-              flex-direction: column; 
-              align-items: center; 
-              justify-content: center; 
-            }
-            .container { 
-              background: white; 
-              border-radius: 16px; 
-              padding: 24px; 
-              box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-              max-width: 400px; 
-              width: 100%; 
-            }
-            h1 { 
-              text-align: center; 
-              margin-bottom: 24px; 
-              color: #333; 
-              font-size: 24px; 
-            }
-            .share-button { 
-              display: block; 
-              width: 100%; 
-              padding: 16px; 
-              margin: 12px 0; 
-              border: none; 
-              border-radius: 12px; 
-              font-size: 16px; 
-              font-weight: 600; 
-              cursor: pointer; 
-              transition: all 0.3s ease; 
-              text-decoration: none; 
-              text-align: center; 
-            }
-            .kakao { background: linear-gradient(135deg, #fee500, #fccc02); color: #3c1e1e; }
-            .kakao:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 229, 0, 0.3); }
-            .copy { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-            .copy:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
-            .back-button { 
-              background: linear-gradient(135deg, #f093fb, #f5576c); 
-              color: white; 
-              padding: 12px 20px; 
-              border: none; 
-              border-radius: 8px; 
-              margin-top: 20px; 
-              cursor: pointer; 
-              font-size: 14px; 
-              width: 100%; 
-            }
-            .back-button:hover { transform: translateY(-2px); }
-            @media (max-width: 480px) {
-              body { padding: 16px; }
-              .container { padding: 20px; }
-              h1 { font-size: 20px; }
-              .share-button { padding: 14px; font-size: 15px; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>📤 공유하기</h1>
-            
-            <button class="share-button copy" onclick="copyLink()">
-              🔗 링크 복사
-            </button>
-            
-            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-              🏠 결과 페이지로 돌아가기
-            </button>
-          </div>
-          
-          <script>
-              
-              // 카카오 SDK가 정상 초기화되어 있는지 확인
-              if (window.Kakao && window.Kakao.isInitialized() && window.Kakao.Link) {
-                try {
-                  window.Kakao.Link.sendDefault({
-                    objectType: 'feed',
-                    content: {
-                      title: '🙏 성경인물 MBTI 테스트 결과',
-                      description: shareText,
-                      imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                      link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl,
-                      },
-                    },
-                    buttons: [
-                      {
-                        title: '✨ 나도 테스트 해보기',
-                        link: {
-                          mobileWebUrl: shareUrl,
-                          webUrl: shareUrl,
-                        },
-                      },
-                    ],
-                    success: function(response) {
-                      console.log('카카오 공유 성공:', response);
-                      alert('✅ 카카오톡으로 공유되었습니다!');
-                    },
-                    fail: function(error) {
-                      console.log('카카오 공유 실패:', error);
-                      fallbackKakaoShare();
-                    }
-                  });
-                } catch (error) {
-                  console.error('카카오 링크 전송 오류:', error);
-                  fallbackKakaoShare();
-                }
-              } else {
-                console.log('카카오 SDK 미초기화 - 대안 방법 사용');
-                fallbackKakaoShare();
-              }
-              
-              function fallbackKakaoShare() {
-                const fullText = shareText + '\\n\\n' + shareUrl;
-                // 클립보드에 텍스트 복사
-                navigator.clipboard.writeText(fullText).then(() => {
-                  alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡에서 붙여넣기 해주세요.');
-                }).catch(() => {
-                  alert('📱 카카오톡으로 공유하기:\\n\\n' + fullText + '\\n\\n위 텍스트를 복사해서 카카오톡에 붙여넣기 해주세요.');
-                });
-              }
-            }
-            
-
-            
-            function copyLink() {
-              const fullText = \`${shareText}\\n${shareUrl}\`;
-              navigator.clipboard.writeText(fullText).then(() => {
-                alert('📋 링크가 복사되었습니다!');
-              }).catch(() => {
-                // 복사 실패 시 대체 방법
-                const textArea = document.createElement('textarea');
-                textArea.value = fullText;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('📋 링크가 복사되었습니다!');
-              });
-            }
-          </script>
-        </body>
-        </html>
-      `);
-      newWindow.document.close();
-    }
-  };
-
-  // 카카오 SDK 초기화 (한 번만 실행)
-  useEffect(() => {
-    const initKakao = () => {
-      if (typeof window !== 'undefined' && (window as any).Kakao) {
-        if (!(window as any).Kakao.isInitialized()) {
-          try {
-            (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
-            console.log('✅ 카카오 SDK 초기화 성공! API 키: 8e24012c3a70657f43f76742dcce245c');
-            console.log('🔧 SDK 상태:', (window as any).Kakao.isInitialized());
-          } catch (error) {
-            console.error('❌ 카카오 SDK 초기화 실패:', error);
-          }
-        } else {
-          console.log('✅ 카카오 SDK 이미 초기화됨');
-        }
-      } else {
-        console.log('⏳ 카카오 SDK 로딩 중... 재시도');
-        // SDK가 아직 로드되지 않았으면 잠시 후 다시 시도
-        setTimeout(initKakao, 100);
-      }
-    };
-    
-    initKakao();
-  }, []);
-
+  // 간단한 클립보드 공유 함수
   const handleSNSShare = (platform: string) => {
     const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com';
 
-    if (platform === 'kakao') {
-      // 모바일 환경 감지
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // 모바일 디버깅 로그
-        console.log('📱 모바일 카카오톡 공유 시작');
-        console.log('  - User Agent:', navigator.userAgent);
-        console.log('  - 카카오 SDK 존재:', !!(window as any).Kakao);
-        console.log('  - 카카오 SDK 초기화:', (window as any).Kakao?.isInitialized());
-        console.log('  - shareText 길이:', shareText.length);
-        
-        // 모바일: 카카오톡 앱 스키마 직접 사용 (더 안정적)
-        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
-        console.log('  - 앱 스키마:', kakaoAppScheme);
-        
-        try {
-          // 카카오톡 앱 열기 시도
-          window.location.href = kakaoAppScheme;
-          
-          // 1초 후 쿠팡 파트너스 링크 열기
-          setTimeout(() => {
-            window.open(getRandomCoupangUrl(), '_blank');
-          }, 1000);
-          
-          // 앱이 열리지 않을 경우 대비해 3초 후 안내
-          setTimeout(() => {
-            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 내용을 복사하세요.');
-            if (confirmation) {
-              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-              }).catch(() => {
-                alert('📱 다음 내용을 수동으로 복사해주세요:\n\n' + shareText + '\n\n' + shareUrl);
-              });
-            }
-          }, 3000);
-          
-        } catch (error) {
-          console.error('❌ 카카오톡 앱 스키마 실행 실패:', error);
-          console.error('  - 오류 타입:', typeof error);
-          console.error('  - 오류 메시지:', (error as any)?.message || error);
-          console.error('  - 스택:', (error as any)?.stack);
-          
-          // 실패 시 바로 클립보드 복사
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert(`❌ 카카오톡 실행 실패\n� 내용이 클립보드에 복사되었습니다!\n\n오류: ${error?.message || error}\n\n카카오톡을 열고 붙여넣기 해주세요.`);
-          }).catch((clipError) => {
-            console.error('❌ 클립보드 복사도 실패:', clipError);
-            alert(`❌ 카카오톡 및 클립보드 모두 실패\n\n카카오톡 오류: ${error?.message || error}\n클립보드 오류: ${clipError?.message || clipError}\n\n다음 내용을 수동으로 복사하세요:\n\n${shareText}\n\n${shareUrl}`);
-          });
-        }
-      } else {
-        // PC: 카카오 SDK 시도, 실패 시 클립보드 복사
-        try {
-          console.log('🔍 카카오 SDK 상태 체크:');
-          console.log('  - window 존재:', typeof window !== 'undefined');
-          console.log('  - Kakao 존재:', !!(window as any).Kakao);
-          console.log('  - 초기화 상태:', (window as any).Kakao?.isInitialized());
-          
-          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-            console.log('🚀 카카오 SDK로 공유 시도 중...');
-            (window as any).Kakao.Link.sendDefault({
-              objectType: 'feed',
-              content: {
-                title: `🙏 ${resultData?.character}(${resultType}) - 성경인물 MBTI 결과`,
-                description: shareText,
-                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                link: {
-                  mobileWebUrl: shareUrl,
-                  webUrl: shareUrl,
-                },
-              },
-              buttons: [
-                {
-                  title: '나도 테스트하기',
-                  link: {
-                    mobileWebUrl: shareUrl,
-                    webUrl: shareUrl,
-                  },
-                },
-              ],
-              success: () => {
-                console.log('카카오톡 공유 성공');
-                setTimeout(() => {
-                  window.open(getRandomCoupangUrl(), '_blank');
-                }, 1000);
-              },
-              fail: (error: any) => {
-                console.error('카카오톡 공유 실패:', error);
-                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                  alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-                });
-              }
-            });
-          } else {
-            throw new Error('카카오 SDK 미초기화');
-          }
-        } catch (error) {
-          console.error('PC 카카오톡 공유 오류:', error);
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-          });
-        }
-      }
-      
-      setShowShareModal(false);
-      
-    } else if (platform === 'copy') {
+    if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -782,159 +466,62 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     return Math.round((gameScore / totalGames) * 100);
   };
 
-  // 게임 점수 공유 함수
+  // 게임 점수 공유 함수 (클립보드만)
   const handleGameScoreShare = (platform: string) => {
     const scorePercentage = calculateGameScore();
     const shareText = `🎮 성경인물 맞히기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
     
-    if (platform === 'kakao') {
-      // 모바일 환경 감지
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // 모바일: 카카오톡 앱 스키마 직접 사용
-        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
-        
-        try {
-          window.location.href = kakaoAppScheme;
-          
-          setTimeout(() => {
-            window.open(getRandomCoupangUrl(), '_blank');
-          }, 1000);
-          
-          setTimeout(() => {
-            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 게임 결과를 복사하세요.');
-            if (confirmation) {
-              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-              });
-            }
-          }, 3000);
-        } catch (error) {
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-          });
-        }
-      } else {
-        // PC: 카카오 SDK 시도
-        try {
-          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-            (window as any).Kakao.Link.sendDefault({
-              objectType: 'feed',
-              content: {
-                title: `🎮 ${resultData?.character}(${resultType}) - 게임 점수 ${scorePercentage}%`,
-                description: shareText,
-                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                link: {
-                  mobileWebUrl: shareUrl,
-                  webUrl: shareUrl,
-                },
-              },
-              buttons: [
-                {
-                  title: '나도 도전하기',
-                  link: {
-                    mobileWebUrl: shareUrl,
-                    webUrl: shareUrl,
-                  },
-                },
-              ],
-              success: () => {
-                setTimeout(() => {
-                  window.open(getRandomCoupangUrl(), '_blank');
-                }, 1000);
-              },
-              fail: (error: any) => {
-                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                  alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
-                });
-              }
-            });
-          } else {
-            throw new Error('카카오 SDK 미초기화');
-          }
-        } catch (error) {
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
-          });
-        }
-      }
-    } else if (platform === 'copy') {
+    if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-        alert('게임 결과가 클립보드에 복사되었습니다!');
+        alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n원하는 곳에 붙여넣기 해주세요. 📋');
         setShowScoreShare(false);
       });
-    }
-    
-    if (platform !== 'copy') {
-      setShowScoreShare(false);
     }
   };
 
   const handleSaveAsImage = async () => {
     try {
-      // 이미지로 저장할 부분만 선택
       const captureElement = document.querySelector('.image-capture-area');
       if (!captureElement) {
         alert('결과 화면을 찾을 수 없습니다.');
         return;
       }
 
-      // 이미지 캡처 처리 함수
       const processCapture = async () => {
         try {
-          // @ts-ignore - html2canvas는 전역 변수로 로드됨
           const canvas = await (window as any).html2canvas(captureElement, {
-            backgroundColor: '#ffffff',
-            scale: 2, // scale을 낮춰서 안정성 향상
-            useCORS: false, // CORS 비활성화
-            allowTaint: false, // Taint 비활성화
-            foreignObjectRendering: true, // SVG 등 외부 객체 렌더링 허용
-            logging: false,
-            ignoreElements: (element: HTMLElement) => {
-              // 외부 이미지나 문제가 될 수 있는 요소 제외
-              return element.tagName === 'IFRAME' || 
-                     element.classList.contains('ad-banner') ||
-                     (element.tagName === 'IMG' && (element as HTMLImageElement).src && 
-                      !(element as HTMLImageElement).src.startsWith(window.location.origin));
-            }
+            allowTaint: true,
+            useCORS: true,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: '#ffffff'
           });
 
-          // 캔버스를 이미지로 변환
-          const dataURL = canvas.toDataURL('image/png', 1.0);
-          
-          // 다운로드 링크 생성
-          const link = document.createElement('a');
-          link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
-          link.href = dataURL;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          // 이미지 저장 완료 후 쿠팡파트너스 링크 열기 및 사용자 안내
-          setTimeout(() => {
-            const coupangPartnersUrl = 'https://link.coupang.com/a/cTTkqa';
-            window.open(coupangPartnersUrl, '_blank');
-            
-            // 사용자에게 다운로드 위치 안내
-            alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
-          }, 500);
-          
+          canvas.toBlob((blob: Blob | null) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            }
+          }, 'image/png');
         } catch (error) {
-          console.error('이미지 저장 실패:', error);
-          alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+          console.error('캡처 실패:', error);
+          alert('이미지 저장에 실패했습니다.');
         }
       };
 
-      // html2canvas가 이미 로드되었는지 확인
       if ((window as any).html2canvas) {
         await processCapture();
       } else {
-        // 동적으로 html2canvas 라이브러리 로드
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        script.crossOrigin = 'anonymous'; // CORS 설정 추가
+        script.crossOrigin = 'anonymous';
         document.head.appendChild(script);
 
         script.onload = async () => {
@@ -951,12 +538,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       alert('이미지 저장 중 오류가 발생했습니다.');
     }
   };
-
-  // handleViewOtherCharacters 함수 제거됨
   
   const handleLeaveComment = () => {
     setShowComments(true);
-    // 댓글 작성 시에도 쿠팡 파트너스 수익 창출
     setTimeout(() => {
       window.open(getRandomCoupangUrl(), '_blank');
     }, 1000);
@@ -978,7 +562,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
   
   const selectCharacterFromCandidates = (character: string) => {
-    if (quizResult !== null) return; // 이미 답안 제출된 경우 선택 불가
+    if (quizResult !== null) return;
     setUserGuess(character);
   };
 
@@ -990,270 +574,109 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       
       {/* 결과 헤더 */}
       <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-        {/* 성경인물 정보 - 텍스트(왼쪽) / 이미지(오른쪽) 배치 */}
-        <div className="flex items-center space-x-6">
-          {/* 왼쪽: 텍스트 정보 */}
-          <div className="flex-1">
-            {/* 상단: 당신과 닮은 성경인물 */}
-            <div className="mb-6">
-              <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium inline-block">
-                당신과 닮은 성경인물
-              </div>
-            </div>
-            
-            {/* 중간: 이름 */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-                <span className="text-2xl mr-2">✨</span>
-                {resultData.character}
-              </h1>
-            </div>
-            
-            {/* 하단: MBTI 유형 */}
-            <div>
-              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold inline-block">
-                {resultType}
-              </div>
-            </div>
+        <h1 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 mb-2 leading-tight">
+          🙏 당신의 성경인물 유형 🙏
+        </h1>
+        <div className="text-center mb-4">
+          <div className="text-4xl md:text-5xl font-black text-violet-700 mb-2 tracking-wider">
+            {resultType}
           </div>
-          
-          {/* 오른쪽: 이미지 */}
-          <div className="flex-shrink-0">
-            {resultData.image ? (
-              <div className="space-y-2">
-                <div 
-                  className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
-                  onClick={() => {
-                    if (resultData.image) {
-                      openImageInNewWindow(resultData.image, resultData.character);
-                    }
-                  }}
-                >
-                  <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
-                    <img 
-                      src={resultData.image} 
-                      alt={resultData.character} 
-                      className="w-full h-full object-cover rounded-xl shadow-md"
-                      style={{
-                        imageRendering: 'crisp-edges'
-                      }}
-                    />
-                  </div>
-                </div>
-                
-                {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
-                <button
-                  onClick={() => {
-                    if (resultData.image) {
-                      openImageInNewWindow(resultData.image, resultData.character);
-                    }
-                  }}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
-                >
-                  <span>🔍</span>
-                  <span>크게보기</span>
-                </button>
-              </div>
-            ) : (
-              <div className="w-48 h-48 md:w-56 md:h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
-                <p className="text-gray-500 text-sm">이미지 로딩중...</p>
-              </div>
-            )}
+          <div className="text-2xl md:text-3xl font-bold text-pink-600 mb-4">
+            {resultData.character}
+          </div>
+        </div>
+        
+        <div 
+          className="relative cursor-pointer group mx-auto mb-4 w-full max-w-xs hover:scale-105 transition-transform duration-300"
+          onClick={() => openImageInNewWindow(getMbtiImage(resultType), resultData.character)}
+        >
+          <img
+            src={getMbtiImage(resultType)}
+            alt={`${resultData.character} - ${resultType}`}
+            className="w-full h-auto rounded-2xl shadow-lg border-4 border-white/50 group-hover:shadow-2xl transition-all duration-300"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-2xl transition-all duration-300 flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 bg-white/90 px-3 py-2 rounded-lg text-sm font-semibold text-gray-800 transform scale-95 group-hover:scale-100 transition-all duration-300">
+              📱 크게 보기
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 설명 텍스트 - 가독성 개선 */}
+      {/* 성격 특성 */}
       <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
-        <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-          <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent mr-2">✨</span>
-          성격 특징
-        </h3>
-        <div className="space-y-3">
-          {PERSONALITY_TRAITS[resultType]?.map((trait, index) => (
-            <div key={index} className="flex items-start space-x-3">
-              <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                {index + 1}
-              </span>
-              <p className="text-gray-700 text-sm leading-relaxed text-left">
-                {trait}
-              </p>
-            </div>
-          )) || (
-            // Fallback - 기존 로직
-            (() => {
-              const sentences = resultData.description.split('.').filter(sentence => sentence.trim());
-              const targetSentences = sentences.slice(0, 5);
-              while (targetSentences.length < 5 && sentences.length > 0) {
-                const additionalTraits = [
-                  '깊은 사색과 성찰을 통해 지혜를 얻습니다',
-                  '다른 사람들에게 선한 영향력을 끼칩니다',
-                  '어려운 상황에서도 희망을 잃지 않습니다',
-                  '진실한 마음으로 관계를 맺습니다',
-                  '하나님의 뜻을 구하며 살아갑니다'
-                ];
-                const additionalIndex = targetSentences.length;
-                if (additionalIndex < additionalTraits.length) {
-                  targetSentences.push(additionalTraits[additionalIndex]);
-                } else {
-                  break;
-                }
-              }
-              
-              return targetSentences.map((sentence, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                    {index + 1}
-                  </span>
-                  <p className="text-gray-700 text-sm leading-relaxed text-left">
-                    {sentence.trim()}{sentence.includes('.') ? '' : '.'}
-                  </p>
-                </div>
-              ));
-            })()
-          )}
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
+          ✨ 성격 특성 ✨
+        </h2>
+        <div className="text-gray-700 leading-relaxed text-base md:text-lg mb-4">
+          {resultData.description}
         </div>
+        
+
       </div>
 
-      {/* 성경 구절 - 간소화된 디자인 */}
+      {/* 성경구절 */}
       <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6 text-center">
-        <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center justify-center">
-          📖 대표 성경구절 ({resultData.verse})
-        </h4>
-        <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
-          "{resultData.verseText}"
-        </blockquote>
-      </div>
-
-      {/* 액션 버튼들 - MZ 스타일 */}
-      <div className="space-y-3">
-        {/* 메인 액션 버튼들 - 세로 배치 */}
-        <div className="space-y-3">
-          <button
-            onClick={handleSaveAsImage}
-            className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
-          >
-            📸 이미지 저장
-          </button>
-          <button
-            onClick={handleShare}
-            className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
-            disabled={copied}
-          >
-            {copied ? '📋 복사됨!' : '🔗 공유하기'}
-          </button>
+        <div className="text-violet-700 font-semibold text-sm mb-2">📖 관련 성경구절</div>
+        <div className="text-gray-800 font-medium text-base italic leading-relaxed">
+          "{resultData.verse}"
         </div>
+        <div className="text-violet-600 text-sm mt-2 font-semibold">- 성경구절 -</div>
       </div>
 
-      {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
+      {/* 액션 버튼들 */}
+      <div className="space-y-3">
+        {/* 공유하기 버튼 */}
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="w-full p-4 bg-gradient-to-r from-pink-500 via-violet-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+        >
+          <span className="text-xl">📤</span>
+          친구들에게 공유하기
+        </button>
+      </div>
+
+      {/* 인물 호환성 분석 */}
       <div className="mb-6 space-y-4 mt-6">
-          {/* 어울리는 성격 유형 */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-3 md:p-4 shadow-sm border border-green-200">
-            {(() => {
-              const compatibleType = getCompatibleTypes(resultType)[0];
-              if (!compatibleType) return null;
-              return (
-                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
-                  {/* 텍스트 정보 */}
-                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
-                    {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                      <h3 className="text-xs md:text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
-                      <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                        {compatibleType}
-                      </span>
-                      <span className="font-bold text-green-800 text-xs md:text-sm">
-                        {RESULTS[compatibleType].character}
-                      </span>
-                      <span className="text-green-600 text-sm md:text-base">💚</span>
-                    </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
-                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
-                        {getCompatibilityReason(resultType, compatibleType)}
-                      </p>
-                    </div>
+          {/* 어울리는 유형 */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-l-4 border-green-400 shadow-sm">
+            <h3 className="text-lg font-bold text-green-700 mb-3 flex items-center gap-2">
+              💚 잘 어울리는 성경인물들
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {getCompatibleTypes(resultType).map((type) => (
+                <div key={type} className="bg-white/70 p-3 rounded-xl shadow-sm border border-green-100">
+                  <div className="font-bold text-green-800 text-sm mb-1">
+                    {type} - {RESULTS[type].character}
                   </div>
-                  
-                  {/* 이미지 */}
-                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
-                    <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
-                      <img 
-                        src={getMbtiImage(compatibleType)} 
-                        alt={RESULTS[compatibleType].character}
-                        className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
-                        onClick={() => {
-                          openImageInNewWindow(getMbtiImage(compatibleType), RESULTS[compatibleType].character);
-                        }}
-                      />
-                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        🔍 크게보기
-                      </div>
-                    </div>
+                  <div className="text-xs text-green-600 leading-relaxed">
+                    {getCompatibilityReason(resultType, type)}
                   </div>
                 </div>
-              );
-            })()}
+              ))}
+            </div>
           </div>
 
-          {/* 어울리지 않는 성격 유형 */}
-          <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-3 md:p-4 shadow-sm border border-red-200">
-            {(() => {
-              const incompatibleType = getIncompatibleTypes(resultType)[0];
-              if (!incompatibleType) return null;
-              return (
-                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
-                  {/* 텍스트 정보 */}
-                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
-                    {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                      <h3 className="text-xs md:text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
-                      <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                        {incompatibleType}
-                      </span>
-                      <span className="font-bold text-red-800 text-xs md:text-sm">
-                        {RESULTS[incompatibleType].character}
-                      </span>
-                      <span className="text-red-600 text-sm md:text-base">💔</span>
-                    </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
-                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
-                        {getIncompatibilityReason(resultType, incompatibleType)}
-                      </p>
-                    </div>
+          {/* 조심해야 할 유형 */}
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border-l-4 border-orange-400 shadow-sm">
+            <h3 className="text-lg font-bold text-orange-700 mb-3 flex items-center gap-2">
+              ⚠️ 소통에 노력이 필요한 유형들
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {getIncompatibleTypes(resultType).map((type) => (
+                <div key={type} className="bg-white/70 p-3 rounded-xl shadow-sm border border-orange-100">
+                  <div className="font-bold text-orange-800 text-sm mb-1">
+                    {type} - {RESULTS[type].character}
                   </div>
-                  
-                  {/* 이미지 */}
-                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
-                    <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
-                      <img 
-                        src={getMbtiImage(incompatibleType)} 
-                        alt={RESULTS[incompatibleType].character}
-                        className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
-                        onClick={() => {
-                          openImageInNewWindow(getMbtiImage(incompatibleType), RESULTS[incompatibleType].character);
-                        }}
-                      />
-                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        🔍 크게보기
-                      </div>
-                    </div>
+                  <div className="text-xs text-orange-600 leading-relaxed">
+                    {getIncompatibilityReason(resultType, type)}
                   </div>
                 </div>
-              );
-            })()}
+              ))}
+            </div>
           </div>
           
-          <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
-            <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 기반 궁합 분석 (개인차 있음)
-            </p>
-          </div>
         </div>
         
         </div> {/* image-capture-area 끝 */}
@@ -1261,189 +684,137 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         {/* 나머지 테스트 추천 섹션 */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
           <div className="text-center">
-            <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-              <span className="mr-2">🔥</span>
-              다른 테스트도 해보실래요?
+            <h3 className="text-xl font-bold text-blue-700 mb-3">
+              🎮 다른 테스트도 해보세요!
             </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              더 정확한 분석을 위해 추가 테스트 해보세요! 🎯
+            <p className="text-blue-600 text-sm mb-4">
+              각각 다른 관점에서 당신을 분석해드려요
             </p>
             
-            <div className="grid grid-cols-1 gap-3">
-              {Object.entries(TEST_VERSIONS)
-                .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
-                .map(([versionKey, version]) => (
-                  <div 
-                    key={versionKey} 
-                    className={`bg-gradient-to-r ${
-                      version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
-                      version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
-                      'from-blue-50 to-cyan-50 border-blue-200'
-                    } rounded-xl p-4 border hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02]`}
-                    onClick={() => {
-                      const testUrls = {
-                        1: 'https://b-mbti.money-hotissue.com/test1',
-                        2: 'https://b-mbti.money-hotissue.com/test2',
-                        3: 'https://b-mbti.money-hotissue.com/test3'
-                      };
-                      window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
-                    }}
-                  >
-                    <div className="text-center">
-                      <div className="text-left mb-3">
-                        <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
-                        <div className="text-sm text-gray-600 mb-2">{version.description}</div>
-                        <div className={`text-xs ${
-                          version.color === 'orange' ? 'text-orange-700' :
-                          version.color === 'purple' ? 'text-purple-700' :
-                          'text-blue-700'
-                        }`}>
-                          {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
-                          {parseInt(versionKey) === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
-                          {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <span className={`w-full block px-4 py-3 rounded-xl font-semibold text-sm text-center ${
-                          version.color === 'orange' ? 'bg-orange-500 text-white' :
-                          version.color === 'purple' ? 'bg-purple-500 text-white' :
-                          'bg-blue-500 text-white'
-                        }`}>
-                          시작!
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setSelectedTestVersion(1);
+                  setTimeout(() => {
+                    window.location.href = '/test1';
+                  }, 100);
+                }}
+                className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <span>📝</span>
+                테스트 1 - 직관형 분석
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedTestVersion(2);
+                  setTimeout(() => {
+                    window.location.href = '/test2';
+                  }, 100);
+                }}
+                className="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <span>🎯</span>
+                테스트 2 - 행동형 분석
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedTestVersion(3);
+                  setTimeout(() => {
+                    window.location.href = '/test3';
+                  }, 100);
+                }}
+                className="w-full p-3 bg-gradient-to-r from-pink-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <span>💖</span>
+                테스트 3 - 감정형 분석
+              </button>
             </div>
           </div>
         </div>
 
         {/* 액션 버튼들을 감싸는 컨테이너 */}
         <div className="space-y-3 md:space-y-4">
-          {/* 성경인물 맞히기 게임 - 참여 유도 문구로 변경 */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
-            <div className="text-center">
-              <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
-                <span className="mr-2">🖼️</span>
-                성경인물 맞히기 게임!
-              </h3>
-              {/* 문제 예시 */}
-              <div className="mb-4 p-3 bg-white/70 rounded-xl border border-indigo-100">
-                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
-                      <img 
-                        src="/ESTJ 모세.jpg" 
-                        alt="문제 예시"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/ENFP 아브라함.jpg'; // 기본 이미지로 대체
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
-                      <div className="text-sm font-medium text-gray-800">이 분은 누구일까요?</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">모세</div>
-                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">다윗</div>
-                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">아브라함</div>
-                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">솔로몬</div>
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => {
-                  // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
-                  localStorage.setItem('tempResult', JSON.stringify({
-                    type: resultType,
-                    character: resultData?.character || '',
-                    timestamp: Date.now()
-                  }));
-                  openWithCoupangAd('/game');
-                }}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
-              >
-                🖼️ 게임 시작하기
-              </button>
-              
-              {/* 게임 점수 표시 (게임을 한 번이라도 했을 때만 표시) */}
-              {totalGames > 0 && (
-                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-white/80 rounded-xl border border-indigo-200">
-                  <div className="flex items-center justify-between mb-1 md:mb-2">
-                    <span className="text-xs md:text-sm font-semibold text-indigo-800">
-                      🏆 내 게임 기록
-                    </span>
-                    <button
-                      onClick={() => setShowScoreShare(true)}
-                      className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
-                    >
-                      📤 공유
-                    </button>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-base md:text-lg font-bold text-indigo-700">
-                      정답률: {calculateGameScore()}%
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      ({gameScore}/{totalGames} 정답)
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* 랜덤 게임 참여 유도 멘트 */}
-              <div className="mt-2 md:mt-3 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
-                <p className="text-xs text-gray-600 text-center leading-relaxed">
-                  {randomPrompt}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* 다시 테스트 버튼 */}
+          {/* 퀴즈게임 버튼 */}
           <button
             onClick={() => {
-              // completedVersion이 있으면 시작 페이지로 버전 정보와 함께 이동
-              if (completedVersion) {
-                openWithCoupangAd(`https://b-mbti.money-hotissue.com/?version=${completedVersion}`);
+              if (onQuizGame) {
+                onQuizGame();
               } else {
-                onRestart();
-                // 다시 테스트 시에도 쿠팡 파트너스 수익 창출
-                setTimeout(() => {
-                  window.open(getRandomCoupangUrl(), '_blank');
-                }, 1000);
+                window.location.href = '/quizgame';
               }
             }}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
+            className="w-full p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
           >
-            🔁 다시 테스트하기
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xl">🎮</span>
+                <span>성경인물 맞히기 게임</span>
+                <span className="text-xl">🏆</span>
+              </div>
+              <div className="text-xs opacity-90 font-medium">
+                {randomPrompt}
+              </div>
+            </div>
           </button>
 
-          {/* 후기 남기기 */}
-          <button
-            onClick={handleLeaveComment}
-            className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm md:text-base"
-          >
-            💬 후기 남기기
-          </button>
+          {totalGames > 0 && (
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-3 border border-amber-200">
+              <div className="text-center">
+                <div className="text-amber-700 font-semibold text-sm mb-1">
+                  🏆 내 게임 기록
+                </div>
+                <div className="text-amber-800 text-lg font-bold">
+                  정답률: {calculateGameScore()}% ({gameScore}/{totalGames})
+                </div>
+                <button
+                  onClick={() => setShowScoreShare(true)}
+                  className="mt-2 px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-semibold hover:bg-amber-600 transition-colors"
+                >
+                  게임 결과 공유하기
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 기타 버튼들 */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleSaveAsImage}
+              className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+            >
+              <span>📷</span>
+              이미지 저장
+            </button>
+            
+            <button
+              onClick={onRestart}
+              className="p-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+            >
+              <span>🔄</span>
+              다시하기
+            </button>
+          </div>
         </div>
 
       {/* SNS 공유 모달 */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
-          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
-            <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
-            <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">
-              📋 링크 복사
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="text-xl font-bold text-center mb-4">📤 공유하기</h3>
+            <button
+              onClick={() => handleSNSShare('copy')}
+              className="w-full p-4 mb-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <span>🔗</span>
+              링크 복사하기
             </button>
-            <button onClick={() => setShowShareModal(false)} className="w-full p-3 md:p-4 text-gray-500 text-sm md:text-base">
-              취소
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full p-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+            >
+              닫기
             </button>
           </div>
         </div>
@@ -1452,24 +823,28 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* 게임 점수 공유 모달 */}
       {showScoreShare && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
-          <div className="bg-white rounded-3xl p-4 md:p-6 max-w-xs md:max-w-sm w-full shadow-2xl mx-3">
-            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">🏆 게임 결과 공유하기</h3>
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-3 md:p-4 mb-3 md:mb-4 text-center">
-              <div className="text-lg md:text-xl font-bold text-indigo-700 mb-1">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="text-xl font-bold text-center mb-4">🎮 게임 결과 공유</h3>
+            <div className="text-center mb-4">
+              <div className="text-2xl font-bold text-amber-600">
                 정답률: {calculateGameScore()}%
               </div>
-              <div className="text-xs md:text-sm text-gray-600">
-                ({gameScore}/{totalGames} 문제 정답)
-              </div>
-              <div className="text-xs text-indigo-600 mt-1 md:mt-2">
-                친구들과 경쟁해보세요! 💪
+              <div className="text-gray-600">
+                ({gameScore}/{totalGames})
               </div>
             </div>
-            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
-              📋 결과 복사
+            <button
+              onClick={() => handleGameScoreShare('copy')}
+              className="w-full p-4 mb-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <span>🔗</span>
+              결과 복사하기
             </button>
-            <button onClick={() => setShowScoreShare(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">
-              취소
+            <button
+              onClick={() => setShowScoreShare(false)}
+              className="w-full p-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+            >
+              닫기
             </button>
           </div>
         </div>
@@ -1478,136 +853,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* 후기 남기기 모달 */}
       {showComments && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-bold text-center mb-4">💬 후기 남기기</h3>
-            <div className="mb-4 space-y-3">
-              {fakeComments.map((c) => (
-                <div key={c.id} className="p-3 bg-gray-50 rounded-2xl">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-sm text-gray-800">{c.user}</span>
-                    <span className="text-xs text-gray-500">❤️ {c.likes}</span>
-                  </div>
-                  <p className="text-sm text-gray-700">{c.comment}</p>
-                </div>
-              ))}
-            </div>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="테스트 결과는 어떠셨나요?"
-              className="w-full p-3 border border-gray-200 rounded-2xl text-sm resize-none h-20"
-            />
-            <div className="flex gap-2 mt-3">
-              <button onClick={handleSubmitComment} className="flex-1 p-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-2xl font-semibold text-sm">
-                등록
-              </button>
-              <button onClick={() => setShowComments(false)} className="px-4 p-3 text-gray-500 text-sm">
-                취소
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-
-      {/* 삭제된 게임 모달 섹션 - 더 이상 필요 없음 */}
-      {false && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h3 className="text-xl font-bold text-center mb-4">💬 후기 남기기</h3>
             
-            <div className="text-center mb-6">
-              {/* 캐릭터 이미지 */}
-              <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">
-                <div className="w-32 h-32 mx-auto mb-3 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
-                  {currentQuizType && (
-                    <img 
-                      src={`/${currentQuizType === 'ENFJ' ? 'ENJS 느헤미야' : 
-                           currentQuizType === 'ENTP' ? 'ENFP 아브라함' : 
-                           `${currentQuizType} ${RESULTS[currentQuizType as keyof typeof RESULTS].character}`}.jpg`}
-                      alt="성경인물"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/ENFP 아브라함.jpg';
-                      }}
-                    />
-                  )}
-                </div>
-                <h4 className="text-lg font-bold text-gray-800 mb-2">이 사람은 누구일까요? 🤔</h4>
-                
-                {/* 선택된 답안 표시 */}
-                {userGuess && quizResult === null && (
-                  <div className="mt-3 p-3 bg-blue-100 text-blue-700 rounded-xl">
-                    선택한 답안: <strong>{userGuess}</strong>
-                  </div>
-                )}
-                
-                {quizResult && (
-                  <div className={`mt-3 p-3 rounded-xl ${quizResult === 'correct' 
-                    ? 'bg-green-100 text-green-700' 
-                    : 'bg-red-100 text-red-700'}`}>
-                    {quizResult === 'correct' 
-                      ? `🎉 정답입니다! ${quizCharacter}님이 맞네요!` 
-                      : `😅 아쉬워요! 정답은 ${quizCharacter}입니다.`}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 16명 후보 선택지 */}
             <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-600 mb-3 text-center">
-                💡 아래 후보 중에서 선택하세요!
-              </h4>
-              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-                {ALL_CHARACTERS.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => selectCharacterFromCandidates(RESULTS[type].character)}
-                    disabled={quizResult !== null}
-                    className={`p-2 rounded-xl text-xs font-medium transition-all duration-200 ${
-                      userGuess === RESULTS[type].character && quizResult === null
-                        ? 'bg-blue-200 text-blue-800 border-2 border-blue-400'
-                        : quizResult !== null && RESULTS[type].character === quizCharacter
-                        ? 'bg-green-200 text-green-800 border-2 border-green-400'
-                        : quizResult === null
-                        ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700'
-                        : 'bg-gray-50 text-gray-400'
-                    }`}
-                  >
-                    <div className="font-bold">{RESULTS[type].character}</div>
-                    <div className="text-xs opacity-70">{type}</div>
-                  </button>
-                ))}
-              </div>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="테스트 결과가 어떠셨나요? 후기를 남겨주세요!"
+                className="w-full p-3 border border-gray-300 rounded-xl resize-none h-24"
+                maxLength={200}
+              />
             </div>
-
-            {/* 게임 액션 버튼 */}
+            
             <div className="flex gap-2">
-              {quizResult === null ? (
-                <button 
-                  onClick={checkQuizAnswer}
-                  disabled={!userGuess || userGuess.trim() === ''}
-                  className={`flex-1 p-3 rounded-2xl font-semibold transition-all duration-200 ${
-                    userGuess && userGuess.trim() !== ''
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  ✅ 답안 제출
-                </button>
-              ) : (
-                <button 
-                  onClick={getRandomCharacter}
-                  className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold"
-                >
-                  🎮 다시 도전
-                </button>
-              )}
-              <button 
-                onClick={() => {}} 
-                className="px-6 p-3 text-gray-500 text-sm hover:bg-gray-100 rounded-2xl"
+              <button
+                onClick={handleSubmitComment}
+                className="flex-1 p-3 bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+              >
+                후기 등록
+              </button>
+              <button
+                onClick={() => setShowComments(false)}
+                className="flex-1 p-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
               >
                 닫기
               </button>

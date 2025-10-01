@@ -428,21 +428,33 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   // 쿠팡파트너스 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (수익 창출)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
-    // 랜덤하게 쿠팡파트너스 링크 선택
-    const coupangPartnersUrl = getRandomCoupangUrl();
-    
-    // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
-    const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
-    
-    if (!targetWindow) {
-      alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-      return;
+    try {
+      // 랜덤하게 쿠팡파트너스 링크 선택
+      const coupangPartnersUrl = getRandomCoupangUrl();
+      
+      // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
+      const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
+      
+      if (!targetWindow) {
+        alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        return;
+      }
+      
+      // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
+      setTimeout(() => {
+        try {
+          window.location.href = coupangPartnersUrl;
+        } catch (error) {
+          console.error('쿠팡파트너스 링크 이동 오류:', error);
+          // 오류 발생 시 기본 페이지로 이동
+          window.location.href = 'https://b-mbti.money-hotissue.com';
+        }
+      }, 200); // 새 탭이 완전히 열린 후 현재 탭 이동
+    } catch (error) {
+      console.error('openWithCoupangAd 함수 오류:', error);
+      // 오류 발생 시 기본적으로 새 탭에서만 열기
+      window.open(targetUrl, '_blank', windowOptions || '');
     }
-    
-    // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
-    setTimeout(() => {
-      window.location.href = coupangPartnersUrl;
-    }, 100); // 새 탭이 열린 후 현재 탭 이동
   };
 
   const handleShare = () => {
@@ -895,31 +907,21 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
-                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
-                  {/* 텍스트 정보 */}
-                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
-                    {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                      <h3 className="text-xs md:text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
-                      <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                        {compatibleType}
-                      </span>
-                      <span className="font-bold text-green-800 text-xs md:text-sm">
-                        {RESULTS[compatibleType].character}
-                      </span>
-                      <span className="text-green-600 text-sm md:text-base">💚</span>
-                    </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
-                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
-                        {getCompatibilityReason(resultType, compatibleType)}
-                      </p>
-                    </div>
+                <div className="space-y-3 md:space-y-4">
+                  {/* 1. 제목과 MBTI 유형 */}
+                  <div className="flex items-center gap-2 flex-wrap justify-center">
+                    <h3 className="text-xs md:text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
+                    <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
+                      {compatibleType}
+                    </span>
+                    <span className="font-bold text-green-800 text-xs md:text-sm">
+                      {RESULTS[compatibleType].character}
+                    </span>
+                    <span className="text-green-600 text-sm md:text-base">💚</span>
                   </div>
                   
-                  {/* 이미지 */}
-                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
+                  {/* 2. 이미지 */}
+                  <div className="flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(compatibleType)} 
@@ -935,6 +937,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       </div>
                     </div>
                   </div>
+                  
+                  {/* 3. 설명 */}
+                  <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
+                      {getCompatibilityReason(resultType, compatibleType)}
+                    </p>
+                  </div>
                 </div>
               );
             })()}
@@ -946,31 +955,21 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
-                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
-                  {/* 텍스트 정보 */}
-                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
-                    {/* 제목과 MBTI 유형 */}
-                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                      <h3 className="text-xs md:text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
-                      <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                        {incompatibleType}
-                      </span>
-                      <span className="font-bold text-red-800 text-xs md:text-sm">
-                        {RESULTS[incompatibleType].character}
-                      </span>
-                      <span className="text-red-600 text-sm md:text-base">💔</span>
-                    </div>
-                    
-                    {/* 이유 설명 */}
-                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
-                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
-                        {getIncompatibilityReason(resultType, incompatibleType)}
-                      </p>
-                    </div>
+                <div className="space-y-3 md:space-y-4">
+                  {/* 1. 제목과 MBTI 유형 */}
+                  <div className="flex items-center gap-2 flex-wrap justify-center">
+                    <h3 className="text-xs md:text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
+                    <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
+                      {incompatibleType}
+                    </span>
+                    <span className="font-bold text-red-800 text-xs md:text-sm">
+                      {RESULTS[incompatibleType].character}
+                    </span>
+                    <span className="text-red-600 text-sm md:text-base">💔</span>
                   </div>
                   
-                  {/* 이미지 */}
-                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
+                  {/* 2. 이미지 */}
+                  <div className="flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img 
                         src={getMbtiImage(incompatibleType)} 
@@ -985,6 +984,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         🔍 크게보기
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* 3. 설명 */}
+                  <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
+                      {getIncompatibilityReason(resultType, incompatibleType)}
+                    </p>
                   </div>
                 </div>
               );
@@ -1075,31 +1081,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </p>
               
               {/* 문제 예시 */}
-              <div className="mb-4 p-3 bg-white/70 rounded-xl border border-indigo-100">
-                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
-                      <img 
-                        src="/ISFP 다윗.jpg" 
-                        alt="야곱"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/ENFP 아브라함.jpg'; // 기본 이미지로 대체
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
-                      <div className="text-sm font-medium text-gray-800">이 사람은 누구일까요?</div>
-                    </div>
+              <div className="mb-4 p-3 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl border border-indigo-200">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
+                    <img 
+                      src="/ISFP 다윗.jpg" 
+                      alt="다윗"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/ENFP 아브라함.jpg'; // 기본 이미지로 대체
+                      }}
+                    />
                   </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">다윗</div>
-                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">모세</div>
-                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">아브라함</div>
-                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">솔로몬</div>
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
+                    <div className="text-sm font-medium text-gray-800">이 사람은 누구일까요?</div>
                   </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                  <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">다윗</div>
+                  <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">모세</div>
+                  <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">아브라함</div>
+                  <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">솔로몬</div>
                 </div>
               </div>
               

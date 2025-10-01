@@ -473,8 +473,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>공유하기</title>
-          <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
-                  integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             body { 
@@ -515,8 +513,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               text-decoration: none; 
               text-align: center; 
             }
-            .kakao { background: linear-gradient(135deg, #fee500, #fccc02); color: #3c1e1e; }
-            .kakao:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 229, 0, 0.3); }
             .copy { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
             .copy:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
             .back-button { 
@@ -543,10 +539,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <div class="container">
             <h1>📤 공유하기</h1>
             
-            <button class="share-button kakao" onclick="shareToKakao()">
-              💬 카카오톡으로 공유
-            </button>
-            
             <button class="share-button copy" onclick="copyLink()">
               🔗 링크 복사
             </button>
@@ -557,76 +549,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
           
           <script>
-            // 카카오 SDK 초기화
-            const KAKAO_JS_KEY = '8e24012c3a70657f43f76742dcce245c'; // JavaScript 키 사용
-            
-            if (window.Kakao && !window.Kakao.isInitialized()) {
-              try {
-                window.Kakao.init(KAKAO_JS_KEY);
-                console.log('카카오 SDK 초기화 성공');
-              } catch (error) {
-                console.error('카카오 SDK 초기화 실패:', error);
-              }
-            }
-            
-            function shareToKakao() {
-              const shareText = \`${shareText}\`;
-              const shareUrl = \`${shareUrl}\`;
-              
-              // 카카오 SDK가 정상 초기화되어 있는지 확인
-              if (window.Kakao && window.Kakao.isInitialized() && window.Kakao.Link) {
-                try {
-                  window.Kakao.Link.sendDefault({
-                    objectType: 'feed',
-                    content: {
-                      title: '🙏 성경인물 MBTI 테스트 결과',
-                      description: shareText,
-                      imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                      link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl,
-                      },
-                    },
-                    buttons: [
-                      {
-                        title: '✨ 나도 테스트 해보기',
-                        link: {
-                          mobileWebUrl: shareUrl,
-                          webUrl: shareUrl,
-                        },
-                      },
-                    ],
-                    success: function(response) {
-                      console.log('카카오 공유 성공:', response);
-                      alert('✅ 카카오톡으로 공유되었습니다!');
-                    },
-                    fail: function(error) {
-                      console.log('카카오 공유 실패:', error);
-                      fallbackKakaoShare();
-                    }
-                  });
-                } catch (error) {
-                  console.error('카카오 링크 전송 오류:', error);
-                  fallbackKakaoShare();
-                }
-              } else {
-                console.log('카카오 SDK 미초기화 - 대안 방법 사용');
-                fallbackKakaoShare();
-              }
-              
-              function fallbackKakaoShare() {
-                const fullText = shareText + '\\n\\n' + shareUrl;
-                // 클립보드에 텍스트 복사
-                navigator.clipboard.writeText(fullText).then(() => {
-                  alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡에서 붙여넣기 해주세요.');
-                }).catch(() => {
-                  alert('📱 카카오톡으로 공유하기:\\n\\n' + fullText + '\\n\\n위 텍스트를 복사해서 카카오톡에 붙여넣기 해주세요.');
-                });
-              }
-            }
-            
-
-            
             function copyLink() {
               const fullText = \`${shareText}\\n${shareUrl}\`;
               navigator.clipboard.writeText(fullText).then(() => {
@@ -650,121 +572,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
-  // 카카오 SDK 초기화 (한 번만 실행)
-  useEffect(() => {
-    const initKakao = () => {
-      if (typeof window !== 'undefined' && (window as any).Kakao) {
-        if (!(window as any).Kakao.isInitialized()) {
-          try {
-            (window as any).Kakao.init('8e24012c3a70657f43f76742dcce245c');
-            console.log('카카오 SDK 초기화 성공');
-          } catch (error) {
-            console.error('카카오 SDK 초기화 실패:', error);
-          }
-        }
-      } else {
-        // SDK가 아직 로드되지 않았으면 잠시 후 다시 시도
-        setTimeout(initKakao, 100);
-      }
-    };
-    
-    initKakao();
-  }, []);
+
 
   const handleSNSShare = (platform: string) => {
     const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
     const shareUrl = 'https://b-mbti.money-hotissue.com';
 
-    if (platform === 'kakao') {
-      // 모바일 환경 감지
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // 모바일: 카카오톡 앱 스키마 직접 사용 (더 안정적)
-        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
-        
-        try {
-          // 카카오톡 앱 열기 시도
-          window.location.href = kakaoAppScheme;
-          
-          // 1초 후 쿠팡 파트너스 링크 열기
-          setTimeout(() => {
-            window.open(getRandomCoupangUrl(), '_blank');
-          }, 1000);
-          
-          // 앱이 열리지 않을 경우 대비해 3초 후 안내
-          setTimeout(() => {
-            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 내용을 복사하세요.');
-            if (confirmation) {
-              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-              }).catch(() => {
-                alert('📱 다음 내용을 수동으로 복사해주세요:\n\n' + shareText + '\n\n' + shareUrl);
-              });
-            }
-          }, 3000);
-          
-        } catch (error) {
-          console.error('카카오톡 앱 스키마 실행 실패:', error);
-          // 실패 시 바로 클립보드 복사
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('📱 내용이 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-          });
-        }
-      } else {
-        // PC: 카카오 SDK 시도, 실패 시 클립보드 복사
-        try {
-          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-            (window as any).Kakao.Link.sendDefault({
-              objectType: 'feed',
-              content: {
-                title: `🙏 ${resultData?.character}(${resultType}) - 성경인물 MBTI 결과`,
-                description: shareText,
-                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                link: {
-                  mobileWebUrl: shareUrl,
-                  webUrl: shareUrl,
-                },
-              },
-              buttons: [
-                {
-                  title: '나도 테스트하기',
-                  link: {
-                    mobileWebUrl: shareUrl,
-                    webUrl: shareUrl,
-                  },
-                },
-              ],
-              success: () => {
-                console.log('카카오톡 공유 성공');
-                setTimeout(() => {
-                  window.open(getRandomCoupangUrl(), '_blank');
-                }, 1000);
-              },
-              fail: (error: any) => {
-                console.error('카카오톡 공유 실패:', error);
-                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                  alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-                });
-              }
-            });
-          } else {
-            throw new Error('카카오 SDK 미초기화');
-          }
-        } catch (error) {
-          console.error('PC 카카오톡 공유 오류:', error);
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('� PC에서는 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-          });
-        }
-      }
-      
-      setShowShareModal(false);
-      
-    } else if (platform === 'copy') {
+    if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        setShowShareModal(false);
+        alert('📋 링크가 복사되었습니다!');
+      }).catch(() => {
+        alert('📱 다음 내용을 수동으로 복사해주세요:\n\n' + shareText + '\n\n' + shareUrl);
         setShowShareModal(false);
       });
     }
@@ -780,89 +601,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const handleGameScoreShare = (platform: string) => {
     const scorePercentage = calculateGameScore();
     const shareText = `🎮 성경인물 맞히기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
-    const shareUrl = 'https://b-mbti.money-hotissue.com/quizgame';
+    const shareUrl = 'https://b-mbti.money-hotissue.com/game';
     
-    if (platform === 'kakao') {
-      // 모바일 환경 감지
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // 모바일: 카카오톡 앱 스키마 직접 사용
-        const kakaoAppScheme = `kakao://msg?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
-        
-        try {
-          window.location.href = kakaoAppScheme;
-          
-          setTimeout(() => {
-            window.open(getRandomCoupangUrl(), '_blank');
-          }, 1000);
-          
-          setTimeout(() => {
-            const confirmation = confirm('카카오톡 앱이 열리지 않았다면 "확인"을 클릭하여 게임 결과를 복사하세요.');
-            if (confirmation) {
-              navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-              });
-            }
-          }, 3000);
-        } catch (error) {
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('🎮 게임 결과가 클립보드에 복사되었습니다!\n카카오톡을 열고 붙여넣기 해주세요. 📋');
-          });
-        }
-      } else {
-        // PC: 카카오 SDK 시도
-        try {
-          if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-            (window as any).Kakao.Link.sendDefault({
-              objectType: 'feed',
-              content: {
-                title: `🎮 ${resultData?.character}(${resultType}) - 게임 점수 ${scorePercentage}%`,
-                description: shareText,
-                imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
-                link: {
-                  mobileWebUrl: shareUrl,
-                  webUrl: shareUrl,
-                },
-              },
-              buttons: [
-                {
-                  title: '나도 도전하기',
-                  link: {
-                    mobileWebUrl: shareUrl,
-                    webUrl: shareUrl,
-                  },
-                },
-              ],
-              success: () => {
-                setTimeout(() => {
-                  window.open(getRandomCoupangUrl(), '_blank');
-                }, 1000);
-              },
-              fail: (error: any) => {
-                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-                  alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
-                });
-              }
-            });
-          } else {
-            throw new Error('카카오 SDK 미초기화');
-          }
-        } catch (error) {
-          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-            alert('� PC에서는 게임 결과가 클립보드에 복사되었습니다!');
-          });
-        }
-      }
-    } else if (platform === 'copy') {
+    if (platform === 'copy') {
       navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-        alert('게임 결과가 클립보드에 복사되었습니다!');
+        alert('🎮 게임 결과가 클립보드에 복사되었습니다!');
+        setShowScoreShare(false);
+      }).catch(() => {
+        alert('📱 다음 내용을 수동으로 복사해주세요:\n\n' + shareText + '\n\n' + shareUrl);
         setShowScoreShare(false);
       });
-    }
-    
-    if (platform !== 'copy') {
-      setShowScoreShare(false);
     }
   };
 
@@ -1437,11 +1185,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
             <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
-            <div className="mb-4 md:mb-6">
-              <button onClick={() => handleSNSShare('kakao')} className="w-full flex items-center justify-center p-4 md:p-6 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                💬 카카오톡으로 공유하기
-              </button>
-            </div>
             <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">
               📋 링크 복사
             </button>
@@ -1468,12 +1211,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 친구들과 경쟁해보세요! 💪
               </div>
             </div>
-            <div className="mb-3 md:mb-4">
-              <button onClick={() => handleGameScoreShare('kakao')} className="w-full flex items-center justify-center p-3 md:p-4 bg-yellow-400 text-gray-800 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base">
-                💬 카카오톡으로 공유하기
-              </button>
-            </div>
-            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
+            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-3 md:p-4 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-sm md:text-base">
               📋 결과 복사
             </button>
             <button onClick={() => setShowScoreShare(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">

@@ -9,10 +9,6 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/privacy",
-      "destination": "/index.html"
-    },
-    {
       "source": "/test1",
       "destination": "/test1.html"
     },
@@ -35,6 +31,10 @@
     {
       "source": "/game",
       "destination": "/game.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

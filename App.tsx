@@ -1,12 +1,17 @@
 import React from 'react';
 import MbtiTestApp from './MbtiTestApp';
 import AdminPage from './pages/AdminPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 const App: React.FC = () => {
-  const isAdmin = window.location.pathname === '/admin';
+  const path = window.location.pathname;
   
-  if (isAdmin) {
+  if (path === '/admin') {
     return <AdminPage />;
+  }
+  
+  if (path === '/privacy') {
+    return <PrivacyPage />;
   }
   
   return <MbtiTestApp />;

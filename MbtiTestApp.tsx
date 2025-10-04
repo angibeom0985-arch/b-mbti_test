@@ -271,7 +271,7 @@ const App: React.FC = () => {
         style={{
           paddingLeft: window.innerWidth > 768 ? '180px' : '0',
           paddingRight: window.innerWidth > 768 ? '180px' : '0',
-          paddingBottom: '110px', // 플로팅 광고 공간
+          paddingBottom: '20px', // 여유 공간만
         }}
       >
         {/* MZ 스타일 배경 장식 */}

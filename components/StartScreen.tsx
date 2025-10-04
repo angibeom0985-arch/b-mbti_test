@@ -187,10 +187,10 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
           </div>
         </div>
 
-        {/* 웹사이트 소개 */}
+        {/* 소개 */}
         <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-3xl p-4 shadow-lg border border-green-200">
           <h3 className="text-lg font-bold text-gray-800 mb-3 text-center">
-            📖 웹사이트 소개
+            📖 소개
           </h3>
           <p className="text-sm text-green-700 text-center leading-relaxed">
             MBTI 성격유형검사와 성경 속 인물들을 결합한 의미있는 테스트입니다. 

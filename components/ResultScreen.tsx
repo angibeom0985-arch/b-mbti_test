@@ -1372,6 +1372,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse delay-75"></div>
         <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse delay-150"></div>
       </div>
+
+      {/* 푸터 */}
+      <div className="mt-8 pt-6 border-t border-gray-200/50">
+        <div className="space-y-2 text-center">
+          <p className="text-xs text-gray-500">
+            쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+          </p>
+          <p className="text-xs text-gray-400">
+            © 2025 B-MBTI. All rights reserved.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

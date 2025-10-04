@@ -5,6 +5,9 @@ import StartScreen from './components/StartScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
 import QuizGame from './components/QuizGame';
+import FloatingAd from './components/FloatingAd';
+import SideAd from './components/SideAd';
+import AdBlockDetector from './components/AdBlockDetector';
 
 type GameState = 'start' | 'quiz' | 'result' | 'quizgame';
 
@@ -245,33 +248,65 @@ const App: React.FC = () => {
   }, [gameState, currentQuestionIndex, handleAnswerSelect, resultType, generatedResult, error, handleRestart, handleStart, currentQuestions, selectedVersion, handleQuizGame, handleBackToResult]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800 flex flex-col transition-all duration-500">
-      {/* MZ 스타일 배경 장식 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-violet-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-pink-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl"></div>
+    <>
+      {/* 애드블록 감지 */}
+      <AdBlockDetector />
+      
+      {/* 좌측 사이드 광고 (데스크톱만) */}
+      <SideAd
+        adClient="ca-pub-2686975437928535"
+        adSlot="8015079861"
+        position="left"
+      />
+      
+      {/* 우측 사이드 광고 (데스크톱만) */}
+      <SideAd
+        adClient="ca-pub-2686975437928535"
+        adSlot="8015079861"
+        position="right"
+      />
+      
+      <div 
+        className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800 flex flex-col transition-all duration-500"
+        style={{
+          paddingLeft: window.innerWidth > 768 ? '180px' : '0',
+          paddingRight: window.innerWidth > 768 ? '180px' : '0',
+          paddingBottom: '110px', // 플로팅 광고 공간
+        }}
+      >
+        {/* MZ 스타일 배경 장식 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-violet-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-pink-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl"></div>
+        </div>
+        
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg mx-auto relative z-10">
+            {currentView}
+          </div>
+        </main>
+
+        {/* 쿠팡 파트너스 활동 문구 - 결과 페이지에서만 표시 */}
+        {gameState === 'result' && (
+          <footer className="relative z-10 bg-white/80 backdrop-blur-sm border-t border-gray-200/50 py-0.5 px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <p className="text-xs text-gray-500 py-1">
+                "쿠팡파트너스 활동을 통해 일정액의 수수료를 받을 수 있습니다."
+                <br />
+                <span className="text-gray-400">© 2025 성경인물 MBTI 테스트. 모든 권리 보유.</span>
+              </p>
+            </div>
+          </footer>
+        )}
       </div>
       
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg mx-auto relative z-10">
-          {currentView}
-        </div>
-      </main>
-
-      {/* 쿠팡 파트너스 활동 문구 - 결과 페이지에서만 표시 */}
-      {gameState === 'result' && (
-        <footer className="relative z-10 bg-white/80 backdrop-blur-sm border-t border-gray-200/50 py-0.5 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs text-gray-500 py-1">
-              "쿠팡파트너스 활동을 통해 일정액의 수수료를 받을 수 있습니다."
-              <br />
-              <span className="text-gray-400">© 2025 성경인물 MBTI 테스트. 모든 권리 보유.</span>
-            </p>
-          </div>
-        </footer>
-      )}
-    </div>
+      {/* 플로팅 하단 광고 */}
+      <FloatingAd
+        adClient="ca-pub-2686975437928535"
+        adSlot="2689008677"
+      />
+    </>
   );
 }
 

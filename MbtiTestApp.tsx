@@ -239,7 +239,14 @@ const App: React.FC = () => {
         setGameState("result");
       }
     },
-    [scores, currentQuestionIndex, calculateResult, currentQuestions.length, selectedVersion, answerHistory]
+    [
+      scores,
+      currentQuestionIndex,
+      calculateResult,
+      currentQuestions.length,
+      selectedVersion,
+      answerHistory,
+    ]
   );
 
   const currentView = useMemo(() => {
@@ -250,6 +257,7 @@ const App: React.FC = () => {
             question={currentQuestions[currentQuestionIndex]}
             onAnswer={handleAnswerSelect}
             onPrevious={handlePreviousQuestion}
+            onHome={() => setGameState("start")}
             currentQuestion={currentQuestionIndex + 1}
             totalQuestions={currentQuestions.length}
           />

@@ -40,9 +40,14 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         borderRadius: "8px",
         zIndex: 9999,
         padding: "8px",
-        width: isMobile ? "min(328px, calc(100vw - 20px))" : "min(736px, calc(100vw - 40px))",
+        width: isMobile
+          ? "min(328px, calc(100vw - 20px))"
+          : "min(736px, calc(100vw - 40px))",
         maxWidth: isMobile ? "328px" : "736px",
         height: isMobile ? "66px" : "106px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <ins

@@ -53,7 +53,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4 pb-24 md:pb-28">
       <div className="w-full max-w-md mx-auto text-center">
         {/* 1. 사이트 제목과 지금까지 참여한 사람들 */}
         <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-3xl p-4 shadow-lg border border-green-200">
@@ -91,7 +91,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                     // 클릭 시 바로 해당 테스트 시작
                     // 테스트 시작 통계 업데이트
                     VisitorCounter.incrementVersionUsage(versionNumber);
-                    
+
                     // 앱 내에서 상태 변경으로 테스트 시작
                     onStart(versionNumber);
                   }}

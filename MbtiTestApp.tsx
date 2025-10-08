@@ -271,6 +271,22 @@ const App: React.FC = () => {
             onRestart={handleRestart}
             completedVersion={selectedVersion}
             onQuizGame={handleQuizGame}
+            onStartTest={(version) => {
+              setSelectedVersion(version);
+              setGameState("quiz");
+              setCurrentQuestionIndex(0);
+              setAnswerHistory([]);
+              setScores({
+                E: 0,
+                I: 0,
+                S: 0,
+                N: 0,
+                T: 0,
+                F: 0,
+                J: 0,
+                P: 0,
+              });
+            }}
           />
         );
       case "quizgame":

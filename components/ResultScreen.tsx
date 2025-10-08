@@ -32,6 +32,7 @@ interface ResultScreenProps {
   onRestart: () => void;
   completedVersion?: number;
   onQuizGame?: () => void;
+  onStartTest?: (version: number) => void;
 }
 
 // 16가지 MBTI 유형과 대응하는 성경인물들
@@ -192,6 +193,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   onRestart,
   completedVersion = 1,
   onQuizGame,
+  onStartTest,
 }) => {
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -849,7 +851,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   return (
-    <div className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden" style={{ paddingBottom: "90px" }}>
+    <div
+      className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden"
+      style={{ paddingBottom: "90px" }}
+    >
       {/* 이미지 캡처 영역 시작 */}
       <div className="image-capture-area">
         {/* 결과 헤더 */}
@@ -1166,13 +1171,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       : "from-blue-50 to-cyan-50 border-blue-200"
                   } rounded-xl p-4 border hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02]`}
                   onClick={() => {
-                    const testUrls = {
-                      1: "https://b-mbti.money-hotissue.com/test1",
-                      2: "https://b-mbti.money-hotissue.com/test2",
-                      3: "https://b-mbti.money-hotissue.com/test3",
-                    };
-                    window.location.href =
-                      testUrls[parseInt(versionKey) as keyof typeof testUrls];
+                    const versionNum = parseInt(versionKey);
+                    if (onStartTest) {
+                      // 앱 내부에서 상태 변경
+                      onStartTest(versionNum);
+                    } else {
+                      // 웹에서는 URL 변경
+                      const testUrls = {
+                        1: "https://b-mbti.money-hotissue.com/test1",
+                        2: "https://b-mbti.money-hotissue.com/test2",
+                        3: "https://b-mbti.money-hotissue.com/test3",
+                      };
+                      window.location.href =
+                        testUrls[versionNum as keyof typeof testUrls];
+                    }
                   }}
                 >
                   <div className="text-center">

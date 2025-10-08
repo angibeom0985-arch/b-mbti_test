@@ -1292,7 +1292,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     timestamp: Date.now(),
                   })
                 );
-                openWithCoupangAd("/game");
+                
+                // 앱 내부에서는 onQuizGame 콜백 사용
+                if (onQuizGame) {
+                  onQuizGame();
+                } else {
+                  // 웹에서는 기존 방식 사용
+                  openWithCoupangAd("/game");
+                }
               }}
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
             >

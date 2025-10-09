@@ -6,66 +6,61 @@ interface FloatingAdProps {
 }
 
 const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    // AdSense 스크립트 로드
-    try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {}
-      );
-    } catch (e) {
-      console.error("AdSense error:", e);
-    }
+    // AdSense 스크립트 로드 (한 번만)
+    const timer = setTimeout(() => {
+      try {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
+          {}
+        );
+      } catch (e) {
+        console.error("AdSense error:", e);
+      }
+    }, 100);
 
-    return () => window.removeEventListener("resize", checkMobile);
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      clearTimeout(timer);
+    };
   }, []);
+
+  const adWidth = isMobile ? 300 : 350;
+  const adHeight = isMobile ? 200 : 150;
 
   return (
     <div
       style={{
         position: "fixed",
-        bottom: "0",
-        left: "0",
-        right: "0",
+        bottom: 0,
+        left: 0,
+        width: "100vw",
+        height: `${adHeight}px`,
         zIndex: 9999,
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
-        height: isMobile ? "200px" : "150px",
-        padding: "0",
-        margin: "0",
+        alignItems: "center",
+        padding: 0,
+        margin: 0,
       }}
     >
-      <div
+      <ins
+        className="adsbygoogle"
         style={{
-          width: isMobile ? "300px" : "350px",
-          height: isMobile ? "200px" : "150px",
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: "block",
+          width: `${adWidth}px`,
+          height: `${adHeight}px`,
         }}
-      >
-        <ins
-          className="adsbygoogle"
-          style={{
-            display: "inline-block",
-            width: isMobile ? "300px" : "350px",
-            height: isMobile ? "200px" : "150px",
-            margin: "0 auto",
-          }}
-          data-ad-client={adClient}
-          data-ad-slot={adSlot}
-        />
-      </div>
+        data-ad-client={adClient}
+        data-ad-slot={adSlot}
+      />
     </div>
   );
 };

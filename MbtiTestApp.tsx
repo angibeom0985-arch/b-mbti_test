@@ -367,10 +367,9 @@ const App: React.FC = () => {
       </div>
 
       {/* 플로팅 하단 광고 */}
-      <FloatingAd 
-        key={`${gameState}-${currentQuestionIndex}`}
-        adClient="ca-pub-2686975437928535" 
-        adSlot="2689008677" 
+      <FloatingAd
+        adClient="ca-pub-2686975437928535"
+        adSlot="2689008677"
       />
     </>
   );

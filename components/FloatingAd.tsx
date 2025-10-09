@@ -44,7 +44,7 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
           ? "min(316px, calc(100vw - 20px))"
           : "min(366px, calc(100vw - 20px))",
         maxWidth: isMobile ? "316px" : "366px",
-        height: isMobile ? "108px" : "166px",
+        height: isMobile ? "216px" : "166px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -55,7 +55,7 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         style={{
           display: "inline-block",
           width: isMobile ? "300px" : "350px",
-          height: isMobile ? "100px" : "150px",
+          height: isMobile ? "200px" : "150px",
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}

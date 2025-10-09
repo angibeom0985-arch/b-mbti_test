@@ -863,7 +863,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   return (
-    <div className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden">
+    <div
+      className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden"
+      style={{ paddingBottom: "200px" }}
+    >
       {/* 이미지 캡처 영역 시작 */}
       <div className="image-capture-area">
         {/* 결과 헤더 */}

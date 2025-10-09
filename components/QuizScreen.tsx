@@ -30,7 +30,10 @@ const QuizScreen: React.FC<QuizScreenProps> = ({
     }, 200);
   };
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-start justify-center pt-8 px-4">
+    <div
+      className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-start justify-center pt-8 px-4"
+      style={{ paddingBottom: "200px" }}
+    >
       <div className="w-full max-w-lg mx-auto">
         {/* 프로그레스 헤더 - 여백 줄임 */}
         <div className="text-center mb-4">

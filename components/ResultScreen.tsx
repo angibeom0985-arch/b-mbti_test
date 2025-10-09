@@ -531,15 +531,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const handleShare = async () => {
     // 공유 URL 생성
     const shareUrl = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
-    
+
     // 링크 복사
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      
+
       // 복사 안내 표시
       alert("링크가 복사되었습니다! 친구들과 공유해보세요 😊");
-      
+
       // 3초 후 복사 상태 초기화
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
@@ -558,7 +558,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       }
       document.body.removeChild(textArea);
     }
-    
+
     // 쿠팡 링크 열기
     window.open(getRandomCoupangUrl(), "_blank");
   };
@@ -863,10 +863,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   return (
-    <div
-      className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden"
-      style={{ paddingBottom: "90px" }}
-    >
+    <div className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden">
       {/* 이미지 캡처 영역 시작 */}
       <div className="image-capture-area">
         {/* 결과 헤더 */}

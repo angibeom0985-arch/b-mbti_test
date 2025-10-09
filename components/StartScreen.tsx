@@ -53,7 +53,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4" style={{ paddingBottom: "90px" }}>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto text-center">
         {/* 1. 사이트 제목과 지금까지 참여한 사람들 */}
         <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-3xl p-4 shadow-lg border border-green-200">

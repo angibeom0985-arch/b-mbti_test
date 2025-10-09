@@ -56,6 +56,54 @@ const App: React.FC = () => {
   );
   const [error, setError] = useState<string | null>(null);
 
+  // Pull to refresh state
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullStartY, setPullStartY] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
+
+  // Pull to refresh handlers
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (window.scrollY === 0) {
+        setPullStartY(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (pullStartY > 0) {
+        const currentY = e.touches[0].clientY;
+        const distance = currentY - pullStartY;
+        
+        if (distance > 0 && window.scrollY === 0) {
+          setIsPulling(true);
+          setPullDistance(Math.min(distance, 150));
+          if (distance > 20) {
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (pullDistance > 80) {
+        window.location.reload();
+      }
+      setIsPulling(false);
+      setPullStartY(0);
+      setPullDistance(0);
+    };
+
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [pullStartY, pullDistance]);
+
   // 자동 시작 버전 체크 및 URL 파라미터 처리
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -312,6 +360,24 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* Pull to refresh indicator */}
+      {isPulling && (
+        <div
+          style={{
+            position: "fixed",
+            top: `${pullDistance / 2}px`,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 10000,
+            fontSize: "24px",
+            opacity: Math.min(pullDistance / 80, 1),
+            transition: "opacity 0.2s",
+          }}
+        >
+          {pullDistance > 80 ? "🔄" : "⬇️"}
+        </div>
+      )}
+
       {/* 애드블록 감지 */}
       <AdBlockDetector />
 

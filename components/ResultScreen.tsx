@@ -228,6 +228,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const [modalImageSrc, setModalImageSrc] = useState("");
   const [modalImageTitle, setModalImageTitle] = useState("");
 
+  // 모달 열릴 때 body 스크롤 막기
+  useEffect(() => {
+    if (showImageModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showImageModal]);
+
   // 게임 참여 유도 멘트 배열
   const gamePromptMessages = [
     "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
@@ -1666,11 +1678,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {/* 이미지 확대 모달 */}
       {showImageModal && (
         <div
-          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          style={{ padding: "20px" }}
           onClick={() => setShowImageModal(false)}
         >
           <div
-            className="relative bg-white rounded-2xl p-4 max-w-2xl w-full max-h-[90vh] overflow-auto"
+            className="relative bg-white rounded-2xl w-full max-w-2xl"
+            style={{
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* 닫기 버튼 */}
@@ -1683,25 +1701,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
             {/* 제목 */}
             {modalImageTitle && (
-              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">
-                {modalImageTitle}
-              </h2>
+              <div className="px-6 pt-6 pb-3">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 text-center">
+                  {modalImageTitle}
+                </h2>
+              </div>
             )}
 
             {/* 이미지 */}
-            <img
-              src={modalImageSrc}
-              alt={modalImageTitle}
-              className="w-full h-auto rounded-xl shadow-lg"
-            />
+            <div
+              className="flex-1 flex items-center justify-center px-6"
+              style={{ minHeight: 0 }}
+            >
+              <img
+                src={modalImageSrc}
+                alt={modalImageTitle}
+                className="w-full h-auto rounded-xl shadow-lg object-contain"
+                style={{ maxHeight: "calc(90vh - 180px)" }}
+              />
+            </div>
 
             {/* 닫기 버튼 (하단) */}
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="mt-4 w-full py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
-            >
-              닫기
-            </button>
+            <div className="px-6 pb-6 pt-4">
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="w-full py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}

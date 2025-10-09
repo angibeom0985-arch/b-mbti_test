@@ -32,7 +32,6 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
     };
   }, []);
 
-  const adWidth = isMobile ? 300 : 350;
   const adHeight = isMobile ? 200 : 150;
 
   return (
@@ -44,9 +43,6 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         width: "100vw",
         height: `${adHeight}px`,
         zIndex: 9999,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         padding: 0,
         margin: 0,
       }}
@@ -55,8 +51,8 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         className="adsbygoogle"
         style={{
           display: "block",
-          width: `${adWidth}px`,
-          height: `${adHeight}px`,
+          width: "100%",
+          height: "100%",
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}

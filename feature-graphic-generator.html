@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Store Feature Graphic Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #canvas {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .info {
+            color: #666;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Play Store 그래픽 이미지 생성기</h1>
+        <p class="info">1024 x 500px PNG 이미지</p>
+        
+        <canvas id="canvas" width="1024" height="500"></canvas>
+        
+        <div>
+            <button onclick="drawGraphic()">그래픽 생성</button>
+            <button onclick="downloadImage()">PNG 다운로드</button>
+        </div>
+        
+        <p class="info">※ 생성 후 다운로드 버튼을 클릭하세요</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawGraphic() {
+            // 배경 그라데이션 (하늘색 -> 보라색)
+            const gradient = ctx.createLinearGradient(0, 0, 1024, 500);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1024, 500);
+
+            // 장식적인 원들 추가
+            ctx.globalAlpha = 0.1;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(100, 400, 150, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(900, 100, 200, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            // 십자가 아이콘 (왼쪽)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            
+            // 십자가 그리기
+            const crossX = 180;
+            const crossY = 250;
+            const crossSize = 60;
+            
+            // 세로선
+            ctx.beginPath();
+            ctx.moveTo(crossX, crossY - crossSize);
+            ctx.lineTo(crossX, crossY + crossSize);
+            ctx.stroke();
+            
+            // 가로선
+            ctx.beginPath();
+            ctx.moveTo(crossX - crossSize * 0.7, crossY - crossSize * 0.3);
+            ctx.lineTo(crossX + crossSize * 0.7, crossY - crossSize * 0.3);
+            ctx.stroke();
+
+            // 원형 배경 (십자가 뒤)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.arc(crossX, crossY, 80, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 메인 텍스트
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 70px "Malgun Gothic", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('B-MBTI', 300, 200);
+
+            // 서브 텍스트
+            ctx.font = '35px "Malgun Gothic", sans-serif';
+            ctx.fillText('성경인물 성격유형 테스트', 300, 260);
+
+            // 작은 설명 텍스트
+            ctx.font = '24px "Malgun Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText('나와 닮은 성경 속 인물을 찾아보세요', 300, 310);
+
+            // MBTI 타입 박스들 (오른쪽 하단)
+            const types = ['ENFP', 'INFJ', 'ESTJ', 'ISTP'];
+            const startX = 720;
+            const startY = 360;
+            const boxSize = 60;
+            const gap = 10;
+
+            types.forEach((type, index) => {
+                const x = startX + (index * (boxSize + gap));
+                
+                // 박스 배경
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.fillRect(x, startY, boxSize, boxSize);
+                
+                // 텍스트
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(type, x + boxSize/2, startY + boxSize/2 + 6);
+            });
+
+            // 하단 작은 텍스트
+            ctx.font = '18px "Malgun Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.textAlign = 'right';
+            ctx.fillText('16가지 성경인물과 매칭 • 무료', 1000, 460);
+
+            alert('✅ 그래픽 이미지가 생성되었습니다!\n"PNG 다운로드" 버튼을 클릭하세요.');
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'b-mbti-feature-graphic-1024x500.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            alert('✅ 다운로드가 시작되었습니다!');
+        }
+
+        // 페이지 로드 시 자동 생성
+        window.onload = function() {
+            drawGraphic();
+        };
+    </script>
+</body>
+</html>

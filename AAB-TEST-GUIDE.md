@@ -2,7 +2,8 @@
 
 ## 📦 AAB(Android App Bundle)란?
 
-AAB는 Google Play Store 전용 배포 포맷입니다. 
+AAB는 Google Play Store 전용 배포 포맷입니다.
+
 - 사용자 기기에 최적화된 APK를 자동으로 생성
 - 앱 크기 감소 (평균 15-20%)
 - **직접 설치 불가** - Play Store를 통해서만 배포
@@ -27,6 +28,7 @@ AAB는 Google Play Store 전용 배포 포맷입니다.
 ### 방법 3: 수동으로 단계별 실행
 
 #### 1. AAB 빌드
+
 ```powershell
 cd android
 .\gradlew clean bundleRelease
@@ -34,6 +36,7 @@ cd ..
 ```
 
 #### 2. bundletool로 APK 생성
+
 ```powershell
 # bundletool 다운로드 (최초 1회)
 Invoke-WebRequest -Uri "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar" -OutFile "bundletool.jar"
@@ -50,6 +53,7 @@ java -jar bundletool.jar build-apks `
 ```
 
 #### 3. APKS에서 APK 추출
+
 ```powershell
 # APKS는 ZIP 파일입니다
 Copy-Item b-mbti-release.apks -Destination temp.zip
@@ -58,6 +62,7 @@ Copy-Item temp-apks\universal.apk -Destination b-mbti-release.apk
 ```
 
 #### 4. 에뮬레이터에 설치
+
 ```powershell
 # 기존 앱 삭제 (서명 충돌 방지)
 adb uninstall com.bmbi.test
@@ -74,16 +79,19 @@ adb shell am start -n com.bmbi.test/.MainActivity
 ### ✅ 릴리즈 빌드에서 확인할 것들
 
 1. **광고 표시**
+
    - 앵커 광고 (하단 고정)
    - 사이드 광고 (좌우)
    - 광고 클릭 동작
 
 2. **성능**
+
    - 로딩 속도
    - 애니메이션 부드러움
    - 메모리 사용량
 
 3. **기능**
+
    - 테스트 진행 (1, 2, 3)
    - 결과 페이지
    - 공유 기능
@@ -96,14 +104,14 @@ adb shell am start -n com.bmbi.test/.MainActivity
 
 ## 📊 디버그 APK vs 릴리즈 APK 차이
 
-| 항목 | 디버그 APK | 릴리즈 APK (AAB 변환) |
-|------|-----------|---------------------|
-| 서명 | 디버그 키 | 릴리즈 키 |
-| 난독화 | ❌ 없음 | ✅ ProGuard |
-| 크기 | 더 큼 | 최적화됨 |
-| 로그 | 모든 로그 | 최소화 |
-| 성능 | 느림 | 빠름 |
-| Play Store | ❌ 업로드 불가 | ✅ 업로드 가능 |
+| 항목       | 디버그 APK     | 릴리즈 APK (AAB 변환) |
+| ---------- | -------------- | --------------------- |
+| 서명       | 디버그 키      | 릴리즈 키             |
+| 난독화     | ❌ 없음        | ✅ ProGuard           |
+| 크기       | 더 큼          | 최적화됨              |
+| 로그       | 모든 로그      | 최소화                |
+| 성능       | 느림           | 빠름                  |
+| Play Store | ❌ 업로드 불가 | ✅ 업로드 가능        |
 
 ## 🚀 플레이스토어 출시 전 체크리스트
 
@@ -153,12 +161,15 @@ adb logcat | Select-String "bmbi"
 ## ❓ 문제 해결
 
 ### "INSTALL_FAILED_UPDATE_INCOMPATIBLE"
+
 → 기존 앱을 먼저 삭제: `adb uninstall com.bmbi.test`
 
 ### "device offline"
+
 → 에뮬레이터 재시작: `adb kill-server && adb start-server`
 
 ### "cmd: Can't find service: package"
+
 → 에뮬레이터가 완전히 부팅되지 않음. 30초 대기 후 재시도
 
 ## 🔗 참고 링크

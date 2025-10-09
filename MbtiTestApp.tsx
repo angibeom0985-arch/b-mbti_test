@@ -73,7 +73,7 @@ const App: React.FC = () => {
       if (pullStartY > 0) {
         const currentY = e.touches[0].clientY;
         const distance = currentY - pullStartY;
-        
+
         if (distance > 0 && window.scrollY === 0) {
           setIsPulling(true);
           setPullDistance(Math.min(distance, 150));

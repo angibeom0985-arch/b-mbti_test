@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface SideAdProps {
   adSlot: string;
   adClient: string;
-  position: 'left' | 'right';
+  position: "left" | "right";
 }
 
 const SideAd: React.FC<SideAdProps> = ({ adSlot, adClient, position }) => {
@@ -15,18 +15,20 @@ const SideAd: React.FC<SideAdProps> = ({ adSlot, adClient, position }) => {
     };
 
     checkDesktop();
-    window.addEventListener('resize', checkDesktop);
+    window.addEventListener("resize", checkDesktop);
 
     // AdSense 스크립트 로드
     if (isDesktop) {
       try {
-        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
+          {}
+        );
       } catch (e) {
-        console.error('AdSense error:', e);
+        console.error("AdSense error:", e);
       }
     }
 
-    return () => window.removeEventListener('resize', checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
   }, [isDesktop]);
 
   if (!isDesktop) return null;
@@ -34,24 +36,24 @@ const SideAd: React.FC<SideAdProps> = ({ adSlot, adClient, position }) => {
   return (
     <div
       style={{
-        position: 'fixed',
-        top: '50%',
-        [position]: '10px',
-        transform: 'translateY(-50%)',
-        width: '160px',
-        minHeight: '600px',
+        position: "fixed",
+        top: "50%",
+        [position]: "10px",
+        transform: "translateY(-50%)",
+        width: "160px",
+        minHeight: "600px",
         zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <ins
         className="adsbygoogle"
         style={{
-          display: 'block',
-          width: '160px',
-          height: '600px',
+          display: "block",
+          width: "160px",
+          height: "600px",
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}

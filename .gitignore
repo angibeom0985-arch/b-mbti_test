@@ -41,3 +41,26 @@ ehthumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/app/debug/
+android/captures/
+android/local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore files (매우 중요!)
+*.jks
+*.keystore
+keystore.properties
+keystores/
+
+# Signing
+signing.properties
+key.properties

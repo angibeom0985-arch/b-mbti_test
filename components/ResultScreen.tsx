@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import type { MbtiType, MbtiResult } from "../types";
 import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from "../constants";
 import RestartIcon from "./icons/RestartIcon";
@@ -41,29 +41,53 @@ interface ResultScreenProps {
 // 16가지 MBTI 유형과 대응하는 성경인물들
 const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
 
+// 호환성 데이터를 컴포넌트 외부로 이동 (한 번만 생성)
+const COMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
+  ENFP: ["INFJ", "INTJ", "ENFJ", "INFP"],
+  ENFJ: ["INFP", "ISFP", "ENFP", "INFJ"],
+  ENTP: ["INFJ", "INTJ", "ENFJ", "INFP"],
+  ENTJ: ["INFP", "ISFP", "ENFP", "INFJ"],
+  ESFP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
+  ESFJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
+  ESTP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
+  ESTJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
+  INFP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
+  INFJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
+  INTP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
+  INTJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
+  ISFP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
+  ISFJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
+  ISTP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
+  ISTJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
+};
+
+const INCOMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
+  ENFP: ["ISTJ", "ISTP", "ESTJ", "ESTP"],
+  ENFJ: ["ISTP", "INTP", "ESTP", "ENTP"],
+  ENTP: ["ISFJ", "ISTJ", "ESFJ", "ESTJ"],
+  ENTJ: ["ISFJ", "ISFP", "ESFJ", "ESFP"],
+  ESFP: ["INTJ", "INTP", "ENTJ", "ENTP"],
+  ESFJ: ["INTP", "ENTP", "INTJ", "ENTJ"],
+  ESTP: ["INFJ", "INFP", "ENFJ", "ENFP"],
+  ESTJ: ["INFP", "ENFP", "INFJ", "ENFJ"],
+  INFP: ["ESTJ", "ENTJ", "ESTP", "ENTP"],
+  INFJ: ["ESTP", "ESFP", "ESTJ", "ESFJ"],
+  INTP: ["ESFJ", "ESFP", "ESTJ", "ESTP"],
+  INTJ: ["ESFP", "ESTP", "ESFJ", "ESTJ"],
+  ISFP: ["ENTJ", "ENTP", "ESTJ", "ESTP"],
+  ISFJ: ["ENTP", "ENTJ", "ESTP", "ESTJ"],
+  ISTP: ["ENFJ", "ESFJ", "ENFP", "ESFP"],
+  ISTJ: ["ENFP", "ESFP", "ENTP", "ESTP"],
+};
+
 // 어울리는 성격 유형 추천 로직
 const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
-  // 각 유형별로 어울리는 유형들을 정의 (심리학적 호환성 기반)
-  const compatibilityMap: Record<MbtiType, MbtiType[]> = {
-    ENFP: ["INFJ", "INTJ", "ENFJ", "INFP"],
-    ENFJ: ["INFP", "ISFP", "ENFP", "INFJ"],
-    ENTP: ["INFJ", "INTJ", "ENFJ", "INFP"],
-    ENTJ: ["INFP", "ISFP", "ENFP", "INFJ"],
-    ESFP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
-    ESFJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
-    ESTP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
-    ESTJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
-    INFP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
-    INFJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
-    INTP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
-    INTJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
-    ISFP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
-    ISFJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
-    ISTP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
-    ISTJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
-  };
+  return COMPATIBILITY_MAP[currentType] || [];
+};
 
-  return compatibilityMap[currentType] || [];
+// 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
+const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
+  return INCOMPATIBILITY_MAP[currentType] || [];
 };
 
 // 호환성 이유 설명
@@ -97,29 +121,7 @@ const getCompatibilityReason = (
   );
 };
 
-// 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
-const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
-  const incompatibilityMap: Record<MbtiType, MbtiType[]> = {
-    ENFP: ["ISTJ", "ISTP", "ESTJ", "ESTP"],
-    ENFJ: ["ISTP", "INTP", "ESTP", "ENTP"],
-    ENTP: ["ISFJ", "ISTJ", "ESFJ", "ESTJ"],
-    ENTJ: ["ISFJ", "ISFP", "ESFJ", "ESFP"],
-    ESFP: ["INTJ", "INTP", "ENTJ", "ENTP"],
-    ESFJ: ["INTP", "ENTP", "INTJ", "ENTJ"],
-    ESTP: ["INFJ", "INFP", "ENFJ", "ENFP"],
-    ESTJ: ["INFP", "ENFP", "INFJ", "ENFJ"],
-    INFP: ["ESTJ", "ENTJ", "ESTP", "ENTP"],
-    INFJ: ["ESTP", "ESFP", "ESTJ", "ESFJ"],
-    INTP: ["ESFJ", "ESFP", "ESTJ", "ESTP"],
-    INTJ: ["ESFP", "ESTP", "ESFJ", "ESTJ"],
-    ISFP: ["ENTJ", "ENTP", "ESTJ", "ESTP"],
-    ISFJ: ["ENTP", "ENTJ", "ESTP", "ESTJ"],
-    ISTP: ["ENFJ", "ESFJ", "ENFP", "ESFP"],
-    ISTJ: ["ENFP", "ESFP", "ENTP", "ESTP"],
-  };
 
-  return incompatibilityMap[currentType] || [];
-};
 
 // 비호환성 이유 설명
 const getIncompatibilityReason = (
@@ -240,59 +242,31 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     };
   }, [showImageModal]);
 
-  // 게임 참여 유도 멘트 배열
-  const gamePromptMessages = [
-    "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
-    "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
-    "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
-    "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
-    "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
-    "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
-    "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
-    "🌟 귀여운 일러스트와 함께하는 힐링 타임!",
-  ];
-
-  // 랜덤 멘트 선택 (컴포넌트 마운트 시 한 번만 선택)
-  const [randomPrompt] = useState(() => {
-    return gamePromptMessages[
-      Math.floor(Math.random() * gamePromptMessages.length)
+  // 랜덤 멘트 선택 (useMemo로 최적화)
+  const randomPrompt = useMemo(() => {
+    const gamePromptMessages = [
+      "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
+      "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
+      "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
+      "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
+      "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
+      "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
+      "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
+      "🌟 귀여운 일러스트와 함께하는 힐링 타임!",
     ];
-  });
+    return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
+  }, []);
 
-  // 미리보기용 랜덤 캐릭터 선택 (컴포넌트 마운트 시 한 번만 선택)
-  const [previewCharacter] = useState(() => {
+  // 미리보기용 랜덤 캐릭터 선택 (useMemo로 최적화)
+  const previewCharacter = useMemo(() => {
     const allTypes = Object.keys(RESULTS) as (keyof typeof RESULTS)[];
     const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
-
-    // 이미지 경로 매핑
-    const getImagePath = (type: string) => {
-      const imageMap: Record<string, string> = {
-        ISTJ: "/ISTJ 요셉.jpg",
-        ISFJ: "/ISFJ 룻.jpg",
-        INFJ: "/INFJ 다니엘.jpg",
-        INTJ: "/INTJ 바울.jpg",
-        ISTP: "/ISTP 삼손.jpg",
-        ISFP: "/ISFP 다윗.jpg",
-        INFP: "/INFP 마리아.jpg",
-        INTP: "/INTP 솔로몬.jpg",
-        ESTP: "/ESTP 베드로.jpg",
-        ESFP: "/ESFP 에스더.jpg",
-        ENFP: "/ENFP 아브라함.jpg",
-        ENTP: "/ENJS 느헤미야.jpg",
-        ESTJ: "/ESTJ 모세.jpg",
-        ESFJ: "/ESFJ 막달라 마리아.jpg",
-        ENFJ: "/ENFJ 예수님.jpg",
-        ENTJ: "/ENTJ 드보라.jpg",
-      };
-      return imageMap[type] || "/ENFP 아브라함.jpg";
-    };
-
     return {
       type: randomType,
       character: RESULTS[randomType].character,
-      image: getImagePath(randomType),
+      image: getMbtiImage(randomType),
     };
-  });
+  }, []);
 
   // 컴포넌트 마운트 시 게임 점수 불러오기
   useEffect(() => {
@@ -305,8 +279,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   }, []);
 
-  // 퀴즈를 위한 랜덤 캐릭터 선택 (중복 방지)
-  const getRandomCharacter = () => {
+  // 퀴즈를 위한 랜덤 캐릭터 선택 (useCallback으로 최적화)
+  const getRandomCharacter = useCallback(() => {
     // 모든 캐릭터를 사용했다면 목록을 초기화
     let availableCharacters = ALL_CHARACTERS.filter(
       (type) => !usedCharacters.includes(type)
@@ -329,17 +303,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     setUsedCharacters((prev) => [...prev, randomType]);
     setUserGuess("");
     setQuizResult(null);
-  };
+  }, [usedCharacters, currentQuizType]);
 
-  // 모달로 이미지 크게 보기 함수
-  const openImageInModal = (imageSrc: string, characterName: string) => {
+  // 모달로 이미지 크게 보기 함수 (useCallback으로 최적화)
+  const openImageInModal = useCallback((imageSrc: string, characterName: string) => {
     setModalImageSrc(imageSrc);
     setModalImageTitle(characterName);
     setShowImageModal(true);
-  };
+  }, []);
 
-  // 모바일 최적화된 새창 이미지 보기 함수 (호환성 유지)
-  const openImageInNewWindow = (imageSrc: string, characterName: string) => {
+  // 모바일 최적화된 새창 이미지 보기 함수 (useCallback으로 최적화)
+  const openImageInNewWindow = useCallback((imageSrc: string, characterName: string) => {
     openImageInModal(imageSrc, characterName);
     return;
 
@@ -462,7 +436,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       `);
       newWindow.document.close();
     }
-  };
+  }, [openImageInModal]);
 
   // 가짜 댓글 데이터
   const fakeComments = [
@@ -833,9 +807,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 window.open(getRandomCoupangUrl(), "_blank");
               } catch (fsError) {
                 console.error("Filesystem 저장 실패:", fsError);
-                alert(
-                  "이미지 저장에 실패했습니다.\n스크린샷을 이용해주세요."
-                );
+                alert("이미지 저장에 실패했습니다.\n스크린샷을 이용해주세요.");
               }
             }
           } else {
@@ -860,24 +832,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         }
       };
 
-      // html2canvas가 이미 로드되었는지 확인
+      // html2canvas는 index.html에서 이미 로드됨
       if ((window as any).html2canvas) {
         await processCapture();
       } else {
-        // 동적으로 html2canvas 라이브러리 로드
-        const script = document.createElement("script");
-        script.src =
-          "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-        script.crossOrigin = "anonymous";
-        document.head.appendChild(script);
-
-        script.onload = async () => {
-          await processCapture();
-        };
-
-        script.onerror = () => {
-          alert("이미지 저장 라이브러리 로드에 실패했습니다.");
-        };
+        alert("이미지 저장 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해주세요.");
       }
     } catch (error) {
       console.error("이미지 저장 중 오류:", error);

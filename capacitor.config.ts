@@ -1,24 +1,24 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.bmbi.test',
-  appName: '성경인물 MBTI 테스트',
-  webDir: 'dist',
+  appId: "com.bmbi.test",
+  appName: "성경인물 MBTI 테스트",
+  webDir: "dist",
   server: {
-    androidScheme: 'https',
+    androidScheme: "https",
     cleartext: true,
-    hostname: 'b-mbti.money-hotissue.com',
+    hostname: "b-mbti.money-hotissue.com",
     allowNavigation: [
-      'b-mbti.money-hotissue.com',
-      '*.b-mbti.money-hotissue.com'
-    ]
+      "b-mbti.money-hotissue.com",
+      "*.b-mbti.money-hotissue.com",
+    ],
   },
   android: {
     buildOptions: {
       keystorePath: undefined,
       keystoreAlias: undefined,
     },
-    allowMixedContent: true
+    allowMixedContent: true,
   },
   plugins: {
     SplashScreen: {
@@ -29,9 +29,9 @@ const config: CapacitorConfig = {
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
       androidSpinnerStyle: "large",
-      spinnerColor: "#999999"
-    }
-  }
+      spinnerColor: "#999999",
+    },
+  },
 };
 
 export default config;

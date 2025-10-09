@@ -4,6 +4,9 @@ import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from "../constants";
 import RestartIcon from "./icons/RestartIcon";
 import LoadingIndicator from "./LoadingIndicator";
 import ShareIcon from "./icons/ShareIcon";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import { Capacitor } from "@capacitor/core";
 
 // 쿠팡 파트너스 링크 배열
 const COUPANG_PARTNERS_URLS = [
@@ -760,13 +763,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           // @ts-ignore - html2canvas는 전역 변수로 로드됨
           const canvas = await (window as any).html2canvas(captureElement, {
             backgroundColor: "#ffffff",
-            scale: 2, // scale을 낮춰서 안정성 향상
-            useCORS: false, // CORS 비활성화
-            allowTaint: false, // Taint 비활성화
-            foreignObjectRendering: true, // SVG 등 외부 객체 렌더링 허용
+            scale: 2,
+            useCORS: false,
+            allowTaint: false,
+            foreignObjectRendering: true,
             logging: false,
             ignoreElements: (element: HTMLElement) => {
-              // 외부 이미지나 문제가 될 수 있는 요소 제외
               return (
                 element.tagName === "IFRAME" ||
                 element.classList.contains("ad-banner") ||
@@ -781,25 +783,65 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
           // 캔버스를 이미지로 변환
           const dataURL = canvas.toDataURL("image/png", 1.0);
+          const fileName = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
 
-          // 다운로드 링크 생성
-          const link = document.createElement("a");
-          link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
-          link.href = dataURL;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          // 모바일 네이티브 앱인 경우
+          if (Capacitor.isNativePlatform()) {
+            try {
+              // base64 데이터에서 prefix 제거
+              const base64Data = dataURL.split(",")[1];
 
-          // 이미지 저장 완료 후 쿠팡파트너스 링크 열기 및 사용자 안내
-          setTimeout(() => {
-            const coupangPartnersUrl = "https://link.coupang.com/a/cTTkqa";
-            window.open(coupangPartnersUrl, "_blank");
+              // 파일 저장 (갤러리에 저장하려면 Share API 사용)
+              await Share.share({
+                title: "성경인물 MBTI 결과",
+                text: `나의 성경인물은 ${resultData?.character}입니다!`,
+                url: dataURL,
+                dialogTitle: "이미지 저장 위치 선택",
+              });
 
-            // 사용자에게 다운로드 위치 안내
-            alert(
-              "📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더"
-            );
-          }, 500);
+              // 쿠팡 링크 열기
+              setTimeout(() => {
+                window.open(getRandomCoupangUrl(), "_blank");
+              }, 500);
+            } catch (shareError) {
+              console.error("Share 실패, Filesystem 시도:", shareError);
+              // Share 실패 시 Filesystem으로 직접 저장 시도
+              try {
+                const base64Data = dataURL.split(",")[1];
+                const savedFile = await Filesystem.writeFile({
+                  path: fileName,
+                  data: base64Data,
+                  directory: Directory.Documents,
+                });
+
+                alert(
+                  `📸 이미지가 저장되었습니다!\n저장 위치: 문서 폴더\n\n파일 관리자에서 확인하실 수 있습니다.`
+                );
+
+                window.open(getRandomCoupangUrl(), "_blank");
+              } catch (fsError) {
+                console.error("Filesystem 저장 실패:", fsError);
+                alert(
+                  "이미지 저장에 실패했습니다.\n스크린샷을 이용해주세요."
+                );
+              }
+            }
+          } else {
+            // 웹 브라우저인 경우 (기존 방식)
+            const link = document.createElement("a");
+            link.download = fileName;
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => {
+              window.open(getRandomCoupangUrl(), "_blank");
+              alert(
+                "📸 이미지가 저장되었습니다!\n\n💡 저장 위치:\n- Android: 다운로드 폴더\n- iPhone: 사진 앱\n- PC: 다운로드 폴더"
+              );
+            }, 500);
+          }
         } catch (error) {
           console.error("이미지 저장 실패:", error);
           alert("이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.");
@@ -814,7 +856,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         const script = document.createElement("script");
         script.src =
           "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-        script.crossOrigin = "anonymous"; // CORS 설정 추가
+        script.crossOrigin = "anonymous";
         document.head.appendChild(script);
 
         script.onload = async () => {

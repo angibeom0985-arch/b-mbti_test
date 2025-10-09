@@ -33,14 +33,13 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
       style={{
         position: "fixed",
         bottom: "0",
-        left: "50%",
-        transform: "translateX(-50%)",
+        left: "0",
+        right: "0",
         zIndex: 9999,
-        width: isMobile ? "300px" : "350px",
-        height: isMobile ? "200px" : "150px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        height: isMobile ? "200px" : "150px",
       }}
     >
       <ins

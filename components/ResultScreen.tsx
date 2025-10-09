@@ -528,27 +528,39 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
-  const handleShare = () => {
-    // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
-    localStorage.setItem(
-      "tempResult",
-      JSON.stringify({
-        type: resultType,
-        character: resultData?.character || "",
-        timestamp: Date.now(),
-      })
-    );
-
-    // 결과 데이터를 URL 파라미터로 전달하여 /share 페이지 열기
-    const shareUrl = `/share?type=${encodeURIComponent(
-      resultType
-    )}&character=${encodeURIComponent(resultData?.character || "")}`;
-
-    // 쿠팡 링크를 먼저 열고 그 다음에 공유 페이지 열기
-    openWithCoupangAd(
-      shareUrl,
-      "width=450,height=650,scrollbars=yes,resizable=yes"
-    );
+  const handleShare = async () => {
+    // 공유 URL 생성
+    const shareUrl = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
+    
+    // 링크 복사
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      
+      // 복사 안내 표시
+      alert("링크가 복사되었습니다! 친구들과 공유해보세요 😊");
+      
+      // 3초 후 복사 상태 초기화
+      setTimeout(() => setCopied(false), 3000);
+    } catch (err) {
+      // clipboard API 실패 시 대체 방법
+      const textArea = document.createElement("textarea");
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+        alert("링크가 복사되었습니다! 친구들과 공유해보세요 😊");
+        setTimeout(() => setCopied(false), 3000);
+      } catch (err) {
+        alert("링크 복사에 실패했습니다.");
+      }
+      document.body.removeChild(textArea);
+    }
+    
+    // 쿠팡 링크 열기
+    window.open(getRandomCoupangUrl(), "_blank");
   };
 
   const handleShareOld = () => {
@@ -1292,7 +1304,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     timestamp: Date.now(),
                   })
                 );
-                
+
                 // 앱 내부에서는 onQuizGame 콜백 사용
                 if (onQuizGame) {
                   onQuizGame();

@@ -6,16 +6,7 @@ interface FloatingAdProps {
 }
 
 const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
     // AdSense 스크립트 로드
     try {
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
@@ -24,8 +15,6 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
     } catch (e) {
       console.error("AdSense error:", e);
     }
-
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   return (
@@ -40,11 +29,9 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         borderRadius: "8px",
         zIndex: 9999,
         padding: "8px",
-        width: isMobile
-          ? "min(328px, calc(100vw - 20px))"
-          : "min(736px, calc(100vw - 40px))",
-        maxWidth: isMobile ? "328px" : "736px",
-        height: isMobile ? "66px" : "106px",
+        width: "min(366px, calc(100vw - 20px))",
+        maxWidth: "366px",
+        height: "166px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -54,12 +41,11 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
         className="adsbygoogle"
         style={{
           display: "inline-block",
-          width: isMobile ? "320px" : "728px",
-          height: isMobile ? "50px" : "90px",
+          width: "350px",
+          height: "150px",
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}
-        data-full-width-responsive="false"
       />
     </div>
   );

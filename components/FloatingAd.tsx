@@ -29,21 +29,31 @@ const FloatingAd: React.FC<FloatingAdProps> = ({ adSlot, adClient }) => {
   }, []);
 
   return (
-    <ins
-      className="adsbygoogle"
+    <div
       style={{
-        display: "block",
         position: "fixed",
-        bottom: "10px",
+        bottom: "0",
         left: "50%",
         transform: "translateX(-50%)",
+        zIndex: 9999,
         width: isMobile ? "300px" : "350px",
         height: isMobile ? "200px" : "150px",
-        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
-      data-ad-client={adClient}
-      data-ad-slot={adSlot}
-    />
+    >
+      <ins
+        className="adsbygoogle"
+        style={{
+          display: "inline-block",
+          width: isMobile ? "300px" : "350px",
+          height: isMobile ? "200px" : "150px",
+        }}
+        data-ad-client={adClient}
+        data-ad-slot={adSlot}
+      />
+    </div>
   );
 };
 

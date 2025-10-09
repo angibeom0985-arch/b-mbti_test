@@ -121,8 +121,6 @@ const getCompatibilityReason = (
   );
 };
 
-
-
 // 비호환성 이유 설명
 const getIncompatibilityReason = (
   currentType: MbtiType,
@@ -254,7 +252,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
       "🌟 귀여운 일러스트와 함께하는 힐링 타임!",
     ];
-    return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
+    return gamePromptMessages[
+      Math.floor(Math.random() * gamePromptMessages.length)
+    ];
   }, []);
 
   // 미리보기용 랜덤 캐릭터 선택 (useMemo로 최적화)
@@ -306,20 +306,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   }, [usedCharacters, currentQuizType]);
 
   // 모달로 이미지 크게 보기 함수 (useCallback으로 최적화)
-  const openImageInModal = useCallback((imageSrc: string, characterName: string) => {
-    setModalImageSrc(imageSrc);
-    setModalImageTitle(characterName);
-    setShowImageModal(true);
-  }, []);
+  const openImageInModal = useCallback(
+    (imageSrc: string, characterName: string) => {
+      setModalImageSrc(imageSrc);
+      setModalImageTitle(characterName);
+      setShowImageModal(true);
+    },
+    []
+  );
 
   // 모바일 최적화된 새창 이미지 보기 함수 (useCallback으로 최적화)
-  const openImageInNewWindow = useCallback((imageSrc: string, characterName: string) => {
-    openImageInModal(imageSrc, characterName);
-    return;
+  const openImageInNewWindow = useCallback(
+    (imageSrc: string, characterName: string) => {
+      openImageInModal(imageSrc, characterName);
+      return;
 
-    const newWindow = window.open("", "_blank");
-    if (newWindow) {
-      newWindow.document.write(`
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        newWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
@@ -434,9 +438,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </body>
         </html>
       `);
-      newWindow.document.close();
-    }
-  }, [openImageInModal]);
+        newWindow.document.close();
+      }
+    },
+    [openImageInModal]
+  );
 
   // 가짜 댓글 데이터
   const fakeComments = [
@@ -836,7 +842,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       if ((window as any).html2canvas) {
         await processCapture();
       } else {
-        alert("이미지 저장 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해주세요.");
+        alert(
+          "이미지 저장 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해주세요."
+        );
       }
     } catch (error) {
       console.error("이미지 저장 중 오류:", error);

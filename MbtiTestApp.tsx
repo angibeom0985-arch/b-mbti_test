@@ -8,6 +8,7 @@ import QuizGame from "./components/QuizGame";
 import FloatingAd from "./components/FloatingAd";
 import SideAd from "./components/SideAd";
 import AdBlockDetector from "./components/AdBlockDetector";
+import LoadingIndicator from "./components/LoadingIndicator";
 
 type GameState = "start" | "quiz" | "result" | "quizgame";
 
@@ -228,6 +229,24 @@ const App: React.FC = () => {
     setGameState("result");
   }, []);
 
+  useEffect(() => {
+    if (gameState === "result" && (!generatedResult || !resultType)) {
+      const savedResult = sessionStorage.getItem("mbtiTestResult");
+      if (savedResult) {
+        try {
+          const parsed = JSON.parse(savedResult);
+          if (parsed?.resultType && parsed?.resultData) {
+            setResultType(parsed.resultType);
+            setGeneratedResult(parsed.resultData);
+            setSelectedVersion(parsed.completedVersion || 1);
+          }
+        } catch (hydrateError) {
+          console.error("Failed to hydrate saved result:", hydrateError);
+        }
+      }
+    }
+  }, [gameState, generatedResult, resultType]);
+
   const handlePreviousQuestion = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
@@ -311,9 +330,16 @@ const App: React.FC = () => {
           />
         );
       case "result":
+        if (!resultType || !generatedResult) {
+          return (
+            <div className="p-6">
+              <LoadingIndicator />
+            </div>
+          );
+        }
         return (
           <ResultScreen
-            resultType={resultType!}
+            resultType={resultType}
             resultData={generatedResult}
             error={error}
             onRestart={handleRestart}

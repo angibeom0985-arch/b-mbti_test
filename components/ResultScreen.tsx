@@ -792,6 +792,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             await waitForImagesToLoad(captureElement);
 
             const rect = captureElement.getBoundingClientRect();
+            const width = Math.ceil(captureElement.scrollWidth || rect.width);
+            const height = Math.ceil(
+              captureElement.scrollHeight || rect.height
+            );
+            const originalBodyOverflow = document.body.style.overflow;
+            document.body.style.overflow = "hidden";
 
             // @ts-ignore - html2canvas? ?? ??? ???
             canvas = await (window as any).html2canvas(captureElement, {
@@ -803,10 +809,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               logging: false,
               scrollX: 0,
               scrollY: 0,
-              width: rect.width,
-              height: captureElement.scrollHeight,
-              windowWidth: rect.width,
-              windowHeight: captureElement.scrollHeight,
+              width,
+              height,
+              windowWidth: width,
+              windowHeight: height,
               ignoreElements: (element: HTMLElement) => {
                 return (
                   element.tagName === "IFRAME" ||
@@ -820,6 +826,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               },
             });
           } finally {
+            document.body.style.overflow = originalBodyOverflow;
             hiddenElements.forEach((element, index) => {
               element.style.display = previousDisplay[index];
             });

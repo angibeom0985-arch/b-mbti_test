@@ -132,6 +132,22 @@ const App: React.FC = () => {
       }
     }
 
+    const savedResult = sessionStorage.getItem("mbtiTestResult");
+    if (savedResult) {
+      try {
+        const parsedResult = JSON.parse(savedResult);
+        if (parsedResult?.resultType && parsedResult?.resultData) {
+          setResultType(parsedResult.resultType);
+          setGeneratedResult(parsedResult.resultData);
+          setSelectedVersion(parsedResult.completedVersion || 1);
+          setGameState("result");
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to restore saved result:", error);
+      }
+    }
+
     const autoStartVersion = (window as any).autoStartVersion;
     if (autoStartVersion && autoStartVersion >= 1 && autoStartVersion <= 3) {
       handleStart(autoStartVersion);

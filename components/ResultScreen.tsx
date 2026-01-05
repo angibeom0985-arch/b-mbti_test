@@ -1237,7 +1237,7 @@ const previewCharacter = useMemo(() => {
                 <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
                   <img
                     src="/default-avatar.jpg"
-                    alt="?? ???"
+                    alt="추천 캐릭터"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -1474,7 +1474,7 @@ const previewCharacter = useMemo(() => {
                                 .character
                             }`
                       }.jpg`}
-                      alt="?깃꼍?몃Ъ"
+                      alt={`quiz image ${currentQuizType}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =

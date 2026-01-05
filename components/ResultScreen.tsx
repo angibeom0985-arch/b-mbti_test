@@ -185,7 +185,7 @@ const getIncompatibilityReason = (
       "Strict routines can feel limiting to flexible, exploratory partners.",
   };
 
-  const key = ${currentType}-;
+  const key = `${currentType}-${targetType}`;
   return (
     reasons[key] ||
     "Different priorities and pacing can cause friction; clear communication helps."

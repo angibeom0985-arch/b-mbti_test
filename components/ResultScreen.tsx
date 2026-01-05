@@ -101,33 +101,97 @@ const getCompatibilityReason = (
   targetType: MbtiType
 ): string => {
   const reasons: Record<string, string> = {
-    "ENFP-INFJ": "?쒕줈??吏곴?怨?媛먯젙??源딆씠 ?댄빐?섎ŉ, ?곸쟻 援먭컧???곗뼱?⑸땲??,
-    "ENFP-INTJ": "李쎌쓽???꾩씠?붿뼱? 泥닿퀎???ㅽ뻾?μ씠 ?꾨꼍?섍쾶 議고솕瑜??대９?덈떎",
-    "ENFJ-INFP": "?쒕줈??媛移섍???議댁쨷?섎ŉ ?곕쑜??愿怨꾨? ?뺤꽦?⑸땲??,
-    "ENTP-INFJ": "?곸떊???ш퀬? 源딆? ?듭같?μ씠 留뚮굹 ?쒕꼫吏瑜?李쎌텧?⑸땲??,
-    "ENTJ-INFP": "由щ뜑??낵 李쎌쓽?깆씠 留뚮굹 洹좏삎 ?≫엺 ?묐젰??蹂댁뿬以띾땲??,
-    "ESFP-ISFJ": "?쒕컻?④낵 諛곕젮?ъ씠 議고솕濡?쾶 ?댁슦?ъ졇 利먭굅??愿怨꾨? 留뚮벊?덈떎",
-    "ESFJ-ISFP": "?곕쑜??留덉쓬怨??덉닠??媛먯꽦???꾨쫫?듦쾶 ?듯빀?⑸땲??,
-    "ESTP-ISFJ": "?됰룞?κ낵 ?몄떖?⑥씠 ?쒕줈??遺議깊븿??梨꾩썙以띾땲??,
-    "ESTJ-ISFP": "泥닿퀎?깃낵 ?좎뿰?깆씠 留뚮굹 ?ㅼ슜???묐젰???대９?덈떎",
-    "INFP-ENFJ": "?대㈃??媛移섏? ?곕쑜??由щ뜑??씠 ?쒕줈瑜??깆옣?쒗궢?덈떎",
-    "INFJ-ENFP": "源딆? ?듭같?κ낵 諛앹? ?먮꼫吏媛 ?꾨꼍??議고솕瑜??대９?덈떎",
-    "INTP-ENFJ": "?쇰━???ш퀬? ?멸컙???곕쑜?⑥씠 洹좏삎??留욎땅?덈떎",
-    "INTJ-ENFP": "?꾨왂???ш퀬? 李쎌쓽???곴컧???쒕꼫吏瑜?諛쒗쐶?⑸땲??,
-    "ISFP-ESFJ": "?덉닠??媛먯꽦怨??ы쉶??諛곕젮媛 ?꾨쫫?듦쾶 ?댁슦?ъ쭛?덈떎",
-    "ISFJ-ESFP": "?덉젙媛먭낵 ?쒕젰???쒕줈瑜?蹂댁셿?섎ŉ 議고솕瑜??대９?덈떎",
-    "ISTP-ESFJ": "?ㅼ슜??湲곗닠怨??곕쑜??諛곕젮媛 ?ㅼ깮?쒖뿉?????꾩????⑸땲??,
-    "ISTJ-ESFP": "泥닿퀎??怨꾪쉷怨?利됲씎???쒕젰??洹좏삎?≫엺 愿怨꾨? 留뚮벊?덈떎",
+    "ENFP-INFJ":
+      "Warm empathy meets depth, creating supportive and meaningful conversations.",
+    "ENFP-INTJ":
+      "Creativity and vision meet structured planning for balanced growth.",
+    "ENFJ-INFP":
+      "Shared values and care for people build steady emotional harmony.",
+    "ENTP-INFJ":
+      "Ideas spark while insight keeps them grounded, forming a thoughtful duo.",
+    "ENTJ-INFP":
+      "Decisive leadership pairs with empathy, inspiring purpose with compassion.",
+    "ESFP-ISFJ":
+      "Spontaneity and steady support balance daily life with encouragement.",
+    "ESFJ-ISFP":
+      "Kindness and sensitivity blend, making a considerate and gentle partnership.",
+    "ESTP-ISFJ":
+      "Action-oriented energy meets reliability, helping each other stay balanced.",
+    "ESTJ-ISFP":
+      "Practical structure supports creativity, giving freedom with safety.",
+    "INFP-ENFJ":
+      "Shared ideals and care create a nurturing, value-driven relationship.",
+    "INFJ-ENFP":
+      "Insightful reflection meets enthusiasm, bringing out each other's strengths.",
+    "INTP-ENFJ":
+      "Analysis and encouragement combine for thoughtful growth and learning.",
+    "INTJ-ENFP":
+      "Strategic vision meets inspiration, motivating each other toward goals.",
+    "ISFP-ESFJ":
+      "Gentle empathy and attentive care build a warm, supportive bond.",
+    "ISFJ-ESFP":
+      "Stability and fun blend, making everyday moments enjoyable and secure.",
+    "ISTP-ESFJ":
+      "Calm problem-solving pairs with sociable warmth, balancing independence.",
+    "ISTJ-ESFP":
+      "Reliable planning supports lively spontaneity, keeping life steady yet fun.",
   };
 
-  const key = `${currentType}-${targetType}`;
+  const key = ${currentType}-;
   return (
-    reasons[key] || "?쒕줈 ?ㅻⅨ 媛뺤젏??議고솕濡?쾶 ?댁슦?ъ졇 醫뗭? 愿怨꾨? ?뺤꽦?⑸땲??
+    reasons[key] ||
+    "Practical strengths complement each other, leading to supportive teamwork."
   );
 };
 
-// 鍮꾪샇?섏꽦 ?댁쑀 ?ㅻ챸
 const getIncompatibilityReason = (
+  currentType: MbtiType,
+  targetType: MbtiType
+): string => {
+  const reasons: Record<string, string> = {
+    "ENFP-ISTJ":
+      "Different pacing and structure preferences can create friction in plans.",
+    "ENFP-ISTP":
+      "Spontaneous feelings and reserved pragmatism may struggle to align.",
+    "ENFJ-ISTP":
+      "Emotion-first decisions versus independent logic can feel conflicting.",
+    "ENTP-ISFJ":
+      "Constant change can exhaust those who value consistency and calm.",
+    "ENTJ-ISFJ":
+      "Direct leadership may feel overwhelming to someone seeking steady support.",
+    "ESFP-INTJ":
+      "Present-focused action and long-term strategy can clash without compromise.",
+    "ESFJ-INTP":
+      "Structured expectations and analytical detachment may frustrate both sides.",
+    "ESTP-INFJ":
+      "Fast moves versus reflective processing often lead to misunderstandings.",
+    "ESTJ-INFP":
+      "Orderly enforcement can feel harsh to values-driven, flexible partners.",
+    "INFP-ESTJ":
+      "Idealism versus strict structure can create tension over priorities.",
+    "INFJ-ESTP":
+      "Need for depth and planning can collide with impulsive experimentation.",
+    "INTP-ESFJ":
+      "Detached analysis and relational focus may feel at odds day-to-day.",
+    "INTJ-ESFP":
+      "Future-minded strategy versus in-the-moment enjoyment can cause disconnects.",
+    "ISFP-ENTJ":
+      "Gentle spontaneity may feel pressured by direct, results-first drives.",
+    "ISFJ-ENTP":
+      "Desire for stability can conflict with constant debate and change.",
+    "ISTP-ENFJ":
+      "Reserved independence may resist coordinated, people-centered planning.",
+    "ISTJ-ENFP":
+      "Strict routines can feel limiting to flexible, exploratory partners.",
+  };
+
+  const key = ${currentType}-;
+  return (
+    reasons[key] ||
+    "Different priorities and pacing can cause friction; clear communication helps."
+  );
+};
+ = (
   currentType: MbtiType,
   targetType: MbtiType
 ): string => {

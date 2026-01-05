@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import type { MbtiType, MbtiResult } from "../types";
 import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from "../constants";
 import RestartIcon from "./icons/RestartIcon";
@@ -8,7 +14,7 @@ import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { Capacitor } from "@capacitor/core";
 
-// 쿠팡 파트너스 링크 배열
+// 荑좏뙜 ?뚰듃?덉뒪 留곹겕 諛곗뿴
 const COUPANG_PARTNERS_URLS = [
   "https://link.coupang.com/a/cTTkqa",
   "https://link.coupang.com/a/cTTkLm",
@@ -22,7 +28,7 @@ const COUPANG_PARTNERS_URLS = [
   "https://link.coupang.com/a/cTTlif",
 ];
 
-// 랜덤 쿠팡 파트너스 링크 선택 함수
+// ?쒕뜡 荑좏뙜 ?뚰듃?덉뒪 留곹겕 ?좏깮 ?⑥닔
 const getRandomCoupangUrl = (): string => {
   const randomIndex = Math.floor(Math.random() * COUPANG_PARTNERS_URLS.length);
   return COUPANG_PARTNERS_URLS[randomIndex];
@@ -38,10 +44,9 @@ interface ResultScreenProps {
   onStartTest?: (version: number) => void;
 }
 
-// 16가지 MBTI 유형과 대응하는 성경인물들
-const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
+// 16媛吏 MBTI ?좏삎怨???묓븯???깃꼍?몃Ъ??const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
 
-// 호환성 데이터를 컴포넌트 외부로 이동 (한 번만 생성)
+// ?명솚???곗씠?곕? 而댄룷?뚰듃 ?몃?濡??대룞 (??踰덈쭔 ?앹꽦)
 const COMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
   ENFP: ["INFJ", "INTJ", "ENFJ", "INFP"],
   ENFJ: ["INFP", "ISFP", "ENFP", "INFJ"],
@@ -80,113 +85,113 @@ const INCOMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
   ISTJ: ["ENFP", "ESFP", "ENTP", "ESTP"],
 };
 
-// 어울리는 성격 유형 추천 로직
+// ?댁슱由щ뒗 ?깃꺽 ?좏삎 異붿쿇 濡쒖쭅
 const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   return COMPATIBILITY_MAP[currentType] || [];
 };
 
-// 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
+// ?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 (異⑸룎?섍린 ?ъ슫 ?좏삎)
 const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
   return INCOMPATIBILITY_MAP[currentType] || [];
 };
 
-// 호환성 이유 설명
+// ?명솚???댁쑀 ?ㅻ챸
 const getCompatibilityReason = (
   currentType: MbtiType,
   targetType: MbtiType
 ): string => {
   const reasons: Record<string, string> = {
-    "ENFP-INFJ": "서로의 직관과 감정을 깊이 이해하며, 영적 교감이 뛰어납니다",
-    "ENFP-INTJ": "창의적 아이디어와 체계적 실행력이 완벽하게 조화를 이룹니다",
-    "ENFJ-INFP": "서로의 가치관을 존중하며 따뜻한 관계를 형성합니다",
-    "ENTP-INFJ": "혁신적 사고와 깊은 통찰력이 만나 시너지를 창출합니다",
-    "ENTJ-INFP": "리더십과 창의성이 만나 균형 잡힌 협력을 보여줍니다",
-    "ESFP-ISFJ": "활발함과 배려심이 조화롭게 어우러져 즐거운 관계를 만듭니다",
-    "ESFJ-ISFP": "따뜻한 마음과 예술적 감성이 아름답게 융합됩니다",
-    "ESTP-ISFJ": "행동력과 세심함이 서로의 부족함을 채워줍니다",
-    "ESTJ-ISFP": "체계성과 유연성이 만나 실용적 협력을 이룹니다",
-    "INFP-ENFJ": "내면의 가치와 따뜻한 리더십이 서로를 성장시킵니다",
-    "INFJ-ENFP": "깊은 통찰력과 밝은 에너지가 완벽한 조화를 이룹니다",
-    "INTP-ENFJ": "논리적 사고와 인간적 따뜻함이 균형을 맞춥니다",
-    "INTJ-ENFP": "전략적 사고와 창의적 영감이 시너지를 발휘합니다",
-    "ISFP-ESFJ": "예술적 감성과 사회적 배려가 아름답게 어우러집니다",
-    "ISFJ-ESFP": "안정감과 활력이 서로를 보완하며 조화를 이룹니다",
-    "ISTP-ESFJ": "실용적 기술과 따뜻한 배려가 실생활에서 큰 도움이 됩니다",
-    "ISTJ-ESFP": "체계적 계획과 즉흥적 활력이 균형잡힌 관계를 만듭니다",
+    "ENFP-INFJ": "?쒕줈??吏곴?怨?媛먯젙??源딆씠 ?댄빐?섎ŉ, ?곸쟻 援먭컧???곗뼱?⑸땲??,
+    "ENFP-INTJ": "李쎌쓽???꾩씠?붿뼱? 泥닿퀎???ㅽ뻾?μ씠 ?꾨꼍?섍쾶 議고솕瑜??대９?덈떎",
+    "ENFJ-INFP": "?쒕줈??媛移섍???議댁쨷?섎ŉ ?곕쑜??愿怨꾨? ?뺤꽦?⑸땲??,
+    "ENTP-INFJ": "?곸떊???ш퀬? 源딆? ?듭같?μ씠 留뚮굹 ?쒕꼫吏瑜?李쎌텧?⑸땲??,
+    "ENTJ-INFP": "由щ뜑??낵 李쎌쓽?깆씠 留뚮굹 洹좏삎 ?≫엺 ?묐젰??蹂댁뿬以띾땲??,
+    "ESFP-ISFJ": "?쒕컻?④낵 諛곕젮?ъ씠 議고솕濡?쾶 ?댁슦?ъ졇 利먭굅??愿怨꾨? 留뚮벊?덈떎",
+    "ESFJ-ISFP": "?곕쑜??留덉쓬怨??덉닠??媛먯꽦???꾨쫫?듦쾶 ?듯빀?⑸땲??,
+    "ESTP-ISFJ": "?됰룞?κ낵 ?몄떖?⑥씠 ?쒕줈??遺議깊븿??梨꾩썙以띾땲??,
+    "ESTJ-ISFP": "泥닿퀎?깃낵 ?좎뿰?깆씠 留뚮굹 ?ㅼ슜???묐젰???대９?덈떎",
+    "INFP-ENFJ": "?대㈃??媛移섏? ?곕쑜??由щ뜑??씠 ?쒕줈瑜??깆옣?쒗궢?덈떎",
+    "INFJ-ENFP": "源딆? ?듭같?κ낵 諛앹? ?먮꼫吏媛 ?꾨꼍??議고솕瑜??대９?덈떎",
+    "INTP-ENFJ": "?쇰━???ш퀬? ?멸컙???곕쑜?⑥씠 洹좏삎??留욎땅?덈떎",
+    "INTJ-ENFP": "?꾨왂???ш퀬? 李쎌쓽???곴컧???쒕꼫吏瑜?諛쒗쐶?⑸땲??,
+    "ISFP-ESFJ": "?덉닠??媛먯꽦怨??ы쉶??諛곕젮媛 ?꾨쫫?듦쾶 ?댁슦?ъ쭛?덈떎",
+    "ISFJ-ESFP": "?덉젙媛먭낵 ?쒕젰???쒕줈瑜?蹂댁셿?섎ŉ 議고솕瑜??대９?덈떎",
+    "ISTP-ESFJ": "?ㅼ슜??湲곗닠怨??곕쑜??諛곕젮媛 ?ㅼ깮?쒖뿉?????꾩????⑸땲??,
+    "ISTJ-ESFP": "泥닿퀎??怨꾪쉷怨?利됲씎???쒕젰??洹좏삎?≫엺 愿怨꾨? 留뚮벊?덈떎",
   };
 
   const key = `${currentType}-${targetType}`;
   return (
-    reasons[key] || "서로 다른 강점이 조화롭게 어우러져 좋은 관계를 형성합니다"
+    reasons[key] || "?쒕줈 ?ㅻⅨ 媛뺤젏??議고솕濡?쾶 ?댁슦?ъ졇 醫뗭? 愿怨꾨? ?뺤꽦?⑸땲??
   );
 };
 
-// 비호환성 이유 설명
+// 鍮꾪샇?섏꽦 ?댁쑀 ?ㅻ챸
 const getIncompatibilityReason = (
   currentType: MbtiType,
   targetType: MbtiType
 ): string => {
   const reasons: Record<string, string> = {
     "ENFP-ISTJ":
-      "자유로운 창의성과 체계적 계획성이 충돌할 수 있어 소통에 노력이 필요합니다",
-    "ENFP-ISTP": "감정표현 방식과 실용적 접근의 차이로 오해가 생길 수 있습니다",
+      "?먯쑀濡쒖슫 李쎌쓽?깃낵 泥닿퀎??怨꾪쉷?깆씠 異⑸룎?????덉뼱 ?뚰넻???몃젰???꾩슂?⑸땲??,
+    "ENFP-ISTP": "媛먯젙?쒗쁽 諛⑹떇怨??ㅼ슜???묎렐??李⑥씠濡??ㅽ빐媛 ?앷만 ???덉뒿?덈떎",
     "ENFJ-ISTP":
-      "따뜻한 감정 표현과 차분한 성향의 차이가 거리감을 만들 수 있습니다",
-    "ENTP-ISFJ": "혁신적 변화 추구와 안정 선호로 인해 갈등이 생길 수 있습니다",
-    "ENTJ-ISFJ": "목표 지향적 추진력과 안정 추구로 인한 충돌 가능성이 있습니다",
-    "ESFP-INTJ": "즉흥적 활력과 신중한 계획성이 서로 답답함을 느낄 수 있습니다",
+      "?곕쑜??媛먯젙 ?쒗쁽怨?李⑤텇???깊뼢??李⑥씠媛 嫄곕━媛먯쓣 留뚮뱾 ???덉뒿?덈떎",
+    "ENTP-ISFJ": "?곸떊??蹂??異붽뎄? ?덉젙 ?좏샇濡??명빐 媛덈벑???앷만 ???덉뒿?덈떎",
+    "ENTJ-ISFJ": "紐⑺몴 吏?μ쟻 異붿쭊?κ낵 ?덉젙 異붽뎄濡??명븳 異⑸룎 媛?μ꽦???덉뒿?덈떎",
+    "ESFP-INTJ": "利됲씎???쒕젰怨??좎쨷??怨꾪쉷?깆씠 ?쒕줈 ?듬떟?⑥쓣 ?먮굜 ???덉뒿?덈떎",
     "ESFJ-INTP":
-      "감정적 배려와 논리적 분석 방식의 차이로 오해가 생길 수 있습니다",
+      "媛먯젙??諛곕젮? ?쇰━??遺꾩꽍 諛⑹떇??李⑥씠濡??ㅽ빐媛 ?앷만 ???덉뒿?덈떎",
     "ESTP-INFJ":
-      "행동 중심적 성향과 신중한 성찰의 차이가 갈등을 만들 수 있습니다",
+      "?됰룞 以묒떖???깊뼢怨??좎쨷???깆같??李⑥씠媛 媛덈벑??留뚮뱾 ???덉뒿?덈떎",
     "ESTJ-INFP":
-      "체계적 통제와 개인적 자유 추구로 인한 마찰이 있을 수 있습니다",
-    "INFP-ESTJ": "개인적 가치와 객관적 효율성 추구의 차이로 충돌할 수 있습니다",
+      "泥닿퀎???듭젣? 媛쒖씤???먯쑀 異붽뎄濡??명븳 留덉같???덉쓣 ???덉뒿?덈떎",
+    "INFP-ESTJ": "媛쒖씤??媛移섏? 媛앷????⑥쑉??異붽뎄??李⑥씠濡?異⑸룎?????덉뒿?덈떎",
     "INFJ-ESTP":
-      "깊은 성찰과 즉흥적 행동의 차이가 서로를 이해하기 어렵게 만듭니다",
+      "源딆? ?깆같怨?利됲씎???됰룞??李⑥씠媛 ?쒕줈瑜??댄빐?섍린 ?대졄寃?留뚮벊?덈떎",
     "INTP-ESFJ":
-      "논리적 분석과 감정적 배려의 차이로 소통에 어려움이 있을 수 있습니다",
+      "?쇰━??遺꾩꽍怨?媛먯젙??諛곕젮??李⑥씠濡??뚰넻???대젮????덉쓣 ???덉뒿?덈떎",
     "INTJ-ESFP":
-      "장기적 계획과 순간적 즐거움 추구의 차이가 갈등을 만들 수 있습니다",
+      "?κ린??怨꾪쉷怨??쒓컙??利먭굅? 異붽뎄??李⑥씠媛 媛덈벑??留뚮뱾 ???덉뒿?덈떎",
     "ISFP-ENTJ":
-      "개인적 가치와 목표 달성 중심 사고의 차이로 마찰이 생길 수 있습니다",
+      "媛쒖씤??媛移섏? 紐⑺몴 ?ъ꽦 以묒떖 ?ш퀬??李⑥씠濡?留덉같???앷만 ???덉뒿?덈떎",
     "ISFJ-ENTP":
-      "안정 추구와 변화 선호의 차이로 인해 스트레스를 받을 수 있습니다",
+      "?덉젙 異붽뎄? 蹂???좏샇??李⑥씠濡??명빐 ?ㅽ듃?덉뒪瑜?諛쏆쓣 ???덉뒿?덈떎",
     "ISTP-ENFJ":
-      "독립적 성향과 사회적 관계 중시의 차이가 거리감을 만들 수 있습니다",
+      "?낅┰???깊뼢怨??ы쉶??愿怨?以묒떆??李⑥씠媛 嫄곕━媛먯쓣 留뚮뱾 ???덉뒿?덈떎",
     "ISTJ-ENFP":
-      "체계적 질서와 자유로운 창의성이 서로 제약으로 느껴질 수 있습니다",
+      "泥닿퀎??吏덉꽌? ?먯쑀濡쒖슫 李쎌쓽?깆씠 ?쒕줈 ?쒖빟?쇰줈 ?먭뺨吏????덉뒿?덈떎",
   };
 
   const key = `${currentType}-${targetType}`;
   return (
     reasons[key] ||
-    "서로 다른 성향으로 인해 이해하는 데 더 많은 노력이 필요할 수 있습니다"
+    "?쒕줈 ?ㅻⅨ ?깊뼢?쇰줈 ?명빐 ?댄빐?섎뒗 ????留롮? ?몃젰???꾩슂?????덉뒿?덈떎"
   );
 };
 
-// MBTI 유형별 이미지 파일 매핑 함수
+// MBTI ?좏삎蹂??대?吏 ?뚯씪 留ㅽ븨 ?⑥닔
 const getMbtiImage = (type: MbtiType): string => {
   const imageMap: Record<MbtiType, string> = {
-    ENFP: "/ENFP 아브라함.jpg",
-    ENFJ: "/ENJS 느헤미야.jpg",
-    ENTJ: "/ENTJ 드보라.jpg",
-    ENTP: "/ENFP 아브라함.jpg", // ENTP 파일이 없어서 임시로 ENFP 사용
-    ESFJ: "/ESFJ 막달라 마리아.jpg",
-    ESFP: "/ESFP 에스더.jpg",
-    ESTJ: "/ESTJ 모세.jpg",
-    ESTP: "/ESTP 베드로.jpg",
-    INFJ: "/INFJ 다니엘.jpg",
-    INFP: "/INFP 마리아.jpg",
-    INTJ: "/INTJ 바울.jpg",
-    INTP: "/INTP 솔로몬.jpg",
-    ISFJ: "/ISFJ 룻.jpg",
-    ISFP: "/ISFP 다윗.jpg",
-    ISTJ: "/ISTJ 요셉.jpg",
-    ISTP: "/ISTP 삼손.jpg",
+    ENFP: "/ENFP ?꾨툕?쇳븿.jpg",
+    ENFJ: "/ENJS ?먰뿤誘몄빞.jpg",
+    ENTJ: "/ENTJ ?쒕낫??jpg",
+    ENTP: "/ENFP ?꾨툕?쇳븿.jpg", // ENTP ?뚯씪???놁뼱???꾩떆濡?ENFP ?ъ슜
+    ESFJ: "/ESFJ 留됰떖??留덈━??jpg",
+    ESFP: "/ESFP ?먯뒪??jpg",
+    ESTJ: "/ESTJ 紐⑥꽭.jpg",
+    ESTP: "/ESTP 踰좊뱶濡?jpg",
+    INFJ: "/INFJ ?ㅻ땲??jpg",
+    INFP: "/INFP 留덈━??jpg",
+    INTJ: "/INTJ 諛붿슱.jpg",
+    INTP: "/INTP ?붾줈紐?jpg",
+    ISFJ: "/ISFJ 猷?jpg",
+    ISFP: "/ISFP ?ㅼ쐵.jpg",
+    ISTJ: "/ISTJ ?붿뀎.jpg",
+    ISTP: "/ISTP ?쇱넀.jpg",
   };
 
-  return imageMap[type] || "/ENFP 아브라함.jpg";
+  return imageMap[type] || "/ENFP ?꾨툕?쇳븿.jpg";
 };
 
 const ResultScreen: React.FC<ResultScreenProps> = ({
@@ -198,16 +203,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   onQuizGame,
   onStartTest,
 }) => {
+  const captureRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  // showOtherCharacters 상태 제거됨
-  const [showComments, setShowComments] = useState(false);
+  // showOtherCharacters ?곹깭 ?쒓굅??  const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(
     null
   );
 
-  // 퀴즈 게임 상태
+  // ?댁쫰 寃뚯엫 ?곹깭
   const [quizCharacter, setQuizCharacter] = useState<string>("");
   const [userGuess, setUserGuess] = useState("");
   const [quizResult, setQuizResult] = useState<"correct" | "wrong" | null>(
@@ -215,20 +220,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   );
   const [currentQuizType, setCurrentQuizType] = useState<string>("");
 
-  // 게임 점수 관련 상태
+  // 寃뚯엫 ?먯닔 愿???곹깭
   const [gameScore, setGameScore] = useState(0);
   const [totalGames, setTotalGames] = useState(0);
   const [showScoreShare, setShowScoreShare] = useState(false);
 
-  // 중복 방지를 위한 사용된 캐릭터 추적
+  // 以묐났 諛⑹?瑜??꾪븳 ?ъ슜??罹먮┃??異붿쟻
   const [usedCharacters, setUsedCharacters] = useState<string[]>([]);
 
-  // 이미지 모달 상태
+  // ?대?吏 紐⑤떖 ?곹깭
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState("");
   const [modalImageTitle, setModalImageTitle] = useState("");
 
-  // 모달 열릴 때 body 스크롤 막기
+  // 紐⑤떖 ?대┫ ??body ?ㅽ겕濡?留됯린
   useEffect(() => {
     if (showImageModal) {
       document.body.style.overflow = "hidden";
@@ -240,24 +245,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     };
   }, [showImageModal]);
 
-  // 랜덤 멘트 선택 (useMemo로 최적화)
+  // ?쒕뜡 硫섑듃 ?좏깮 (useMemo濡?理쒖쟻??
   const randomPrompt = useMemo(() => {
     const gamePromptMessages = [
-      "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
-      "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
-      "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
-      "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
-      "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
-      "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
-      "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
-      "🌟 귀여운 일러스트와 함께하는 힐링 타임!",
+      "?렜 移쒓뎄?ㅻ낫????留롮씠 留욎텧 ?먯떊 ?덈굹?? ?꾩쟾?대낫?몄슂!",
+      "?렓 洹?ъ슫 ?쇰윭?ㅽ듃瑜?醫뗭븘?쒕떎硫???寃뚯엫???깆씠?먯슂!",
+      "?룇 ?ㅻⅨ ?щ엺?ㅼ? 紐?留욎텛??臾몄젣???뱀떊? 留욎텧 ???덉쓣 嫄곗삁??,
+      "?뮕 ?덉뜲誘멸? 醫뗭? ?뱀떊?먭쾶 ??留욌뒗 ?щ??덈뒗 ?꾩쟾!",
+      "???쒓컙 ?먮떒?μ씠 ?곗뼱??遺꾨뱾??醫뗭븘?섎뒗 ?대?吏 寃뚯엫?댁뿉??,
+      "?삃 ?ㅽ듃?덉뒪 ?댁냼?⑹쑝濡쒕룄 理쒓퀬! 洹?ъ슫 罹먮┃?곕뱾??湲곕떎?ㅼ슂",
+      "?렞 移쒓뎄?ㅺ낵 ?먯닔 寃쎌웳?섎㈃ ???щ컡?댁슂!",
+      "?뙚 洹?ъ슫 ?쇰윭?ㅽ듃? ?④퍡?섎뒗 ?먮쭅 ???",
     ];
     return gamePromptMessages[
       Math.floor(Math.random() * gamePromptMessages.length)
     ];
   }, []);
 
-  // 미리보기용 랜덤 캐릭터 선택 (useMemo로 최적화)
+  // 誘몃━蹂닿린???쒕뜡 罹먮┃???좏깮 (useMemo濡?理쒖쟻??
   const previewCharacter = useMemo(() => {
     const allTypes = Object.keys(RESULTS) as (keyof typeof RESULTS)[];
     const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
@@ -268,7 +273,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     };
   }, []);
 
-  // 컴포넌트 마운트 시 게임 점수 불러오기
+  // 而댄룷?뚰듃 留덉슫????寃뚯엫 ?먯닔 遺덈윭?ㅺ린
   useEffect(() => {
     const savedScore = localStorage.getItem("quizGameScore");
     const savedTotal = localStorage.getItem("quizGameTotal");
@@ -279,15 +284,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   }, []);
 
-  // 퀴즈를 위한 랜덤 캐릭터 선택 (useCallback으로 최적화)
+  // ?댁쫰瑜??꾪븳 ?쒕뜡 罹먮┃???좏깮 (useCallback?쇰줈 理쒖쟻??
   const getRandomCharacter = useCallback(() => {
-    // 모든 캐릭터를 사용했다면 목록을 초기화
-    let availableCharacters = ALL_CHARACTERS.filter(
+    // 紐⑤뱺 罹먮┃?곕? ?ъ슜?덈떎硫?紐⑸줉??珥덇린??    let availableCharacters = ALL_CHARACTERS.filter(
       (type) => !usedCharacters.includes(type)
     );
 
     if (availableCharacters.length === 0) {
-      // 모든 캐릭터를 사용했으면 초기화하고 현재 캐릭터만 제외
+      // 紐⑤뱺 罹먮┃?곕? ?ъ슜?덉쑝硫?珥덇린?뷀븯怨??꾩옱 罹먮┃?곕쭔 ?쒖쇅
       setUsedCharacters([]);
       availableCharacters = ALL_CHARACTERS.filter(
         (type) => type !== currentQuizType
@@ -305,7 +309,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     setQuizResult(null);
   }, [usedCharacters, currentQuizType]);
 
-  // 모달로 이미지 크게 보기 함수 (useCallback으로 최적화)
+  // 紐⑤떖濡??대?吏 ?ш쾶 蹂닿린 ?⑥닔 (useCallback?쇰줈 理쒖쟻??
   const openImageInModal = useCallback(
     (imageSrc: string, characterName: string) => {
       setModalImageSrc(imageSrc);
@@ -315,7 +319,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     []
   );
 
-  // 모바일 최적화된 새창 이미지 보기 함수 (useCallback으로 최적화)
+  // 紐⑤컮??理쒖쟻?붾맂 ?덉갹 ?대?吏 蹂닿린 ?⑥닔 (useCallback?쇰줈 理쒖쟻??
   const openImageInNewWindow = useCallback(
     (imageSrc: string, characterName: string) => {
       openImageInModal(imageSrc, characterName);
@@ -327,7 +331,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <!DOCTYPE html>
         <html>
         <head>
-          <title>${characterName} - 성경인물 MBTI</title>
+          <title>${characterName} - ?깃꼍?몃Ъ MBTI</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             body {
@@ -428,12 +432,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </head>
         <body>
           <div class="container">
-            <button class="close-button" onclick="window.close()">×</button>
+            <button class="close-button" onclick="window.close()">횞</button>
             <img src="${window.location.origin}${imageSrc}" alt="${characterName}" />
             <h1>${characterName}</h1>
             <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-              🏠 결과 페이지로 돌아가기
-            </button>
+              ?룧 寃곌낵 ?섏씠吏濡??뚯븘媛湲?            </button>
           </div>
         </body>
         </html>
@@ -444,25 +447,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     [openImageInModal]
   );
 
-  // 가짜 댓글 데이터
-  const fakeComments = [
+  // 媛吏??볤? ?곗씠??  const fakeComments = [
     {
       id: 1,
-      user: "은혜님",
-      comment: "완전 저네요!! 대박 신기해요 ㅋㅋ",
+      user: "??쒕떂",
+      comment: "?꾩쟾 ??ㅼ슂!! ?諛??좉린?댁슂 ?뗣뀑",
       likes: 23,
     },
-    { id: 2, user: "믿음이", comment: "와 진짜 정확하다... 소름", likes: 18 },
+    { id: 2, user: "誘우쓬??, comment: "? 吏꾩쭨 ?뺥솗?섎떎... ?뚮쫫", likes: 18 },
     {
       id: 3,
-      user: "소망♡",
-      comment: "친구들이랑 다 해봤는데 다 맞아요!",
+      user: "?뚮쭩??,
+      comment: "移쒓뎄?ㅼ씠?????대뇬?붾뜲 ??留욎븘??",
       likes: 12,
     },
     {
       id: 4,
-      user: "평강",
-      comment: `${resultData?.character} 완전 멋져요!! 저도 닮고 싶어요`,
+      user: "?됯컯",
+      comment: `${resultData?.character} ?꾩쟾 硫뗭졇??! ?????퀬 ?띠뼱??,
       likes: 8,
     },
   ];
@@ -475,7 +477,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   if (error && !resultData?.image) {
     return (
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-red-100 w-full max-w-md mx-auto text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-4">오류 발생</h2>
+        <h2 className="text-xl font-semibold text-red-600 mb-4">?ㅻ쪟 諛쒖깮</h2>
         <p className="text-gray-600 mb-6 text-sm">{error}</p>
         <button
           onClick={onRestart}
@@ -488,13 +490,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     );
   }
 
-  // 쿠팡파트너스 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (수익 창출)
+  // 荑좏뙜?뚰듃?덉뒪 留곹겕瑜?癒쇱? ?닿퀬, 洹??ㅼ쓬??紐⑹쟻吏 URL???щ뒗 ?⑥닔 (?섏씡 李쎌텧)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
     try {
-      // 랜덤하게 쿠팡파트너스 링크 선택
+      // ?쒕뜡?섍쾶 荑좏뙜?뚰듃?덉뒪 留곹겕 ?좏깮
       const coupangPartnersUrl = getRandomCoupangUrl();
 
-      // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
+      // 1. 紐⑹쟻吏 URL??????뿉??癒쇱? ?닿린 (?ъ슜?먭? ?먰븯???섏씠吏)
       const targetWindow = window.open(
         targetUrl,
         "_blank",
@@ -502,43 +504,42 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       );
 
       if (!targetWindow) {
-        alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+        alert("?앹뾽??李⑤떒?섏뿀?듬땲?? ?앹뾽 李⑤떒???댁젣?댁＜?몄슂.");
         return;
       }
 
-      // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
+      // 2. ?꾩옱 ??뿉??荑좏뙜?뚰듃?덉뒪 留곹겕濡??대룞 (?섏씡 李쎌텧)
       setTimeout(() => {
         try {
           window.location.href = coupangPartnersUrl;
         } catch (error) {
-          console.error("쿠팡파트너스 링크 이동 오류:", error);
-          // 오류 발생 시 기본 페이지로 이동
+          console.error("荑좏뙜?뚰듃?덉뒪 留곹겕 ?대룞 ?ㅻ쪟:", error);
+          // ?ㅻ쪟 諛쒖깮 ??湲곕낯 ?섏씠吏濡??대룞
           window.location.href = "https://b-mbti.money-hotissue.com";
         }
-      }, 200); // 새 탭이 완전히 열린 후 현재 탭 이동
+      }, 200); // ????씠 ?꾩쟾???대┛ ???꾩옱 ???대룞
     } catch (error) {
-      console.error("openWithCoupangAd 함수 오류:", error);
-      // 오류 발생 시 기본적으로 새 탭에서만 열기
+      console.error("openWithCoupangAd ?⑥닔 ?ㅻ쪟:", error);
+      // ?ㅻ쪟 諛쒖깮 ??湲곕낯?곸쑝濡?????뿉?쒕쭔 ?닿린
       window.open(targetUrl, "_blank", windowOptions || "");
     }
   };
 
   const handleShare = async () => {
-    // 공유 URL 생성
+    // 怨듭쑀 URL ?앹꽦
     const shareUrl = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
 
-    // 링크 복사
+    // 留곹겕 蹂듭궗
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
 
-      // 복사 안내 표시
-      alert("링크가 복사되었습니다! 친구들과 공유해보세요 😊");
+      // 蹂듭궗 ?덈궡 ?쒖떆
+      alert("留곹겕媛 蹂듭궗?섏뿀?듬땲?? 移쒓뎄?ㅺ낵 怨듭쑀?대낫?몄슂 ?삃");
 
-      // 3초 후 복사 상태 초기화
-      setTimeout(() => setCopied(false), 3000);
+      // 3珥???蹂듭궗 ?곹깭 珥덇린??      setTimeout(() => setCopied(false), 3000);
     } catch (err) {
-      // clipboard API 실패 시 대체 방법
+      // clipboard API ?ㅽ뙣 ???泥?諛⑸쾿
       const textArea = document.createElement("textarea");
       textArea.value = shareUrl;
       document.body.appendChild(textArea);
@@ -546,26 +547,26 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       try {
         document.execCommand("copy");
         setCopied(true);
-        alert("링크가 복사되었습니다! 친구들과 공유해보세요 😊");
+        alert("留곹겕媛 蹂듭궗?섏뿀?듬땲?? 移쒓뎄?ㅺ낵 怨듭쑀?대낫?몄슂 ?삃");
         setTimeout(() => setCopied(false), 3000);
       } catch (err) {
-        alert("링크 복사에 실패했습니다.");
+        alert("留곹겕 蹂듭궗???ㅽ뙣?덉뒿?덈떎.");
       }
       document.body.removeChild(textArea);
     }
 
-    // 쿠팡 링크 열기
+    // 荑좏뙜 留곹겕 ?닿린
     window.open(getRandomCoupangUrl(), "_blank");
   };
 
   const handleShareOld = () => {
-    // 새창에서 공유 옵션을 보여주는 함수
-    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${
+    // ?덉갹?먯꽌 怨듭쑀 ?듭뀡??蹂댁뿬二쇰뒗 ?⑥닔
+    const shareText = `?솋 ?깃꼍?몃Ъ MBTI ?뚯뒪??寃곌낵 ?솋\n\n???'${
       resultData?.character
-    }(${resultType})' 유형이에요!\n\n${resultData?.description.slice(
+    }(${resultType})' ?좏삎?댁뿉??\n\n${resultData?.description.slice(
       0,
       50
-    )}...\n\n여러분도 테스트해보세요!`;
+    )}...\n\n?щ윭遺꾨룄 ?뚯뒪?명빐蹂댁꽭??`;
     const shareUrl = "https://gowith153.com";
 
     const newWindow = window.open(
@@ -579,7 +580,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>공유하기</title>
+          <title>怨듭쑀?섍린</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             body { 
@@ -644,31 +645,30 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         </head>
         <body>
           <div class="container">
-            <h1>📤 공유하기</h1>
+            <h1>?뱾 怨듭쑀?섍린</h1>
             
             <button class="share-button copy" onclick="copyLink()">
-              🔗 링크 복사
+              ?뵕 留곹겕 蹂듭궗
             </button>
             
             <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-              🏠 결과 페이지로 돌아가기
-            </button>
+              ?룧 寃곌낵 ?섏씠吏濡??뚯븘媛湲?            </button>
           </div>
           
           <script>
             function copyLink() {
               const fullText = \`${shareText}\\n${shareUrl}\`;
               navigator.clipboard.writeText(fullText).then(() => {
-                alert('📋 링크가 복사되었습니다!');
+                alert('?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??');
               }).catch(() => {
-                // 복사 실패 시 대체 방법
+                // 蹂듭궗 ?ㅽ뙣 ???泥?諛⑸쾿
                 const textArea = document.createElement('textarea');
                 textArea.value = fullText;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert('📋 링크가 복사되었습니다!');
+                alert('?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??');
               });
             }
           </script>
@@ -680,12 +680,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   const handleSNSShare = (platform: string) => {
-    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${
+    const shareText = `?솋 ?깃꼍?몃Ъ MBTI ?뚯뒪??寃곌낵 ?솋\n\n???'${
       resultData?.character
-    }(${resultType})' 유형이에요!\n\n${resultData?.description.slice(
+    }(${resultType})' ?좏삎?댁뿉??\n\n${resultData?.description.slice(
       0,
       50
-    )}...\n\n여러분도 테스트해보세요!`;
+    )}...\n\n?щ윭遺꾨룄 ?뚯뒪?명빐蹂댁꽭??`;
     const shareUrl = "https://b-mbti.money-hotissue.com";
 
     if (platform === "copy") {
@@ -695,11 +695,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
           setShowShareModal(false);
-          alert("📋 링크가 복사되었습니다!");
+          alert("?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??");
         })
         .catch(() => {
           alert(
-            "📱 다음 내용을 수동으로 복사해주세요:\n\n" +
+            "?벑 ?ㅼ쓬 ?댁슜???섎룞?쇰줈 蹂듭궗?댁＜?몄슂:\n\n" +
               shareText +
               "\n\n" +
               shareUrl
@@ -709,28 +709,28 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
-  // 게임 점수 계산 함수
+  // 寃뚯엫 ?먯닔 怨꾩궛 ?⑥닔
   const calculateGameScore = () => {
     if (totalGames === 0) return 0;
     return Math.round((gameScore / totalGames) * 100);
   };
 
-  // 게임 점수 공유 함수
+  // 寃뚯엫 ?먯닔 怨듭쑀 ?⑥닔
   const handleGameScoreShare = (platform: string) => {
     const scorePercentage = calculateGameScore();
-    const shareText = `🎮 성경인물 맞히기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
+    const shareText = `?렜 ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫 寃곌낵 ?렜\n\n?뺣떟瑜? ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) ?좏삎???? 寃⑤쨪蹂댁꽭?? ?뮞\n\n移쒓뎄?ㅻ룄 ?꾩쟾?대낫?몄슂!`;
     const shareUrl = "https://b-mbti.money-hotissue.com/game";
 
     if (platform === "copy") {
       navigator.clipboard
         .writeText(`${shareText}\n${shareUrl}`)
         .then(() => {
-          alert("🎮 게임 결과가 클립보드에 복사되었습니다!");
+          alert("?렜 寃뚯엫 寃곌낵媛 ?대┰蹂대뱶??蹂듭궗?섏뿀?듬땲??");
           setShowScoreShare(false);
         })
         .catch(() => {
           alert(
-            "📱 다음 내용을 수동으로 복사해주세요:\n\n" +
+            "?벑 ?ㅼ쓬 ?댁슜???섎룞?쇰줈 蹂듭궗?댁＜?몄슂:\n\n" +
               shareText +
               "\n\n" +
               shareUrl
@@ -740,84 +740,131 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     }
   };
 
+  const waitForImagesToLoad = useCallback(async (element: HTMLElement) => {
+    const images = Array.from(element.querySelectorAll("img"));
+
+    await Promise.all(
+      images.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              resolve();
+              return;
+            }
+
+            const handleLoad = () => {
+              img.removeEventListener("load", handleLoad);
+              img.removeEventListener("error", handleLoad);
+              resolve();
+            };
+
+            img.addEventListener("load", handleLoad);
+            img.addEventListener("error", handleLoad);
+          })
+      )
+    );
+  }, []);
+
   const handleSaveAsImage = async () => {
     try {
-      // 이미지로 저장할 부분만 선택
-      const captureElement = document.querySelector(".image-capture-area");
+      const captureElement = captureRef.current;
       if (!captureElement) {
-        alert("결과 화면을 찾을 수 없습니다.");
+        alert("\uacb0\uacfc \ud654\uba74\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.");
         return;
       }
 
-      // 이미지 캡처 처리 함수
       const processCapture = async () => {
         try {
-          // @ts-ignore - html2canvas는 전역 변수로 로드됨
-          const canvas = await (window as any).html2canvas(captureElement, {
-            backgroundColor: "#ffffff",
-            scale: 2,
-            useCORS: false,
-            allowTaint: false,
-            foreignObjectRendering: true,
-            logging: false,
-            ignoreElements: (element: HTMLElement) => {
-              return (
-                element.tagName === "IFRAME" ||
-                element.classList.contains("ad-banner") ||
-                (element.tagName === "IMG" &&
-                  (element as HTMLImageElement).src &&
-                  !(element as HTMLImageElement).src.startsWith(
-                    window.location.origin
-                  ))
-              );
-            },
+          const hiddenElements = Array.from(
+            captureElement.querySelectorAll("[data-hide-on-capture]")
+          ) as HTMLElement[];
+          const previousDisplay = hiddenElements.map(
+            (element) => element.style.display
+          );
+
+          hiddenElements.forEach((element) => {
+            element.style.display = "none";
           });
 
-          // 캔버스를 이미지로 변환
-          const dataURL = canvas.toDataURL("image/png", 1.0);
-          const fileName = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
+          let canvas: HTMLCanvasElement | null = null;
 
-          // 모바일 네이티브 앱인 경우
+          try {
+            await waitForImagesToLoad(captureElement);
+
+            const rect = captureElement.getBoundingClientRect();
+
+            // @ts-ignore - html2canvas? ?? ??? ???
+            canvas = await (window as any).html2canvas(captureElement, {
+              backgroundColor: "#ffffff",
+              scale: 2,
+              useCORS: true,
+              allowTaint: false,
+              foreignObjectRendering: true,
+              logging: false,
+              scrollX: 0,
+              scrollY: 0,
+              width: rect.width,
+              height: captureElement.scrollHeight,
+              windowWidth: rect.width,
+              windowHeight: captureElement.scrollHeight,
+              ignoreElements: (element: HTMLElement) => {
+                return (
+                  element.tagName === "IFRAME" ||
+                  element.classList.contains("ad-banner") ||
+                  (element.tagName === "IMG" &&
+                    (element as HTMLImageElement).src &&
+                    !(element as HTMLImageElement).src.startsWith(
+                      window.location.origin
+                    ))
+                );
+              },
+            });
+          } finally {
+            hiddenElements.forEach((element, index) => {
+              element.style.display = previousDisplay[index];
+            });
+          }
+
+          if (!canvas) {
+            throw new Error("\uadf8\ub9bc \uce94\ubc84\uc2a4 \uc0dd\uc131\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4.");
+          }
+
+          const dataURL = canvas.toDataURL("image/png", 1.0);
+          const fileName = `\uc131\uacbd\uc778\ubb3c-MBTI-${resultType}-${resultData?.character}.png`;
+
           if (Capacitor.isNativePlatform()) {
             try {
-              // base64 데이터에서 prefix 제거
               const base64Data = dataURL.split(",")[1];
 
-              // 파일 저장 (갤러리에 저장하려면 Share API 사용)
               await Share.share({
-                title: "성경인물 MBTI 결과",
-                text: `나의 성경인물은 ${resultData?.character}입니다!`,
+                title: "\uc131\uacbd\uc778\ubb3c MBTI \uacb0\uacfc",
+                text: `\ub2f9\uc2e0\uc758 \uc131\uacbd\uc778\ubb3c\uc740 ${resultData?.character}\uc785\ub2c8\ub2e4`,
                 url: dataURL,
-                dialogTitle: "이미지 저장 위치 선택",
+                dialogTitle: "\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc704\uce58 \uc120\ud0dd",
               });
 
-              // 쿠팡 링크 열기
               setTimeout(() => {
                 window.open(getRandomCoupangUrl(), "_blank");
               }, 500);
             } catch (shareError) {
-              console.error("Share 실패, Filesystem 시도:", shareError);
-              // Share 실패 시 Filesystem으로 직접 저장 시도
+              console.error("Share ??, Filesystem ??:", shareError);
               try {
                 const base64Data = dataURL.split(",")[1];
-                const savedFile = await Filesystem.writeFile({
+                await Filesystem.writeFile({
                   path: fileName,
                   data: base64Data,
                   directory: Directory.Documents,
                 });
 
-                alert(
-                  `📸 이미지가 저장되었습니다!\n저장 위치: 문서 폴더\n\n파일 관리자에서 확인하실 수 있습니다.`
-                );
+                alert("\uc774\ubbf8\uc9c0\uac00 \uc800\uc7a5\ub418\uc5c8\uc2b5\ub2c8\ub2e4!\n\uc800\uc7a5\uc704\uce58: \ubb38\uc11c \ud3f4\ub354\n\n\ud30c\uc77c \uad00\ub9ac\uc790\ub85c \ud655\uc778\ud574\ubcf4\uc138\uc694.");
 
                 window.open(getRandomCoupangUrl(), "_blank");
               } catch (fsError) {
-                console.error("Filesystem 저장 실패:", fsError);
-                alert("이미지 저장에 실패했습니다.\n스크린샷을 이용해주세요.");
+                console.error("Filesystem ?? ??:", fsError);
+                alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4.\n\uc2a4\ud06c\ub9b0\uc0f7\uc744 \uc774\uc6a9\ud574\uc8fc\uc138\uc694.");
               }
             }
           } else {
-            // 웹 브라우저인 경우 (기존 방식)
             const link = document.createElement("a");
             link.download = fileName;
             link.href = dataURL;
@@ -827,36 +874,30 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
             setTimeout(() => {
               window.open(getRandomCoupangUrl(), "_blank");
-              alert(
-                "📸 이미지가 저장되었습니다!\n\n💡 저장 위치:\n- Android: 다운로드 폴더\n- iPhone: 사진 앱\n- PC: 다운로드 폴더"
-              );
+              alert("\uc774\ubbf8\uc9c0\uac00 \uc800\uc7a5\ub418\uc5c8\uc2b5\ub2c8\ub2e4!\n\n\uc800\uc7a5\uc704\uce58:\n- Android: \ub2e4\uc6b4\ub85c\ub4dc \ud3f4\ub354\n- iPhone: \uc0ac\uc9c4 \uc571\n- PC: \ub2e4\uc6b4\ub85c\ub4dc \ud3f4\ub354");
             }, 500);
           }
         } catch (error) {
-          console.error("이미지 저장 실패:", error);
-          alert("이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.");
+          console.error("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc2e4\ud328:", error);
+          alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \uc2a4\ud06c\ub9b0\uc0f7\uc744 \uc774\uc6a9\ud574\uc8fc\uc138\uc694.");
         }
       };
 
-      // html2canvas는 index.html에서 이미 로드됨
       if ((window as any).html2canvas) {
         await processCapture();
       } else {
-        alert(
-          "이미지 저장 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해주세요."
-        );
+        alert("\uc774\ubbf8\uc9c0 \ucea1\ucc3d \ub77c\uc774\ube0c\ub7ec\ub9ac\ub97c \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud574\uc8fc\uc138\uc694.");
       }
     } catch (error) {
-      console.error("이미지 저장 중 오류:", error);
-      alert("이미지 저장 중 오류가 발생했습니다.");
+      console.error("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc624\ub958:", error);
+      alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.");
     }
   };
 
-  // handleViewOtherCharacters 함수 제거됨
-
+  // handleViewOtherCharacters ?⑥닔 ?쒓굅??
   const handleLeaveComment = () => {
     setShowComments(true);
-    // 댓글 작성 시에도 쿠팡 파트너스 수익 창출
+    // ?볤? ?묒꽦 ?쒖뿉??荑좏뙜 ?뚰듃?덉뒪 ?섏씡 李쎌텧
     setTimeout(() => {
       window.open(getRandomCoupangUrl(), "_blank");
     }, 1000);
@@ -864,7 +905,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   const handleSubmitComment = () => {
     if (comment.trim()) {
-      alert("💬 댓글이 등록되었습니다! (실제 서비스에서는 DB에 저장됩니다)");
+      alert("?뮠 ?볤????깅줉?섏뿀?듬땲?? (?ㅼ젣 ?쒕퉬?ㅼ뿉?쒕뒗 DB????λ맗?덈떎)");
       setComment("");
       setShowComments(false);
     }
@@ -879,7 +920,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   const selectCharacterFromCandidates = (character: string) => {
-    if (quizResult !== null) return; // 이미 답안 제출된 경우 선택 불가
+    if (quizResult !== null) return; // ?대? ?듭븞 ?쒖텧??寃쎌슦 ?좏깮 遺덇?
     setUserGuess(character);
   };
 
@@ -888,30 +929,30 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden"
       style={{ paddingBottom: "200px" }}
     >
-      {/* 이미지 캡처 영역 시작 */}
-      <div className="image-capture-area">
-        {/* 결과 헤더 */}
+      {/* ?대?吏 罹≪쿂 ?곸뿭 ?쒖옉 */}
+      <div className="image-capture-area" ref={captureRef}>
+        {/* 寃곌낵 ?ㅻ뜑 */}
         <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-          {/* 성경인물 정보 - 텍스트(왼쪽) / 이미지(오른쪽) 배치 */}
+          {/* ?깃꼍?몃Ъ ?뺣낫 - ?띿뒪???쇱そ) / ?대?吏(?ㅻⅨ履? 諛곗튂 */}
           <div className="flex items-center space-x-6">
-            {/* 왼쪽: 텍스트 정보 */}
+            {/* ?쇱そ: ?띿뒪???뺣낫 */}
             <div className="flex-1">
-              {/* 상단: 당신과 닮은 성경인물 */}
+              {/* ?곷떒: ?뱀떊怨???? ?깃꼍?몃Ъ */}
               <div className="mb-6">
                 <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium inline-block">
-                  당신과 닮은 성경인물
+                  ?뱀떊怨???? ?깃꼍?몃Ъ
                 </div>
               </div>
 
-              {/* 중간: 이름 */}
+              {/* 以묎컙: ?대쫫 */}
               <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center justify-center">
-                  <span className="text-xl md:text-2xl mr-2">✨</span>
+                  <span className="text-xl md:text-2xl mr-2">??/span>
                   {resultData.character}
                 </h1>
               </div>
 
-              {/* 하단: MBTI 유형 */}
+              {/* ?섎떒: MBTI ?좏삎 */}
               <div>
                 <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold inline-block">
                   {resultType}
@@ -919,7 +960,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </div>
             </div>
 
-            {/* 오른쪽: 이미지 */}
+            {/* ?ㅻⅨ履? ?대?吏 */}
             <div className="flex-shrink-0">
               {resultData.image ? (
                 <div className="space-y-2">
@@ -946,7 +987,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     </div>
                   </div>
 
-                  {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
+                  {/* ?ш쾶蹂닿린 踰꾪듉 - ?대?吏 ?섎떒????긽 ?쒖떆 */}
                   <button
                     onClick={() => {
                       if (resultData.image) {
@@ -958,26 +999,25 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     }}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
                   >
-                    <span>🔍</span>
-                    <span>크게보기</span>
+                    <span>?뵇</span>
+                    <span>?ш쾶蹂닿린</span>
                   </button>
                 </div>
               ) : (
                 <div className="w-48 h-48 md:w-56 md:h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
-                  <p className="text-gray-500 text-sm">이미지 로딩중...</p>
+                  <p className="text-gray-500 text-sm">?대?吏 濡쒕뵫以?..</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* 설명 텍스트 - 가독성 개선 */}
+        {/* ?ㅻ챸 ?띿뒪??- 媛?낆꽦 媛쒖꽑 */}
         <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
           <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
             <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent mr-2">
-              ✨
-            </span>
-            성격 특징
+              ??            </span>
+            ?깃꺽 ?뱀쭠
           </h3>
           <div className="space-y-3">
             {PERSONALITY_TRAITS[resultType]?.map((trait, index) => (
@@ -990,7 +1030,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 </p>
               </div>
             )) ||
-              // Fallback - 기존 로직
+              // Fallback - 湲곗〈 濡쒖쭅
               (() => {
                 const sentences = resultData.description
                   .split(".")
@@ -998,11 +1038,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 const targetSentences = sentences.slice(0, 5);
                 while (targetSentences.length < 5 && sentences.length > 0) {
                   const additionalTraits = [
-                    "깊은 사색과 성찰을 통해 지혜를 얻습니다",
-                    "다른 사람들에게 선한 영향력을 끼칩니다",
-                    "어려운 상황에서도 희망을 잃지 않습니다",
-                    "진실한 마음으로 관계를 맺습니다",
-                    "하나님의 뜻을 구하며 살아갑니다",
+                    "源딆? ?ъ깋怨??깆같???듯빐 吏?쒕? ?살뒿?덈떎",
+                    "?ㅻⅨ ?щ엺?ㅼ뿉寃??좏븳 ?곹뼢?μ쓣 ?쇱묩?덈떎",
+                    "?대젮???곹솴?먯꽌???щ쭩???껋? ?딆뒿?덈떎",
+                    "吏꾩떎??留덉쓬?쇰줈 愿怨꾨? 留븐뒿?덈떎",
+                    "?섎굹?섏쓽 ?살쓣 援ы븯硫??댁븘媛묐땲??,
                   ];
                   const additionalIndex = targetSentences.length;
                   if (additionalIndex < additionalTraits.length) {
@@ -1027,49 +1067,48 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
         </div>
 
-        {/* 성경 구절 - 간소화된 디자인 */}
+        {/* ?깃꼍 援ъ젅 - 媛꾩냼?붾맂 ?붿옄??*/}
         <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6 text-center">
           <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center justify-center">
-            📖 대표 성경구절 ({resultData.verse})
+            ?뱰 ????깃꼍援ъ젅 ({resultData.verse})
           </h4>
           <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
             "{resultData.verseText}"
           </blockquote>
         </div>
 
-        {/* 액션 버튼들 - MZ 스타일 */}
+        {/* ?≪뀡 踰꾪듉??- MZ ?ㅽ???*/}
         <div className="space-y-3">
-          {/* 메인 액션 버튼들 - 세로 배치 */}
+          {/* 硫붿씤 ?≪뀡 踰꾪듉??- ?몃줈 諛곗튂 */}
           <div className="space-y-3">
             <button
               onClick={handleSaveAsImage}
               className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
             >
-              📸 이미지 저장
-            </button>
+              ?벝 ?대?吏 ???            </button>
             <button
               onClick={handleShare}
               className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
               disabled={copied}
             >
-              {copied ? "📋 복사됨!" : "🔗 공유하기"}
+              {copied ? "?뱥 蹂듭궗??" : "?뵕 怨듭쑀?섍린"}
             </button>
           </div>
         </div>
 
-        {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
+        {/* ?댁슱由щ뒗/?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 ?뱀뀡 */}
         <div className="mb-6 space-y-4 mt-6">
-          {/* 어울리는 성격 유형 */}
+          {/* ?댁슱由щ뒗 ?깃꺽 ?좏삎 */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-3 md:p-4 shadow-sm border border-green-200">
             {(() => {
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
                 <div className="space-y-3 md:space-y-4">
-                  {/* 1. 제목과 MBTI 유형 */}
+                  {/* 1. ?쒕ぉ怨?MBTI ?좏삎 */}
                   <div className="flex items-center gap-2 flex-wrap justify-center">
                     <h3 className="text-xs md:text-sm font-bold text-green-800">
-                      어울리는 성격 유형 :
+                      ?댁슱由щ뒗 ?깃꺽 ?좏삎 :
                     </h3>
                     <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
                       {compatibleType}
@@ -1078,11 +1117,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       {RESULTS[compatibleType].character}
                     </span>
                     <span className="text-green-600 text-sm md:text-base">
-                      💚
+                      ?뮍
                     </span>
                   </div>
 
-                  {/* 2. 이미지 */}
+                  {/* 2. ?대?吏 */}
                   <div className="flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img
@@ -1096,14 +1135,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           );
                         }}
                       />
-                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
+                      {/* ?대?吏 ?덉뿉 ?ш쾶蹂닿린 踰꾪듉 - ??긽 ?쒖떆 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        🔍 크게보기
+                        ?뵇 ?ш쾶蹂닿린
                       </div>
                     </div>
                   </div>
 
-                  {/* 3. 설명 */}
+                  {/* 3. ?ㅻ챸 */}
                   <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
                     <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
                       {getCompatibilityReason(resultType, compatibleType)}
@@ -1114,17 +1153,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             })()}
           </div>
 
-          {/* 어울리지 않는 성격 유형 */}
+          {/* ?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 */}
           <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-3 md:p-4 shadow-sm border border-red-200">
             {(() => {
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
                 <div className="space-y-3 md:space-y-4">
-                  {/* 1. 제목과 MBTI 유형 */}
+                  {/* 1. ?쒕ぉ怨?MBTI ?좏삎 */}
                   <div className="flex items-center gap-2 flex-wrap justify-center">
                     <h3 className="text-xs md:text-sm font-bold text-red-800">
-                      주의해야 할 성격 유형 :
+                      二쇱쓽?댁빞 ???깃꺽 ?좏삎 :
                     </h3>
                     <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
                       {incompatibleType}
@@ -1133,11 +1172,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       {RESULTS[incompatibleType].character}
                     </span>
                     <span className="text-red-600 text-sm md:text-base">
-                      💔
+                      ?뮅
                     </span>
                   </div>
 
-                  {/* 2. 이미지 */}
+                  {/* 2. ?대?吏 */}
                   <div className="flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
                       <img
@@ -1151,14 +1190,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                           );
                         }}
                       />
-                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
+                      {/* ?대?吏 ?덉뿉 ?ш쾶蹂닿린 踰꾪듉 - ??긽 ?쒖떆 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        🔍 크게보기
+                        ?뵇 ?ш쾶蹂닿린
                       </div>
                     </div>
                   </div>
 
-                  {/* 3. 설명 */}
+                  {/* 3. ?ㅻ챸 */}
                   <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
                     <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
                       {getIncompatibilityReason(resultType, incompatibleType)}
@@ -1171,21 +1210,21 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
           <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              💡 MBTI 기반 궁합 분석 (개인차 있음)
+              ?뮕 MBTI 湲곕컲 沅곹빀 遺꾩꽍 (媛쒖씤李??덉쓬)
             </p>
           </div>
         </div>
       </div>{" "}
-      {/* image-capture-area 끝 */}
-      {/* 나머지 테스트 추천 섹션 */}
+      {/* image-capture-area ??*/}
+      {/* ?섎㉧吏 ?뚯뒪??異붿쿇 ?뱀뀡 */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
         <div className="text-center">
           <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-            <span className="mr-2">🔥</span>
-            다른 테스트도 해보실래요?
+            <span className="mr-2">?뵦</span>
+            ?ㅻⅨ ?뚯뒪?몃룄 ?대낫?ㅻ옒??
           </h3>
           <p className="text-sm text-gray-600 mb-3">
-            더 정확한 분석을 위해 추가 테스트 해보세요! 🎯
+            ???뺥솗??遺꾩꽍???꾪빐 異붽? ?뚯뒪???대낫?몄슂! ?렞
           </p>
 
           <div className="grid grid-cols-1 gap-3">
@@ -1206,11 +1245,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   onClick={() => {
                     const versionNum = parseInt(versionKey);
                     if (onStartTest) {
-                      // 앱 내부에서 상태 변경
-                      onStartTest(versionNum);
+                      // ???대??먯꽌 ?곹깭 蹂寃?                      onStartTest(versionNum);
                     } else {
-                      // 웹에서는 URL 변경
-                      const testUrls = {
+                      // ?뱀뿉?쒕뒗 URL 蹂寃?                      const testUrls = {
                         1: "https://b-mbti.money-hotissue.com/test1",
                         2: "https://b-mbti.money-hotissue.com/test2",
                         3: "https://b-mbti.money-hotissue.com/test3",
@@ -1238,11 +1275,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                         }`}
                       >
                         {parseInt(versionKey) === 1 &&
-                          "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
+                          "?뮡 ?덈같? 湲곕룄瑜?以묒슂?섍쾶 ?앷컖?섎뒗 遺꾨뱾?먭쾶 異붿쿇"}
                         {parseInt(versionKey) === 2 &&
-                          "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
+                          "?쭬 ?좎븰 怨좊???????듭쓣 李얘퀬 ?띠? 遺꾨뱾?먭쾶 異붿쿇"}
                         {parseInt(versionKey) === 3 &&
-                          "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
+                          "???ㅼ젣 ?앺솢?먯꽌 ?좎븰???ㅼ쿇?섎뒗 遺꾨뱾?먭쾶 異붿쿇"}
                       </div>
                     </div>
                     <div className="w-full">
@@ -1255,7 +1292,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                             : "bg-blue-500 text-white"
                         }`}
                       >
-                        시작!
+                        ?쒖옉!
                       </span>
                     </div>
                   </div>
@@ -1264,59 +1301,56 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
         </div>
       </div>
-      {/* 액션 버튼들을 감싸는 컨테이너 */}
+      {/* ?≪뀡 踰꾪듉?ㅼ쓣 媛먯떥??而⑦뀒?대꼫 */}
       <div className="space-y-3 md:space-y-4">
-        {/* 성경인물 맞히기 게임 - 참여 유도 문구로 변경 */}
+        {/* ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫 - 李몄뿬 ?좊룄 臾멸뎄濡?蹂寃?*/}
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
           <div className="text-center">
             <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
-              <span className="mr-2">🖼️</span>
-              성경인물 맞히기 게임!
+              <span className="mr-2">?뼹截?/span>
+              ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫!
             </h3>
             <p className="text-xs md:text-sm text-indigo-600 mb-3">
-              이미지를 보고 누구인지 맞춰보세요 ✨
-            </p>
+              ?대?吏瑜?蹂닿퀬 ?꾧뎄?몄? 留욎떠蹂댁꽭????            </p>
 
-            {/* 문제 예시 */}
+            {/* 臾몄젣 ?덉떆 */}
             <div className="mb-4 p-3 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl border border-indigo-200">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
                   <img
-                    src="/ISFP 다윗.jpg"
-                    alt="다윗"
+                    src="/ISFP ?ㅼ쐵.jpg"
+                    alt="?ㅼ쐵"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = "/ENFP 아브라함.jpg"; // 기본 이미지로 대체
-                    }}
+                      target.src = "/ENFP ?꾨툕?쇳븿.jpg"; // 湲곕낯 ?대?吏濡??泥?                    }}
                   />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
+                  <div className="text-xs text-gray-600 mb-1">臾몄젣 ?덉떆:</div>
                   <div className="text-sm font-medium text-gray-800">
-                    이 사람은 누구일까요?
+                    ???щ엺? ?꾧뎄?쇨퉴??
                   </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-1">
                 <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  다윗
+                  ?ㅼ쐵
                 </div>
                 <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  모세
+                  紐⑥꽭
                 </div>
                 <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  아브라함
+                  ?꾨툕?쇳븿
                 </div>
                 <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  솔로몬
-                </div>
+                  ?붾줈紐?                </div>
               </div>
             </div>
 
             <button
               onClick={() => {
-                // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
+                // 寃곌낵 ?뺣낫瑜?localStorage???꾩떆 ???(?뚯븘媛湲?湲곕뒫??
                 localStorage.setItem(
                   "tempResult",
                   JSON.stringify({
@@ -1326,45 +1360,45 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                   })
                 );
 
-                // 앱 내부에서는 onQuizGame 콜백 사용
+                // ???대??먯꽌??onQuizGame 肄쒕갚 ?ъ슜
                 if (onQuizGame) {
                   onQuizGame();
                 } else {
-                  // 웹에서는 기존 방식 사용
+                  // ?뱀뿉?쒕뒗 湲곗〈 諛⑹떇 ?ъ슜
                   openWithCoupangAd("/game");
                 }
               }}
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
             >
-              🖼️ 게임 시작하기
+              ?뼹截?寃뚯엫 ?쒖옉?섍린
             </button>
 
-            {/* 게임 점수 표시 (게임을 한 번이라도 했을 때만 표시) */}
+            {/* 寃뚯엫 ?먯닔 ?쒖떆 (寃뚯엫????踰덉씠?쇰룄 ?덉쓣 ?뚮쭔 ?쒖떆) */}
             {totalGames > 0 && (
               <div className="mt-3 md:mt-4 p-2 md:p-3 bg-white/80 rounded-xl border border-indigo-200">
                 <div className="flex items-center justify-between mb-1 md:mb-2">
                   <span className="text-xs md:text-sm font-semibold text-indigo-800">
-                    🏆 내 게임 기록
+                    ?룇 ??寃뚯엫 湲곕줉
                   </span>
                   <button
                     onClick={() => setShowScoreShare(true)}
                     className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
                   >
-                    📤 공유
+                    ?뱾 怨듭쑀
                   </button>
                 </div>
                 <div className="text-center">
                   <div className="text-base md:text-lg font-bold text-indigo-700">
-                    정답률: {calculateGameScore()}%
+                    ?뺣떟瑜? {calculateGameScore()}%
                   </div>
                   <div className="text-xs text-gray-600">
-                    ({gameScore}/{totalGames} 정답)
+                    ({gameScore}/{totalGames} ?뺣떟)
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 랜덤 게임 참여 유도 멘트 */}
+            {/* ?쒕뜡 寃뚯엫 李몄뿬 ?좊룄 硫섑듃 */}
             <div className="mt-2 md:mt-3 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
               <p className="text-xs text-gray-600 text-center leading-relaxed">
                 {randomPrompt}
@@ -1373,17 +1407,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           </div>
         </div>
 
-        {/* 다시 테스트 버튼 */}
+        {/* ?ㅼ떆 ?뚯뒪??踰꾪듉 */}
         <button
           onClick={() => {
-            // completedVersion이 있으면 시작 페이지로 버전 정보와 함께 이동
+            // completedVersion???덉쑝硫??쒖옉 ?섏씠吏濡?踰꾩쟾 ?뺣낫? ?④퍡 ?대룞
             if (completedVersion) {
               openWithCoupangAd(
                 `https://b-mbti.money-hotissue.com/?version=${completedVersion}`
               );
             } else {
               onRestart();
-              // 다시 테스트 시에도 쿠팡 파트너스 수익 창출
+              // ?ㅼ떆 ?뚯뒪???쒖뿉??荑좏뙜 ?뚰듃?덉뒪 ?섏씡 李쎌텧
               setTimeout(() => {
                 window.open(getRandomCoupangUrl(), "_blank");
               }, 1000);
@@ -1391,79 +1425,76 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           }}
           className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
         >
-          🔁 다시 테스트하기
-        </button>
+          ?봺 ?ㅼ떆 ?뚯뒪?명븯湲?        </button>
 
-        {/* 후기 남기기 */}
+        {/* ?꾧린 ?④린湲?*/}
         <button
           onClick={handleLeaveComment}
           className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm md:text-base"
         >
-          💬 후기 남기기
-        </button>
+          ?뮠 ?꾧린 ?④린湲?        </button>
       </div>
-      {/* SNS 공유 모달 */}
+      {/* SNS 怨듭쑀 紐⑤떖 */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
             <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">
-              📤 결과 공유하기
+              ?뱾 寃곌낵 怨듭쑀?섍린
             </h3>
             <button
               onClick={() => handleSNSShare("copy")}
               className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base"
             >
-              📋 링크 복사
+              ?뱥 留곹겕 蹂듭궗
             </button>
             <button
               onClick={() => setShowShareModal(false)}
               className="w-full p-3 md:p-4 text-gray-500 text-sm md:text-base"
             >
-              취소
+              痍⑥냼
             </button>
           </div>
         </div>
       )}
-      {/* 게임 점수 공유 모달 */}
+      {/* 寃뚯엫 ?먯닔 怨듭쑀 紐⑤떖 */}
       {showScoreShare && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-4 md:p-6 max-w-xs md:max-w-sm w-full shadow-2xl mx-3">
             <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">
-              🏆 게임 결과 공유하기
+              ?룇 寃뚯엫 寃곌낵 怨듭쑀?섍린
             </h3>
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-3 md:p-4 mb-3 md:mb-4 text-center">
               <div className="text-lg md:text-xl font-bold text-indigo-700 mb-1">
-                정답률: {calculateGameScore()}%
+                ?뺣떟瑜? {calculateGameScore()}%
               </div>
               <div className="text-xs md:text-sm text-gray-600">
-                ({gameScore}/{totalGames} 문제 정답)
+                ({gameScore}/{totalGames} 臾몄젣 ?뺣떟)
               </div>
               <div className="text-xs text-indigo-600 mt-1 md:mt-2">
-                친구들과 경쟁해보세요! 💪
+                移쒓뎄?ㅺ낵 寃쎌웳?대낫?몄슂! ?뮞
               </div>
             </div>
             <button
               onClick={() => handleGameScoreShare("copy")}
               className="w-full p-3 md:p-4 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-sm md:text-base"
             >
-              📋 결과 복사
+              ?뱥 寃곌낵 蹂듭궗
             </button>
             <button
               onClick={() => setShowScoreShare(false)}
               className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm"
             >
-              취소
+              痍⑥냼
             </button>
           </div>
         </div>
       )}
-      {/* 후기 남기기 모달 */}
+      {/* ?꾧린 ?④린湲?紐⑤떖 */}
       {showComments && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl max-h-96 overflow-y-auto">
             <h3 className="text-lg font-bold text-center mb-4">
-              💬 후기 남기기
-            </h3>
+              ?뮠 ?꾧린 ?④린湲?            </h3>
             <div className="mb-4 space-y-3">
               {fakeComments.map((c) => (
                 <div key={c.id} className="p-3 bg-gray-50 rounded-2xl">
@@ -1471,7 +1502,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     <span className="font-semibold text-sm text-gray-800">
                       {c.user}
                     </span>
-                    <span className="text-xs text-gray-500">❤️ {c.likes}</span>
+                    <span className="text-xs text-gray-500">?ㅿ툘 {c.likes}</span>
                   </div>
                   <p className="text-sm text-gray-700">{c.comment}</p>
                 </div>
@@ -1480,7 +1511,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="테스트 결과는 어떠셨나요?"
+              placeholder="?뚯뒪??寃곌낵???대뼚?⑤굹??"
               className="w-full p-3 border border-gray-200 rounded-2xl text-sm resize-none h-20"
             />
             <div className="flex gap-2 mt-3">
@@ -1488,59 +1519,59 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                 onClick={handleSubmitComment}
                 className="flex-1 p-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-2xl font-semibold text-sm"
               >
-                등록
+                ?깅줉
               </button>
               <button
                 onClick={() => setShowComments(false)}
                 className="px-4 p-3 text-gray-500 text-sm"
               >
-                취소
+                痍⑥냼
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* 삭제된 게임 모달 섹션 - 더 이상 필요 없음 */}
+      {/* ??젣??寃뚯엫 紐⑤떖 ?뱀뀡 - ???댁긽 ?꾩슂 ?놁쓬 */}
       {false && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-center mb-4">
-              🎮 성경인물 맞히기 게임
+              ?렜 ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫
             </h3>
 
             <div className="text-center mb-6">
-              {/* 캐릭터 이미지 */}
+              {/* 罹먮┃???대?吏 */}
               <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">
                 <div className="w-32 h-32 mx-auto mb-3 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
                   {currentQuizType && (
                     <img
                       src={`/${
                         currentQuizType === "ENFJ"
-                          ? "ENJS 느헤미야"
+                          ? "ENJS ?먰뿤誘몄빞"
                           : currentQuizType === "ENTP"
-                          ? "ENFP 아브라함"
+                          ? "ENFP ?꾨툕?쇳븿"
                           : `${currentQuizType} ${
                               RESULTS[currentQuizType as keyof typeof RESULTS]
                                 .character
                             }`
                       }.jpg`}
-                      alt="성경인물"
+                      alt="?깃꼍?몃Ъ"
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
-                          "/ENFP 아브라함.jpg";
+                          "/ENFP ?꾨툕?쇳븿.jpg";
                       }}
                     />
                   )}
                 </div>
                 <h4 className="text-lg font-bold text-gray-800 mb-2">
-                  이 사람은 누구일까요? 🤔
+                  ???щ엺? ?꾧뎄?쇨퉴?? ?쨺
                 </h4>
 
-                {/* 선택된 답안 표시 */}
+                {/* ?좏깮???듭븞 ?쒖떆 */}
                 {userGuess && quizResult === null && (
                   <div className="mt-3 p-3 bg-blue-100 text-blue-700 rounded-xl">
-                    선택한 답안: <strong>{userGuess}</strong>
+                    ?좏깮???듭븞: <strong>{userGuess}</strong>
                   </div>
                 )}
 
@@ -1553,17 +1584,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                     }`}
                   >
                     {quizResult === "correct"
-                      ? `🎉 정답입니다! ${quizCharacter}님이 맞네요!`
-                      : `😅 아쉬워요! 정답은 ${quizCharacter}입니다.`}
+                      ? `?럦 ?뺣떟?낅땲?? ${quizCharacter}?섏씠 留욌꽕??`
+                      : `?쁾 ?꾩돩?뚯슂! ?뺣떟? ${quizCharacter}?낅땲??`}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 16명 후보 선택지 */}
+            {/* 16紐??꾨낫 ?좏깮吏 */}
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-600 mb-3 text-center">
-                💡 아래 후보 중에서 선택하세요!
+                ?뮕 ?꾨옒 ?꾨낫 以묒뿉???좏깮?섏꽭??
               </h4>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                 {ALL_CHARACTERS.map((type) => (
@@ -1592,7 +1623,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </div>
             </div>
 
-            {/* 게임 액션 버튼 */}
+            {/* 寃뚯엫 ?≪뀡 踰꾪듉 */}
             <div className="flex gap-2">
               {quizResult === null ? (
                 <button
@@ -1604,45 +1635,45 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  ✅ 답안 제출
+                  ???듭븞 ?쒖텧
                 </button>
               ) : (
                 <button
                   onClick={getRandomCharacter}
                   className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold"
                 >
-                  🎮 다시 도전
+                  ?렜 ?ㅼ떆 ?꾩쟾
                 </button>
               )}
               <button
                 onClick={() => {}}
                 className="px-6 p-3 text-gray-500 text-sm hover:bg-gray-100 rounded-2xl"
               >
-                닫기
+                ?リ린
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* 하단 장식 */}
+      {/* ?섎떒 ?μ떇 */}
       <div className="mt-2 flex justify-center space-x-1">
         <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></div>
         <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse delay-75"></div>
         <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse delay-150"></div>
       </div>
-      {/* 푸터 */}
+      {/* ?명꽣 */}
       <div className="mt-8 pt-6 border-t border-gray-200/50">
         <div className="space-y-2 text-center">
           <p className="text-xs text-gray-500">
-            쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를
-            제공받습니다.
+            荑좏뙜 ?뚰듃?덉뒪 ?쒕룞???쇳솚?쇰줈, ?댁뿉 ?곕Ⅸ ?쇱젙?≪쓽 ?섏닔猷뚮?
+            ?쒓났諛쏆뒿?덈떎.
           </p>
           <p className="text-xs text-gray-400">
-            © 2025 B-MBTI. All rights reserved.
+            짤 2025 B-MBTI. All rights reserved.
           </p>
         </div>
       </div>
-      {/* 이미지 확대 모달 */}
+      {/* ?대?吏 ?뺣? 紐⑤떖 */}
       {showImageModal && (
         <div
           className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-sm"
@@ -1658,15 +1689,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 닫기 버튼 */}
+            {/* ?リ린 踰꾪듉 */}
             <button
               onClick={() => setShowImageModal(false)}
               className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all"
             >
-              ✕
-            </button>
+              ??            </button>
 
-            {/* 제목 */}
+            {/* ?쒕ぉ */}
             {modalImageTitle && (
               <div className="px-6 pt-6 pb-3">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800 text-center">
@@ -1675,7 +1705,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               </div>
             )}
 
-            {/* 이미지 */}
+            {/* ?대?吏 */}
             <div
               className="flex-1 flex items-center justify-center px-6"
               style={{ minHeight: 0 }}
@@ -1688,13 +1718,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               />
             </div>
 
-            {/* 닫기 버튼 (하단) */}
+            {/* ?リ린 踰꾪듉 (?섎떒) */}
             <div className="px-6 pb-6 pt-4">
               <button
                 onClick={() => setShowImageModal(false)}
                 className="w-full py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
               >
-                닫기
+                ?リ린
               </button>
             </div>
           </div>

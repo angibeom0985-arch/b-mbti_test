@@ -137,7 +137,7 @@ const getCompatibilityReason = (
       "Reliable planning supports lively spontaneity, keeping life steady yet fun.",
   };
 
-  const key = ${currentType}-;
+  const key = `${currentType}-${targetType}`;
   return (
     reasons[key] ||
     "Practical strengths complement each other, leading to supportive teamwork."

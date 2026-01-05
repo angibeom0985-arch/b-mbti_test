@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import html2canvas from 'html2canvas';
 import type { MbtiType, MbtiResult } from '../types';
 import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from '../constants';
 import RestartIcon from './icons/RestartIcon';
@@ -724,82 +725,45 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   };
 
   const handleSaveAsImage = async () => {
+    const captureElement = document.querySelector(
+      '.image-capture-area'
+    ) as HTMLElement | null;
+
+    if (!captureElement) {
+      alert('결과 화면을 찾을 수 없습니다.');
+      return;
+    }
+
     try {
-      // 이미지로 저장할 부분만 선택
-      const captureElement = document.querySelector('.image-capture-area');
-      if (!captureElement) {
-        alert('결과 화면을 찾을 수 없습니다.');
-        return;
-      }
+      const canvas = await html2canvas(captureElement, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+        logging: false,
+        ignoreElements: (element: HTMLElement) =>
+          element.tagName === 'IFRAME' || element.classList.contains('adsbygoogle'),
+      });
 
-      // 이미지 캡처 처리 함수
-      const processCapture = async () => {
-        try {
-          // @ts-ignore - html2canvas는 전역 변수로 로드됨
-          const canvas = await (window as any).html2canvas(captureElement, {
-            backgroundColor: '#ffffff',
-            scale: 2, // scale을 낮춰서 안정성 향상
-            useCORS: false, // CORS 비활성화
-            allowTaint: false, // Taint 비활성화
-            foreignObjectRendering: true, // SVG 등 외부 객체 렌더링 허용
-            logging: false,
-            ignoreElements: (element: HTMLElement) => {
-              // 외부 이미지나 문제가 될 수 있는 요소 제외
-              return element.tagName === 'IFRAME' || 
-                     element.classList.contains('ad-banner') ||
-                     (element.tagName === 'IMG' && (element as HTMLImageElement).src && 
-                      !(element as HTMLImageElement).src.startsWith(window.location.origin));
-            }
-          });
+      const dataURL = canvas.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-          // 캔버스를 이미지로 변환
-          const dataURL = canvas.toDataURL('image/png', 1.0);
-          
-          // 다운로드 링크 생성
-          const link = document.createElement('a');
-          link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
-          link.href = dataURL;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          // 이미지 저장 완료 후 쿠팡파트너스 링크 열기 및 사용자 안내
-          setTimeout(() => {
-            const coupangPartnersUrl = 'https://link.coupang.com/a/cTTkqa';
-            window.open(coupangPartnersUrl, '_blank');
-            
-            // 사용자에게 다운로드 위치 안내
-            alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
-          }, 500);
-          
-        } catch (error) {
-          console.error('이미지 저장 실패:', error);
-          alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
-        }
-      };
-
-      // html2canvas가 이미 로드되었는지 확인
-      if ((window as any).html2canvas) {
-        await processCapture();
-      } else {
-        // 동적으로 html2canvas 라이브러리 로드
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        script.crossOrigin = 'anonymous'; // CORS 설정 추가
-        document.head.appendChild(script);
-
-        script.onload = async () => {
-          await processCapture();
-        };
-
-        script.onerror = () => {
-          alert('이미지 저장 라이브러리 로드에 실패했습니다.');
-        };
-      }
-
+      setTimeout(() => {
+        window.open(getRandomCoupangUrl(), '_blank');
+        alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
+      }, 500);
     } catch (error) {
       console.error('이미지 저장 중 오류:', error);
-      alert('이미지 저장 중 오류가 발생했습니다.');
+      alert('이미지 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 

@@ -1,34 +1,25 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import type { MbtiType, MbtiResult } from "../types";
-import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from "../constants";
-import RestartIcon from "./icons/RestartIcon";
-import LoadingIndicator from "./LoadingIndicator";
-import ShareIcon from "./icons/ShareIcon";
-import { Filesystem, Directory } from "@capacitor/filesystem";
-import { Share } from "@capacitor/share";
-import { Capacitor } from "@capacitor/core";
+import React, { useState, useEffect } from 'react';
+import type { MbtiType, MbtiResult } from '../types';
+import { RESULTS, TEST_VERSIONS, PERSONALITY_TRAITS } from '../constants';
+import RestartIcon from './icons/RestartIcon';
+import LoadingIndicator from './LoadingIndicator';
+import ShareIcon from './icons/ShareIcon';
 
-// 荑좏뙜 ?뚰듃?덉뒪 留곹겕 諛곗뿴
+// 쿠팡 파트너스 링크 배열
 const COUPANG_PARTNERS_URLS = [
-  "https://link.coupang.com/a/cTTkqa",
-  "https://link.coupang.com/a/cTTkLm",
-  "https://link.coupang.com/a/cTTkS7",
-  "https://link.coupang.com/a/cTTkWI",
-  "https://link.coupang.com/a/cTTk02",
-  "https://link.coupang.com/a/cTTk5m",
-  "https://link.coupang.com/a/cTTk7h",
-  "https://link.coupang.com/a/cTTlcr",
-  "https://link.coupang.com/a/cTTldT",
-  "https://link.coupang.com/a/cTTlif",
+  'https://link.coupang.com/a/cTTkqa',
+  'https://link.coupang.com/a/cTTkLm',
+  'https://link.coupang.com/a/cTTkS7',
+  'https://link.coupang.com/a/cTTkWI',
+  'https://link.coupang.com/a/cTTk02',
+  'https://link.coupang.com/a/cTTk5m',
+  'https://link.coupang.com/a/cTTk7h',
+  'https://link.coupang.com/a/cTTlcr',
+  'https://link.coupang.com/a/cTTldT',
+  'https://link.coupang.com/a/cTTlif'
 ];
 
-// ?쒕뜡 荑좏뙜 ?뚰듃?덉뒪 留곹겕 ?좏깮 ?⑥닔
+// 랜덤 쿠팡 파트너스 링크 선택 함수
 const getRandomCoupangUrl = (): string => {
   const randomIndex = Math.floor(Math.random() * COUPANG_PARTNERS_URLS.length);
   return COUPANG_PARTNERS_URLS[randomIndex];
@@ -41,315 +32,257 @@ interface ResultScreenProps {
   onRestart: () => void;
   completedVersion?: number;
   onQuizGame?: () => void;
-  onStartTest?: (version: number) => void;
 }
 
-// 16媛吏 MBTI ?좏삎怨???묓븯???깃꼍?몃Ъ??const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
+// 16가지 MBTI 유형과 대응하는 성경인물들
+const ALL_CHARACTERS = Object.keys(RESULTS) as MbtiType[];
 
-// ?명솚???곗씠?곕? 而댄룷?뚰듃 ?몃?濡??대룞 (??踰덈쭔 ?앹꽦)
-const COMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
-  ENFP: ["INFJ", "INTJ", "ENFJ", "INFP"],
-  ENFJ: ["INFP", "ISFP", "ENFP", "INFJ"],
-  ENTP: ["INFJ", "INTJ", "ENFJ", "INFP"],
-  ENTJ: ["INFP", "ISFP", "ENFP", "INFJ"],
-  ESFP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
-  ESFJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
-  ESTP: ["ISFJ", "ISTJ", "ESFJ", "ISFP"],
-  ESTJ: ["ISFP", "ISTP", "ESFP", "ISFJ"],
-  INFP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
-  INFJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
-  INTP: ["ENFJ", "ENTJ", "ENFP", "INFJ"],
-  INTJ: ["ENFP", "ENTP", "ENFJ", "INFP"],
-  ISFP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
-  ISFJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
-  ISTP: ["ESFJ", "ESTJ", "ESFP", "ISFJ"],
-  ISTJ: ["ESFP", "ESTP", "ESFJ", "ISFP"],
-};
-
-const INCOMPATIBILITY_MAP: Record<MbtiType, MbtiType[]> = {
-  ENFP: ["ISTJ", "ISTP", "ESTJ", "ESTP"],
-  ENFJ: ["ISTP", "INTP", "ESTP", "ENTP"],
-  ENTP: ["ISFJ", "ISTJ", "ESFJ", "ESTJ"],
-  ENTJ: ["ISFJ", "ISFP", "ESFJ", "ESFP"],
-  ESFP: ["INTJ", "INTP", "ENTJ", "ENTP"],
-  ESFJ: ["INTP", "ENTP", "INTJ", "ENTJ"],
-  ESTP: ["INFJ", "INFP", "ENFJ", "ENFP"],
-  ESTJ: ["INFP", "ENFP", "INFJ", "ENFJ"],
-  INFP: ["ESTJ", "ENTJ", "ESTP", "ENTP"],
-  INFJ: ["ESTP", "ESFP", "ESTJ", "ESFJ"],
-  INTP: ["ESFJ", "ESFP", "ESTJ", "ESTP"],
-  INTJ: ["ESFP", "ESTP", "ESFJ", "ESTJ"],
-  ISFP: ["ENTJ", "ENTP", "ESTJ", "ESTP"],
-  ISFJ: ["ENTP", "ENTJ", "ESTP", "ESTJ"],
-  ISTP: ["ENFJ", "ESFJ", "ENFP", "ESFP"],
-  ISTJ: ["ENFP", "ESFP", "ENTP", "ESTP"],
-};
-
-// ?댁슱由щ뒗 ?깃꺽 ?좏삎 異붿쿇 濡쒖쭅
+// 어울리는 성격 유형 추천 로직
 const getCompatibleTypes = (currentType: MbtiType): MbtiType[] => {
-  return COMPATIBILITY_MAP[currentType] || [];
+  // 각 유형별로 어울리는 유형들을 정의 (심리학적 호환성 기반)
+  const compatibilityMap: Record<MbtiType, MbtiType[]> = {
+    'ENFP': ['INFJ', 'INTJ', 'ENFJ', 'INFP'],
+    'ENFJ': ['INFP', 'ISFP', 'ENFP', 'INFJ'],
+    'ENTP': ['INFJ', 'INTJ', 'ENFJ', 'INFP'],
+    'ENTJ': ['INFP', 'ISFP', 'ENFP', 'INFJ'],
+    'ESFP': ['ISFJ', 'ISTJ', 'ESFJ', 'ISFP'],
+    'ESFJ': ['ISFP', 'ISTP', 'ESFP', 'ISFJ'],
+    'ESTP': ['ISFJ', 'ISTJ', 'ESFJ', 'ISFP'],
+    'ESTJ': ['ISFP', 'ISTP', 'ESFP', 'ISFJ'],
+    'INFP': ['ENFJ', 'ENTJ', 'ENFP', 'INFJ'],
+    'INFJ': ['ENFP', 'ENTP', 'ENFJ', 'INFP'],
+    'INTP': ['ENFJ', 'ENTJ', 'ENFP', 'INFJ'],
+    'INTJ': ['ENFP', 'ENTP', 'ENFJ', 'INFP'],
+    'ISFP': ['ESFJ', 'ESTJ', 'ESFP', 'ISFJ'],
+    'ISFJ': ['ESFP', 'ESTP', 'ESFJ', 'ISFP'],
+    'ISTP': ['ESFJ', 'ESTJ', 'ESFP', 'ISFJ'],
+    'ISTJ': ['ESFP', 'ESTP', 'ESFJ', 'ISFP']
+  };
+  
+  return compatibilityMap[currentType] || [];
 };
 
-// ?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 (異⑸룎?섍린 ?ъ슫 ?좏삎)
+// 호환성 이유 설명
+const getCompatibilityReason = (currentType: MbtiType, targetType: MbtiType): string => {
+  const reasons: Record<string, string> = {
+    'ENFP-INFJ': '서로의 직관과 감정을 깊이 이해하며, 영적 교감이 뛰어납니다',
+    'ENFP-INTJ': '창의적 아이디어와 체계적 실행력이 완벽하게 조화를 이룹니다',
+    'ENFJ-INFP': '서로의 가치관을 존중하며 따뜻한 관계를 형성합니다',
+    'ENTP-INFJ': '혁신적 사고와 깊은 통찰력이 만나 시너지를 창출합니다',
+    'ENTJ-INFP': '리더십과 창의성이 만나 균형 잡힌 협력을 보여줍니다',
+    'ESFP-ISFJ': '활발함과 배려심이 조화롭게 어우러져 즐거운 관계를 만듭니다',
+    'ESFJ-ISFP': '따뜻한 마음과 예술적 감성이 아름답게 융합됩니다',
+    'ESTP-ISFJ': '행동력과 세심함이 서로의 부족함을 채워줍니다',
+    'ESTJ-ISFP': '체계성과 유연성이 만나 실용적 협력을 이룹니다',
+    'INFP-ENFJ': '내면의 가치와 따뜻한 리더십이 서로를 성장시킵니다',
+    'INFJ-ENFP': '깊은 통찰력과 밝은 에너지가 완벽한 조화를 이룹니다',
+    'INTP-ENFJ': '논리적 사고와 인간적 따뜻함이 균형을 맞춥니다',
+    'INTJ-ENFP': '전략적 사고와 창의적 영감이 시너지를 발휘합니다',
+    'ISFP-ESFJ': '예술적 감성과 사회적 배려가 아름답게 어우러집니다',
+    'ISFJ-ESFP': '안정감과 활력이 서로를 보완하며 조화를 이룹니다',
+    'ISTP-ESFJ': '실용적 기술과 따뜻한 배려가 실생활에서 큰 도움이 됩니다',
+    'ISTJ-ESFP': '체계적 계획과 즉흥적 활력이 균형잡힌 관계를 만듭니다'
+  };
+  
+  const key = `${currentType}-${targetType}`;
+  return reasons[key] || '서로 다른 강점이 조화롭게 어우러져 좋은 관계를 형성합니다';
+};
+
+// 어울리지 않는 성격 유형 (충돌하기 쉬운 유형)
 const getIncompatibleTypes = (currentType: MbtiType): MbtiType[] => {
-  return INCOMPATIBILITY_MAP[currentType] || [];
-};
-
-// ?명솚???댁쑀 ?ㅻ챸
-const getCompatibilityReason = (
-  currentType: MbtiType,
-  targetType: MbtiType
-): string => {
-  const reasons: Record<string, string> = {
-    "ENFP-INFJ":
-      "Warm empathy meets depth, creating supportive and meaningful conversations.",
-    "ENFP-INTJ":
-      "Creativity and vision meet structured planning for balanced growth.",
-    "ENFJ-INFP":
-      "Shared values and care for people build steady emotional harmony.",
-    "ENTP-INFJ":
-      "Ideas spark while insight keeps them grounded, forming a thoughtful duo.",
-    "ENTJ-INFP":
-      "Decisive leadership pairs with empathy, inspiring purpose with compassion.",
-    "ESFP-ISFJ":
-      "Spontaneity and steady support balance daily life with encouragement.",
-    "ESFJ-ISFP":
-      "Kindness and sensitivity blend, making a considerate and gentle partnership.",
-    "ESTP-ISFJ":
-      "Action-oriented energy meets reliability, helping each other stay balanced.",
-    "ESTJ-ISFP":
-      "Practical structure supports creativity, giving freedom with safety.",
-    "INFP-ENFJ":
-      "Shared ideals and care create a nurturing, value-driven relationship.",
-    "INFJ-ENFP":
-      "Insightful reflection meets enthusiasm, bringing out each other's strengths.",
-    "INTP-ENFJ":
-      "Analysis and encouragement combine for thoughtful growth and learning.",
-    "INTJ-ENFP":
-      "Strategic vision meets inspiration, motivating each other toward goals.",
-    "ISFP-ESFJ":
-      "Gentle empathy and attentive care build a warm, supportive bond.",
-    "ISFJ-ESFP":
-      "Stability and fun blend, making everyday moments enjoyable and secure.",
-    "ISTP-ESFJ":
-      "Calm problem-solving pairs with sociable warmth, balancing independence.",
-    "ISTJ-ESFP":
-      "Reliable planning supports lively spontaneity, keeping life steady yet fun.",
+  const incompatibilityMap: Record<MbtiType, MbtiType[]> = {
+    'ENFP': ['ISTJ', 'ISTP', 'ESTJ', 'ESTP'],
+    'ENFJ': ['ISTP', 'INTP', 'ESTP', 'ENTP'],
+    'ENTP': ['ISFJ', 'ISTJ', 'ESFJ', 'ESTJ'],
+    'ENTJ': ['ISFJ', 'ISFP', 'ESFJ', 'ESFP'],
+    'ESFP': ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
+    'ESFJ': ['INTP', 'ENTP', 'INTJ', 'ENTJ'],
+    'ESTP': ['INFJ', 'INFP', 'ENFJ', 'ENFP'],
+    'ESTJ': ['INFP', 'ENFP', 'INFJ', 'ENFJ'],
+    'INFP': ['ESTJ', 'ENTJ', 'ESTP', 'ENTP'],
+    'INFJ': ['ESTP', 'ESFP', 'ESTJ', 'ESFJ'],
+    'INTP': ['ESFJ', 'ESFP', 'ESTJ', 'ESTP'],
+    'INTJ': ['ESFP', 'ESTP', 'ESFJ', 'ESTJ'],
+    'ISFP': ['ENTJ', 'ENTP', 'ESTJ', 'ESTP'],
+    'ISFJ': ['ENTP', 'ENTJ', 'ESTP', 'ESTJ'],
+    'ISTP': ['ENFJ', 'ESFJ', 'ENFP', 'ESFP'],
+    'ISTJ': ['ENFP', 'ESFP', 'ENTP', 'ESTP']
   };
-
-  const key = `${currentType}-${targetType}`;
-  return (
-    reasons[key] ||
-    "Practical strengths complement each other, leading to supportive teamwork."
-  );
+  
+  return incompatibilityMap[currentType] || [];
 };
 
-const getIncompatibilityReason = (
-  currentType: MbtiType,
-  targetType: MbtiType
-): string => {
+// 비호환성 이유 설명
+const getIncompatibilityReason = (currentType: MbtiType, targetType: MbtiType): string => {
   const reasons: Record<string, string> = {
-    "ENFP-ISTJ":
-      "Different pacing and structure preferences can create friction in plans.",
-    "ENFP-ISTP":
-      "Spontaneous feelings and reserved pragmatism may struggle to align.",
-    "ENFJ-ISTP":
-      "Emotion-first decisions versus independent logic can feel conflicting.",
-    "ENTP-ISFJ":
-      "Constant change can exhaust those who value consistency and calm.",
-    "ENTJ-ISFJ":
-      "Direct leadership may feel overwhelming to someone seeking steady support.",
-    "ESFP-INTJ":
-      "Present-focused action and long-term strategy can clash without compromise.",
-    "ESFJ-INTP":
-      "Structured expectations and analytical detachment may frustrate both sides.",
-    "ESTP-INFJ":
-      "Fast moves versus reflective processing often lead to misunderstandings.",
-    "ESTJ-INFP":
-      "Orderly enforcement can feel harsh to values-driven, flexible partners.",
-    "INFP-ESTJ":
-      "Idealism versus strict structure can create tension over priorities.",
-    "INFJ-ESTP":
-      "Need for depth and planning can collide with impulsive experimentation.",
-    "INTP-ESFJ":
-      "Detached analysis and relational focus may feel at odds day-to-day.",
-    "INTJ-ESFP":
-      "Future-minded strategy versus in-the-moment enjoyment can cause disconnects.",
-    "ISFP-ENTJ":
-      "Gentle spontaneity may feel pressured by direct, results-first drives.",
-    "ISFJ-ENTP":
-      "Desire for stability can conflict with constant debate and change.",
-    "ISTP-ENFJ":
-      "Reserved independence may resist coordinated, people-centered planning.",
-    "ISTJ-ENFP":
-      "Strict routines can feel limiting to flexible, exploratory partners.",
+    'ENFP-ISTJ': '자유로운 창의성과 체계적 계획성이 충돌할 수 있어 소통에 노력이 필요합니다',
+    'ENFP-ISTP': '감정표현 방식과 실용적 접근의 차이로 오해가 생길 수 있습니다',
+    'ENFJ-ISTP': '따뜻한 감정 표현과 차분한 성향의 차이가 거리감을 만들 수 있습니다',
+    'ENTP-ISFJ': '혁신적 변화 추구와 안정 선호로 인해 갈등이 생길 수 있습니다',
+    'ENTJ-ISFJ': '목표 지향적 추진력과 안정 추구로 인한 충돌 가능성이 있습니다',
+    'ESFP-INTJ': '즉흥적 활력과 신중한 계획성이 서로 답답함을 느낄 수 있습니다',
+    'ESFJ-INTP': '감정적 배려와 논리적 분석 방식의 차이로 오해가 생길 수 있습니다',
+    'ESTP-INFJ': '행동 중심적 성향과 신중한 성찰의 차이가 갈등을 만들 수 있습니다',
+    'ESTJ-INFP': '체계적 통제와 개인적 자유 추구로 인한 마찰이 있을 수 있습니다',
+    'INFP-ESTJ': '개인적 가치와 객관적 효율성 추구의 차이로 충돌할 수 있습니다',
+    'INFJ-ESTP': '깊은 성찰과 즉흥적 행동의 차이가 서로를 이해하기 어렵게 만듭니다',
+    'INTP-ESFJ': '논리적 분석과 감정적 배려의 차이로 소통에 어려움이 있을 수 있습니다',
+    'INTJ-ESFP': '장기적 계획과 순간적 즐거움 추구의 차이가 갈등을 만들 수 있습니다',
+    'ISFP-ENTJ': '개인적 가치와 목표 달성 중심 사고의 차이로 마찰이 생길 수 있습니다',
+    'ISFJ-ENTP': '안정 추구와 변화 선호의 차이로 인해 스트레스를 받을 수 있습니다',
+    'ISTP-ENFJ': '독립적 성향과 사회적 관계 중시의 차이가 거리감을 만들 수 있습니다',
+    'ISTJ-ENFP': '체계적 질서와 자유로운 창의성이 서로 제약으로 느껴질 수 있습니다'
   };
-
+  
   const key = `${currentType}-${targetType}`;
-  return (
-    reasons[key] ||
-    "Different priorities and pacing can cause friction; clear communication helps."
-  );
+  return reasons[key] || '서로 다른 성향으로 인해 이해하는 데 더 많은 노력이 필요할 수 있습니다';
 };
 
+// MBTI 유형별 이미지 파일 매핑 함수
 const getMbtiImage = (type: MbtiType): string => {
   const imageMap: Record<MbtiType, string> = {
-    ENFP: "/ENFP ?꾨툕?쇳븿.jpg",
-    ENFJ: "/ENJS ?먰뿤誘몄빞.jpg",
-    ENTJ: "/ENTJ ?쒕낫??jpg",
-    ENTP: "/ENFP ?꾨툕?쇳븿.jpg", // ENTP ?뚯씪???놁뼱???꾩떆濡?ENFP ?ъ슜
-    ESFJ: "/ESFJ 留됰떖??留덈━??jpg",
-    ESFP: "/ESFP ?먯뒪??jpg",
-    ESTJ: "/ESTJ 紐⑥꽭.jpg",
-    ESTP: "/ESTP 踰좊뱶濡?jpg",
-    INFJ: "/INFJ ?ㅻ땲??jpg",
-    INFP: "/INFP 留덈━??jpg",
-    INTJ: "/INTJ 諛붿슱.jpg",
-    INTP: "/INTP ?붾줈紐?jpg",
-    ISFJ: "/ISFJ 猷?jpg",
-    ISFP: "/ISFP ?ㅼ쐵.jpg",
-    ISTJ: "/ISTJ ?붿뀎.jpg",
-    ISTP: "/ISTP ?쇱넀.jpg",
+    'ENFP': '/ENFP 아브라함.jpg',
+    'ENFJ': '/ENJS 느헤미야.jpg',
+    'ENTJ': '/ENTJ 드보라.jpg',
+    'ENTP': '/ENFP 아브라함.jpg', // ENTP 파일이 없어서 임시로 ENFP 사용
+    'ESFJ': '/ESFJ 막달라 마리아.jpg',
+    'ESFP': '/ESFP 에스더.jpg',
+    'ESTJ': '/ESTJ 모세.jpg',
+    'ESTP': '/ESTP 베드로.jpg',
+    'INFJ': '/INFJ 다니엘.jpg',
+    'INFP': '/INFP 마리아.jpg',
+    'INTJ': '/INTJ 바울.jpg',
+    'INTP': '/INTP 솔로몬.jpg',
+    'ISFJ': '/ISFJ 룻.jpg',
+    'ISFP': '/ISFP 다윗.jpg',
+    'ISTJ': '/ISTJ 요셉.jpg',
+    'ISTP': '/ISTP 삼손.jpg'
   };
-
-  return imageMap[type] || "/ENFP ?꾨툕?쇳븿.jpg";
+  
+  return imageMap[type] || '/ENFP 아브라함.jpg';
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({
-  resultType,
-  resultData,
-  error,
+const ResultScreen: React.FC<ResultScreenProps> = ({ 
+  resultType, 
+  resultData, 
+  error, 
   onRestart,
   completedVersion = 1,
-  onQuizGame,
-  onStartTest,
+  onQuizGame
 }) => {
-  const captureRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  // showOtherCharacters 상태 제거됨
   const [showComments, setShowComments] = useState(false);
-  const [comment, setComment] = useState("");
-  const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(
-    null
-  );
+  const [comment, setComment] = useState('');
+  const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(null);
 
-  // ?댁쫰 寃뚯엫 ?곹깭
-  const [quizCharacter, setQuizCharacter] = useState<string>("");
-  const [userGuess, setUserGuess] = useState("");
-  const [quizResult, setQuizResult] = useState<"correct" | "wrong" | null>(
-    null
-  );
-  const [currentQuizType, setCurrentQuizType] = useState<string>("");
+  
+  // 퀴즈 게임 상태
+  const [quizCharacter, setQuizCharacter] = useState<string>('');
+  const [userGuess, setUserGuess] = useState('');
+  const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
+  const [currentQuizType, setCurrentQuizType] = useState<string>('');
 
-  // 寃뚯엫 ?먯닔 愿???곹깭
+  // 게임 점수 관련 상태
   const [gameScore, setGameScore] = useState(0);
   const [totalGames, setTotalGames] = useState(0);
   const [showScoreShare, setShowScoreShare] = useState(false);
 
-  // 以묐났 諛⑹?瑜??꾪븳 ?ъ슜??罹먮┃??異붿쟻
+  // 중복 방지를 위한 사용된 캐릭터 추적
   const [usedCharacters, setUsedCharacters] = useState<string[]>([]);
 
-  // ?대?吏 紐⑤떖 ?곹깭
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [modalImageSrc, setModalImageSrc] = useState("");
-  const [modalImageTitle, setModalImageTitle] = useState("");
+  // 게임 참여 유도 멘트 배열
+  const gamePromptMessages = [
+    "🎮 친구들보다 더 많이 맞출 자신 있나요? 도전해보세요!",
+    "🎨 귀여운 일러스트를 좋아한다면 이 게임이 딱이에요!",
+    "🏆 다른 사람들은 못 맞추는 문제도 당신은 맞출 수 있을 거예요",
+    "💡 눈썰미가 좋은 당신에게 딱 맞는 재미있는 도전!",
+    "⚡ 순간 판단력이 뛰어난 분들이 좋아하는 이미지 게임이에요",
+    "😊 스트레스 해소용으로도 최고! 귀여운 캐릭터들이 기다려요",
+    "🎯 친구들과 점수 경쟁하면 더 재밌어요!",
+    "🌟 귀여운 일러스트와 함께하는 힐링 타임!"
+  ];
 
-  // 紐⑤떖 ?대┫ ??body ?ㅽ겕濡?留됯린
-  useEffect(() => {
-    if (showImageModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [showImageModal]);
+  // 랜덤 멘트 선택 (컴포넌트 마운트 시 한 번만 선택)
+  const [randomPrompt] = useState(() => {
+    return gamePromptMessages[Math.floor(Math.random() * gamePromptMessages.length)];
+  });
 
-  // ?쒕뜡 硫섑듃 ?좏깮 (useMemo濡?理쒖쟻??
-  const randomPrompt = useMemo(() => {
-    const gamePromptMessages = [
-      "?? ?? ?? ?? ?? ????? ???? ?? ??!",
-      "???? ?? ????. ???? ?? ??? ??????.",
-      "?? ???? ?? ??! ?? ??? ??? ??????.",
-      "??? ????. ?? ???? ??? ?????!",
-      "?? ??? ???? ?? ??? ?????.",
-      "??? ??? ?? ?? ??, ?? ? ? ?????",
-      "?? ???? ??, ?? ??? ???!",
-      "??? ??? ???? ? ?????. ?? ? ?? ?????",
-    ];
-    return gamePromptMessages[
-      Math.floor(Math.random() * gamePromptMessages.length)
-    ];
-  }, []);
-
-const previewCharacter = useMemo(() => {
+  // 미리보기용 랜덤 캐릭터 선택 (컴포넌트 마운트 시 한 번만 선택)
+  const [previewCharacter] = useState(() => {
     const allTypes = Object.keys(RESULTS) as (keyof typeof RESULTS)[];
     const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
+    
+    // 이미지 경로 매핑
+    const getImagePath = (type: string) => {
+      const imageMap: Record<string, string> = {
+        'ISTJ': '/ISTJ 요셉.jpg',
+        'ISFJ': '/ISFJ 룻.jpg', 
+        'INFJ': '/INFJ 다니엘.jpg',
+        'INTJ': '/INTJ 바울.jpg',
+        'ISTP': '/ISTP 삼손.jpg',
+        'ISFP': '/ISFP 다윗.jpg',
+        'INFP': '/INFP 마리아.jpg',
+        'INTP': '/INTP 솔로몬.jpg',
+        'ESTP': '/ESTP 베드로.jpg',
+        'ESFP': '/ESFP 에스더.jpg',
+        'ENFP': '/ENFP 아브라함.jpg',
+        'ENTP': '/ENJS 느헤미야.jpg',
+        'ESTJ': '/ESTJ 모세.jpg',
+        'ESFJ': '/ESFJ 막달라 마리아.jpg',
+        'ENFJ': '/ENFJ 예수님.jpg',
+        'ENTJ': '/ENTJ 드보라.jpg'
+      };
+      return imageMap[type] || '/ENFP 아브라함.jpg';
+    };
+    
     return {
       type: randomType,
       character: RESULTS[randomType].character,
-      image: getMbtiImage(randomType),
+      image: getImagePath(randomType)
     };
-  }, []);
+  });
 
-  // Restore quiz mini-game score from localStorage
+  // 컴포넌트 마운트 시 게임 점수 불러오기
   useEffect(() => {
-    const savedScore = localStorage.getItem("quizGameScore");
-    const savedTotal = localStorage.getItem("quizGameTotal");
-
+    const savedScore = localStorage.getItem('quizGameScore');
+    const savedTotal = localStorage.getItem('quizGameTotal');
+    
     if (savedScore && savedTotal) {
       setGameScore(parseInt(savedScore, 10));
       setTotalGames(parseInt(savedTotal, 10));
     }
   }, []);
 
-  // Select a random character for the quiz and reset the pool when all are used
-  const getRandomCharacter = useCallback(() => {
-    let availableCharacters = ALL_CHARACTERS.filter(
-      (type) => !usedCharacters.includes(type)
-    );
-
+  // 퀴즈를 위한 랜덤 캐릭터 선택 (중복 방지)
+  const getRandomCharacter = () => {
+    // 모든 캐릭터를 사용했다면 목록을 초기화
+    let availableCharacters = ALL_CHARACTERS.filter(type => !usedCharacters.includes(type));
+    
     if (availableCharacters.length === 0) {
+      // 모든 캐릭터를 사용했으면 초기화하고 현재 캐릭터만 제외
       setUsedCharacters([]);
-      availableCharacters = ALL_CHARACTERS.filter(
-        (type) => type !== currentQuizType
-      );
+      availableCharacters = ALL_CHARACTERS.filter(type => type !== currentQuizType);
     }
-
-    const randomType =
-      availableCharacters[
-        Math.floor(Math.random() * availableCharacters.length)
-      ];
+    
+    const randomType = availableCharacters[Math.floor(Math.random() * availableCharacters.length)];
     setCurrentQuizType(randomType);
     setQuizCharacter(RESULTS[randomType].character);
-    setUsedCharacters((prev) => [...prev, randomType]);
-    setUserGuess("");
+    setUsedCharacters(prev => [...prev, randomType]);
+    setUserGuess('');
     setQuizResult(null);
-  }, [usedCharacters, currentQuizType]);
+  };
 
-  // Open the image in a modal (mobile friendly)
-  const openImageInModal = useCallback(
-    (imageSrc: string, characterName: string) => {
-      setModalImageSrc(imageSrc);
-      setModalImageTitle(characterName);
-      setShowImageModal(true);
-    },
-    []
-  );
-
-  const openImageInNewWindow = useCallback(
-    (imageSrc: string, characterName: string) => {
-      openImageInModal(imageSrc, characterName);
-      return;
-
-      const newWindow = window.open("", "_blank");
-      if (newWindow) {
-        newWindow.document.write(`
+  // 모바일 최적화된 새창 이미지 보기 함수
+  const openImageInNewWindow = (imageSrc: string, characterName: string) => {
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>${characterName} - ?깃꼍?몃Ъ MBTI</title>
+          <title>${characterName} - 성경인물 MBTI</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             body {
@@ -450,58 +383,37 @@ const previewCharacter = useMemo(() => {
         </head>
         <body>
           <div class="container">
-            <button class="close-button" onclick="window.close()">횞</button>
+            <button class="close-button" onclick="window.close()">×</button>
             <img src="${window.location.origin}${imageSrc}" alt="${characterName}" />
             <h1>${characterName}</h1>
             <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-              ?룧 寃곌낵 ?섏씠吏濡??뚯븘媛湲?            </button>
+              🏠 결과 페이지로 돌아가기
+            </button>
           </div>
         </body>
         </html>
       `);
-        newWindow.document.close();
-      }
-    },
-    [openImageInModal]
-  );
+      newWindow.document.close();
+    }
+  };
 
-  // Sample social proof comments shown under the result
+  // 가짜 댓글 데이터
   const fakeComments = [
-    {
-      id: 1,
-      user: "??",
-      comment: "??? ?? ????! ???? ? ???? ???.",
-      likes: 23,
-    },
-    {
-      id: 2,
-      user: "??",
-      comment: "?? ??? ???? ???? ???.",
-      likes: 18,
-    },
-    {
-      id: 3,
-      user: "??",
-      comment: "???? ??? ???? ??? ????.",
-      likes: 12,
-    },
-    {
-      id: 4,
-      user: "??",
-      comment: `${resultData?.character} ???? ? ? ???!`,
-      likes: 8,
-    },
+    { id: 1, user: "은혜님", comment: "완전 저네요!! 대박 신기해요 ㅋㅋ", likes: 23 },
+    { id: 2, user: "믿음이", comment: "와 진짜 정확하다... 소름", likes: 18 },
+    { id: 3, user: "소망♡", comment: "친구들이랑 다 해봤는데 다 맞아요!", likes: 12 },
+    { id: 4, user: "평강", comment: `${resultData?.character} 완전 멋져요!! 저도 닮고 싶어요`, likes: 8 }
   ];
 
   if (!resultData) {
     // Show loading indicator if data is not yet available
     return <LoadingIndicator />;
   }
-
+  
   if (error && !resultData?.image) {
     return (
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-red-100 w-full max-w-md mx-auto text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-4">??? ???? ????</h2>
+        <h2 className="text-xl font-semibold text-red-600 mb-4">오류 발생</h2>
         <p className="text-gray-600 mb-6 text-sm">{error}</p>
         <button
           onClick={onRestart}
@@ -514,914 +426,917 @@ const previewCharacter = useMemo(() => {
     );
   }
 
-  // 荑좏뙜?뚰듃?덉뒪 留곹겕瑜?癒쇱? ?닿퀬, 洹??ㅼ쓬??紐⑹쟻吏 URL???щ뒗 ?⑥닔 (?섏씡 李쎌텧)
+  // 쿠팡파트너스 링크를 먼저 열고, 그 다음에 목적지 URL을 여는 함수 (수익 창출)
   const openWithCoupangAd = (targetUrl: string, windowOptions?: string) => {
-    try {
-      // ?쒕뜡?섍쾶 荑좏뙜?뚰듃?덉뒪 留곹겕 ?좏깮
-      const coupangPartnersUrl = getRandomCoupangUrl();
-
-      // 1. 紐⑹쟻吏 URL??????뿉??癒쇱? ?닿린 (?ъ슜?먭? ?먰븯???섏씠吏)
-      const targetWindow = window.open(
-        targetUrl,
-        "_blank",
-        windowOptions || ""
-      );
-
-      if (!targetWindow) {
-        alert("?앹뾽??李⑤떒?섏뿀?듬땲?? ?앹뾽 李⑤떒???댁젣?댁＜?몄슂.");
-        return;
-      }
-
-      // 2. ?꾩옱 ??뿉??荑좏뙜?뚰듃?덉뒪 留곹겕濡??대룞 (?섏씡 李쎌텧)
-      setTimeout(() => {
-        try {
-          window.location.href = coupangPartnersUrl;
-        } catch (error) {
-          console.error("荑좏뙜?뚰듃?덉뒪 留곹겕 ?대룞 ?ㅻ쪟:", error);
-          // ?ㅻ쪟 諛쒖깮 ??湲곕낯 ?섏씠吏濡??대룞
-          window.location.href = "https://b-mbti.money-hotissue.com";
-        }
-      }, 200); // ????씠 ?꾩쟾???대┛ ???꾩옱 ???대룞
-    } catch (error) {
-      console.error("openWithCoupangAd ?⑥닔 ?ㅻ쪟:", error);
-      // ?ㅻ쪟 諛쒖깮 ??湲곕낯?곸쑝濡?????뿉?쒕쭔 ?닿린
-      window.open(targetUrl, "_blank", windowOptions || "");
+    // 랜덤하게 쿠팡파트너스 링크 선택
+    const coupangPartnersUrl = getRandomCoupangUrl();
+    
+    // 1. 목적지 URL을 새 탭에서 먼저 열기 (사용자가 원하는 페이지)
+    const targetWindow = window.open(targetUrl, '_blank', windowOptions || '');
+    
+    if (!targetWindow) {
+      alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+      return;
     }
+    
+    // 2. 현재 탭에서 쿠팡파트너스 링크로 이동 (수익 창출)
+    setTimeout(() => {
+      window.location.href = coupangPartnersUrl;
+    }, 100); // 새 탭이 열린 후 현재 탭 이동
   };
 
-  const handleShare = async () => {
-    const shareUrl = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      alert("??? ???????. ???? ??? ???!");
-      setTimeout(() => setCopied(false), 3000);
-    } catch (err) {
-      const textArea = document.createElement("textarea");
-      textArea.value = shareUrl;
-      document.body.appendChild(textArea);
-      textArea.select();
-
-      try {
-        document.execCommand("copy");
-        setCopied(true);
-        alert("??? ???????. ???? ??? ???!");
-        setTimeout(() => setCopied(false), 3000);
-      } catch (err) {
-        alert("?? ??? ??????. ?? ??? ???.");
-      } finally {
-        document.body.removeChild(textArea);
-      }
-    }
-
-    window.open(getRandomCoupangUrl(), "_blank");
+  const handleShare = () => {
+    // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
+    localStorage.setItem('tempResult', JSON.stringify({
+      type: resultType,
+      character: resultData?.character || '',
+      timestamp: Date.now()
+    }));
+    
+    // 결과 데이터를 URL 파라미터로 전달하여 /share 페이지 열기
+    const shareUrl = `/share?type=${encodeURIComponent(resultType)}&character=${encodeURIComponent(resultData?.character || '')}`;
+    
+    // 쿠팡 링크를 먼저 열고 그 다음에 공유 페이지 열기
+    openWithCoupangAd(shareUrl, 'width=450,height=650,scrollbars=yes,resizable=yes');
   };
 
   const handleShareOld = () => {
-    openWithCoupangAd("/share");
-  };
+    // 새창에서 공유 옵션을 보여주는 함수
+    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(0, 50)}...\n\n여러분도 테스트해보세요!`;
+    const shareUrl = 'https://gowith153.com';
+    
+    const newWindow = window.open('', '_blank', 'width=500,height=600,scrollbars=yes,resizable=yes');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>공유하기</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            body { 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+              color: #333; 
+              padding: 20px; 
+              min-height: 100vh; 
+              display: flex; 
+              flex-direction: column; 
+              align-items: center; 
+              justify-content: center; 
+            }
+            .container { 
+              background: white; 
+              border-radius: 16px; 
+              padding: 24px; 
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+              max-width: 400px; 
+              width: 100%; 
+            }
+            h1 { 
+              text-align: center; 
+              margin-bottom: 24px; 
+              color: #333; 
+              font-size: 24px; 
+            }
+            .share-button { 
+              display: block; 
+              width: 100%; 
+              padding: 16px; 
+              margin: 12px 0; 
+              border: none; 
+              border-radius: 12px; 
+              font-size: 16px; 
+              font-weight: 600; 
+              cursor: pointer; 
+              transition: all 0.3s ease; 
+              text-decoration: none; 
+              text-align: center; 
+            }
+            .copy { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            .copy:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+            .back-button { 
+              background: linear-gradient(135deg, #f093fb, #f5576c); 
+              color: white; 
+              padding: 12px 20px; 
+              border: none; 
+              border-radius: 8px; 
+              margin-top: 20px; 
+              cursor: pointer; 
+              font-size: 14px; 
+              width: 100%; 
+            }
+            .back-button:hover { transform: translateY(-2px); }
+            @media (max-width: 480px) {
+              body { padding: 16px; }
+              .container { padding: 20px; }
+              h1 { font-size: 20px; }
+              .share-button { padding: 14px; font-size: 15px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>📤 공유하기</h1>
+            
+            <button class="share-button copy" onclick="copyLink()">
+              🔗 링크 복사
+            </button>
+            
+            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
+              🏠 결과 페이지로 돌아가기
+            </button>
+          </div>
+          
+          <script>
+              
+              // 카카오 SDK가 정상 초기화되어 있는지 확인
+              if (window.Kakao && window.Kakao.isInitialized() && window.Kakao.Link) {
+                try {
+                  window.Kakao.Link.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                      title: '🙏 성경인물 MBTI 테스트 결과',
+                      description: shareText,
+                      imageUrl: 'https://b-mbti.money-hotissue.com/og-image-new.png',
+                      link: {
+                        mobileWebUrl: shareUrl,
+                        webUrl: shareUrl,
+                      },
+                    },
+                    buttons: [
+                      {
+                        title: '✨ 나도 테스트 해보기',
+                        link: {
+                          mobileWebUrl: shareUrl,
+                          webUrl: shareUrl,
+                        },
+                      },
+                    ],
+                    success: function(response) {
+                      console.log('카카오 공유 성공:', response);
+                      alert('✅ 카카오톡으로 공유되었습니다!');
+                    },
+                    fail: function(error) {
+                      console.log('카카오 공유 실패:', error);
+                      fallbackKakaoShare();
+                    }
+                  });
+                } catch (error) {
+                  console.error('카카오 링크 전송 오류:', error);
+                  fallbackKakaoShare();
+                }
+              } else {
+                console.log('카카오 SDK 미초기화 - 대안 방법 사용');
+                fallbackKakaoShare();
+              }
+              
+              function fallbackKakaoShare() {
+                const fullText = shareText + '\\n\\n' + shareUrl;
+                // 클립보드에 텍스트 복사
+                navigator.clipboard.writeText(fullText).then(() => {
+                  alert('📋 공유 텍스트가 클립보드에 복사되었습니다!\\n\\n카카오톡에서 붙여넣기 해주세요.');
+                }).catch(() => {
+                  alert('📱 카카오톡으로 공유하기:\\n\\n' + fullText + '\\n\\n위 텍스트를 복사해서 카카오톡에 붙여넣기 해주세요.');
+                });
+              }
+            }
+            
 
-  const handleSNSShare = (platform: string) => {
-    const shareText = `?솋 ?깃꼍?몃Ъ MBTI ?뚯뒪??寃곌낵 ?솋\n\n???'${
-      resultData?.character
-    }(${resultType})' ?좏삎?댁뿉??\n\n${resultData?.description.slice(
-      0,
-      50
-    )}...\n\n?щ윭遺꾨룄 ?뚯뒪?명빐蹂댁꽭??`;
-    const shareUrl = "https://b-mbti.money-hotissue.com";
-
-    if (platform === "copy") {
-      navigator.clipboard
-        .writeText(`${shareText}\n${shareUrl}`)
-        .then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-          setShowShareModal(false);
-          alert("?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??");
-        })
-        .catch(() => {
-          alert(
-            "?벑 ?ㅼ쓬 ?댁슜???섎룞?쇰줈 蹂듭궗?댁＜?몄슂:\n\n" +
-              shareText +
-              "\n\n" +
-              shareUrl
-          );
-          setShowShareModal(false);
-        });
+            
+            function copyLink() {
+              const fullText = \`${shareText}\\n${shareUrl}\`;
+              navigator.clipboard.writeText(fullText).then(() => {
+                alert('📋 링크가 복사되었습니다!');
+              }).catch(() => {
+                // 복사 실패 시 대체 방법
+                const textArea = document.createElement('textarea');
+                textArea.value = fullText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('📋 링크가 복사되었습니다!');
+              });
+            }
+          </script>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
     }
   };
 
-  // 寃뚯엫 ?먯닔 怨꾩궛 ?⑥닔
+
+
+  const handleSNSShare = (platform: string) => {
+    const shareText = `🙏 성경인물 MBTI 테스트 결과 🙏\n\n저는 '${resultData?.character}(${resultType})' 유형이에요!\n\n${resultData?.description.slice(
+      0,
+      50
+    )}...\n\n여러분도 테스트해보세요!`;
+    const shareUrl = "https://b-mbti.money-hotissue.com";
+
+    const copyToClipboard = async () => {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        alert("📋 링크가 복사되었습니다! 카카오/메신저에 붙여넣기 해주세요.");
+      } catch {
+        alert(
+          "복사에 실패했습니다. 아래 내용을 수동으로 복사해 주세요.\n\n" +
+            `${shareText}\n${shareUrl}`
+        );
+      }
+      setShowShareModal(false);
+    };
+
+    if (platform === "copy") {
+      copyToClipboard();
+      return;
+    }
+
+    const encodedText = encodeURIComponent(`${shareText}\n${shareUrl}`);
+    const shareTargets: Record<string, string> = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl
+      )}&quote=${encodeURIComponent(shareText)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodedText}`,
+    };
+
+    const targetUrl = shareTargets[platform];
+    if (targetUrl) {
+      window.open(targetUrl, "_blank");
+      setTimeout(() => window.open(getRandomCoupangUrl(), "_blank"), 1000);
+      setShowShareModal(false);
+      return;
+    }
+
+    // 기본: 링크 복사
+    copyToClipboard();
+  };
+
+  // 게임 점수 계산 함수
   const calculateGameScore = () => {
     if (totalGames === 0) return 0;
     return Math.round((gameScore / totalGames) * 100);
   };
 
-  // 寃뚯엫 ?먯닔 怨듭쑀 ?⑥닔
+  // 게임 점수 공유 함수
   const handleGameScoreShare = (platform: string) => {
     const scorePercentage = calculateGameScore();
-    const shareText = `?렜 ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫 寃곌낵 ?렜\n\n?뺣떟瑜? ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) ?좏삎???? 寃⑤쨪蹂댁꽭?? ?뮞\n\n移쒓뎄?ㅻ룄 ?꾩쟾?대낫?몄슂!`;
-    const shareUrl = "https://b-mbti.money-hotissue.com/game";
+    const shareText = `🎮 성경인물 맞히기 게임 결과 🎮\n\n정답률: ${scorePercentage}% (${gameScore}/${totalGames})\n\n${resultData?.character}(${resultType}) 유형인 저와 겨뤄보세요! 💪\n\n친구들도 도전해보세요!`;
+    const shareUrl = "https://b-mbti.money-hotissue.com/quizgame";
+    const message = `${shareText}\n${shareUrl}`;
+
+    const copyScore = async () => {
+      try {
+        await navigator.clipboard.writeText(message);
+        alert("🎮 게임 결과가 클립보드에 복사되었습니다!\n원하는 곳에 붙여넣기 해주세요. 📋");
+      } catch {
+        alert("복사에 실패했습니다. 아래 내용을 수동으로 복사해주세요.\n\n" + message);
+      }
+      setShowScoreShare(false);
+    };
 
     if (platform === "copy") {
-      navigator.clipboard
-        .writeText(`${shareText}\n${shareUrl}`)
-        .then(() => {
-          alert("?렜 寃뚯엫 寃곌낵媛 ?대┰蹂대뱶??蹂듭궗?섏뿀?듬땲??");
-          setShowScoreShare(false);
-        })
-        .catch(() => {
-          alert(
-            "?벑 ?ㅼ쓬 ?댁슜???섎룞?쇰줈 蹂듭궗?댁＜?몄슂:\n\n" +
-              shareText +
-              "\n\n" +
-              shareUrl
-          );
-          setShowScoreShare(false);
-        });
+      copyScore();
+      return;
     }
+
+    const encoded = encodeURIComponent(message);
+    const targets: Record<string, string> = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl
+      )}&quote=${encodeURIComponent(shareText)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encoded}`,
+    };
+
+    const url = targets[platform];
+    if (url) {
+      window.open(url, "_blank");
+      setTimeout(() => window.open(getRandomCoupangUrl(), "_blank"), 1000);
+      setShowScoreShare(false);
+      return;
+    }
+
+    copyScore();
   };
-
-  const waitForImagesToLoad = useCallback(async (element: HTMLElement) => {
-    const images = Array.from(element.querySelectorAll("img"));
-
-    await Promise.all(
-      images.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete && img.naturalWidth > 0) {
-              resolve();
-              return;
-            }
-
-            const handleLoad = () => {
-              img.removeEventListener("load", handleLoad);
-              img.removeEventListener("error", handleLoad);
-              resolve();
-            };
-
-            img.addEventListener("load", handleLoad);
-            img.addEventListener("error", handleLoad);
-          })
-      )
-    );
-  }, []);
 
   const handleSaveAsImage = async () => {
     try {
-      const captureElement = captureRef.current;
+      // 이미지로 저장할 부분만 선택
+      const captureElement = document.querySelector('.image-capture-area');
       if (!captureElement) {
-        alert("\uacb0\uacfc \ud654\uba74\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.");
+        alert('결과 화면을 찾을 수 없습니다.');
         return;
       }
 
+      // 이미지 캡처 처리 함수
       const processCapture = async () => {
         try {
-          const hiddenElements = Array.from(
-            captureElement.querySelectorAll("[data-hide-on-capture]")
-          ) as HTMLElement[];
-          const previousDisplay = hiddenElements.map(
-            (element) => element.style.display
-          );
-
-          hiddenElements.forEach((element) => {
-            element.style.display = "none";
+          // @ts-ignore - html2canvas는 전역 변수로 로드됨
+          const canvas = await (window as any).html2canvas(captureElement, {
+            backgroundColor: '#ffffff',
+            scale: 2, // scale을 낮춰서 안정성 향상
+            useCORS: false, // CORS 비활성화
+            allowTaint: false, // Taint 비활성화
+            foreignObjectRendering: true, // SVG 등 외부 객체 렌더링 허용
+            logging: false,
+            ignoreElements: (element: HTMLElement) => {
+              // 외부 이미지나 문제가 될 수 있는 요소 제외
+              return element.tagName === 'IFRAME' || 
+                     element.classList.contains('ad-banner') ||
+                     (element.tagName === 'IMG' && (element as HTMLImageElement).src && 
+                      !(element as HTMLImageElement).src.startsWith(window.location.origin));
+            }
           });
 
-          let canvas: HTMLCanvasElement | null = null;
+          // 캔버스를 이미지로 변환
+          const dataURL = canvas.toDataURL('image/png', 1.0);
+          
+          // 다운로드 링크 생성
+          const link = document.createElement('a');
+          link.download = `성경인물-MBTI-${resultType}-${resultData?.character}.png`;
+          link.href = dataURL;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
 
-          try {
-            await waitForImagesToLoad(captureElement);
-
-            const rect = captureElement.getBoundingClientRect();
-            const width = Math.ceil(captureElement.scrollWidth || rect.width);
-            const height = Math.ceil(
-              captureElement.scrollHeight || rect.height
-            );
-            const currentScrollX = window.scrollX;
-            const currentScrollY = window.scrollY;
-            const originalBodyOverflow = document.body.style.overflow;
-            document.body.style.overflow = "hidden";
-
-            // @ts-ignore - html2canvas? ?? ??? ???
-            canvas = await (window as any).html2canvas(captureElement, {
-              backgroundColor: "#ffffff",
-              scale: 2,
-              useCORS: true,
-              allowTaint: false,
-              foreignObjectRendering: true,
-              logging: false,
-              scrollX: -currentScrollX,
-              scrollY: -currentScrollY,
-              width,
-              height,
-              windowWidth: width,
-              windowHeight: height,
-              ignoreElements: (element: HTMLElement) => {
-                return (
-                  element.tagName === "IFRAME" ||
-                  element.classList.contains("ad-banner") ||
-                  (element.tagName === "IMG" &&
-                    (element as HTMLImageElement).src &&
-                    !(element as HTMLImageElement).src.startsWith(
-                      window.location.origin
-                    ))
-                );
-              },
-            });
-          } finally {
-            hiddenElements.forEach((element, index) => {
-              element.style.display = previousDisplay[index];
-            });
-            document.body.style.overflow = originalBodyOverflow;
-          }
-
-          if (!canvas) {
-            throw new Error("\uadf8\ub9bc \uce94\ubc84\uc2a4 \uc0dd\uc131\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4.");
-          }
-
-          const dataURL = canvas.toDataURL("image/png", 1.0);
-          const fileName = `\uc131\uacbd\uc778\ubb3c-MBTI-${resultType}-${resultData?.character}.png`;
-
-          if (Capacitor.isNativePlatform()) {
-            try {
-              const base64Data = dataURL.split(",")[1];
-
-              await Share.share({
-                title: "\uc131\uacbd\uc778\ubb3c MBTI \uacb0\uacfc",
-                text: `\ub2f9\uc2e0\uc758 \uc131\uacbd\uc778\ubb3c\uc740 ${resultData?.character}\uc785\ub2c8\ub2e4`,
-                url: dataURL,
-                dialogTitle: "\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc704\uce58 \uc120\ud0dd",
-              });
-
-              setTimeout(() => {
-                window.open(getRandomCoupangUrl(), "_blank");
-              }, 500);
-            } catch (shareError) {
-              console.error("Share ??, Filesystem ??:", shareError);
-              try {
-                const base64Data = dataURL.split(",")[1];
-                await Filesystem.writeFile({
-                  path: fileName,
-                  data: base64Data,
-                  directory: Directory.Documents,
-                });
-
-                alert("\uc774\ubbf8\uc9c0\uac00 \uc800\uc7a5\ub418\uc5c8\uc2b5\ub2c8\ub2e4!\n\uc800\uc7a5\uc704\uce58: \ubb38\uc11c \ud3f4\ub354\n\n\ud30c\uc77c \uad00\ub9ac\uc790\ub85c \ud655\uc778\ud574\ubcf4\uc138\uc694.");
-
-                window.open(getRandomCoupangUrl(), "_blank");
-              } catch (fsError) {
-                console.error("Filesystem ?? ??:", fsError);
-                alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4.\n\uc2a4\ud06c\ub9b0\uc0f7\uc744 \uc774\uc6a9\ud574\uc8fc\uc138\uc694.");
-              }
-            }
-          } else {
-            const link = document.createElement("a");
-            link.download = fileName;
-            link.href = dataURL;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            setTimeout(() => {
-              window.open(getRandomCoupangUrl(), "_blank");
-              alert("\uc774\ubbf8\uc9c0\uac00 \uc800\uc7a5\ub418\uc5c8\uc2b5\ub2c8\ub2e4!\n\n\uc800\uc7a5\uc704\uce58:\n- Android: \ub2e4\uc6b4\ub85c\ub4dc \ud3f4\ub354\n- iPhone: \uc0ac\uc9c4 \uc571\n- PC: \ub2e4\uc6b4\ub85c\ub4dc \ud3f4\ub354");
-            }, 500);
-          }
+          // 이미지 저장 완료 후 쿠팡파트너스 링크 열기 및 사용자 안내
+          setTimeout(() => {
+            const coupangPartnersUrl = 'https://link.coupang.com/a/cTTkqa';
+            window.open(coupangPartnersUrl, '_blank');
+            
+            // 사용자에게 다운로드 위치 안내
+            alert('📸 이미지가 저장되었습니다!\n\n💡 저장 위치 확인:\n- Android: 다운로드 폴더 또는 갤러리\n- iPhone: 사진 앱의 다운로드 폴더\n- PC: 다운로드 폴더');
+          }, 500);
+          
         } catch (error) {
-          console.error("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc2e4\ud328:", error);
-          alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \uc2a4\ud06c\ub9b0\uc0f7\uc744 \uc774\uc6a9\ud574\uc8fc\uc138\uc694.");
+          console.error('이미지 저장 실패:', error);
+          alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
         }
       };
 
+      // html2canvas가 이미 로드되었는지 확인
       if ((window as any).html2canvas) {
         await processCapture();
       } else {
-        alert("\uc774\ubbf8\uc9c0 \ucea1\ucc3d \ub77c\uc774\ube0c\ub7ec\ub9ac\ub97c \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud574\uc8fc\uc138\uc694.");
+        // 동적으로 html2canvas 라이브러리 로드
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.crossOrigin = 'anonymous'; // CORS 설정 추가
+        document.head.appendChild(script);
+
+        script.onload = async () => {
+          await processCapture();
+        };
+
+        script.onerror = () => {
+          alert('이미지 저장 라이브러리 로드에 실패했습니다.');
+        };
       }
+
     } catch (error) {
-      console.error("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc624\ub958:", error);
-      alert("\uc774\ubbf8\uc9c0 \uc800\uc7a5 \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.");
+      console.error('이미지 저장 중 오류:', error);
+      alert('이미지 저장 중 오류가 발생했습니다.');
     }
   };
 
-  // handleViewOtherCharacters ?⑥닔 ?쒓굅??
+  // handleViewOtherCharacters 함수 제거됨
+  
   const handleLeaveComment = () => {
     setShowComments(true);
-    // ?볤? ?묒꽦 ?쒖뿉??荑좏뙜 ?뚰듃?덉뒪 ?섏씡 李쎌텧
+    // 댓글 작성 시에도 쿠팡 파트너스 수익 창출
     setTimeout(() => {
-      window.open(getRandomCoupangUrl(), "_blank");
+      window.open(getRandomCoupangUrl(), '_blank');
     }, 1000);
   };
 
   const handleSubmitComment = () => {
     if (comment.trim()) {
-      alert("?뮠 ?볤????깅줉?섏뿀?듬땲?? (?ㅼ젣 ?쒕퉬?ㅼ뿉?쒕뒗 DB????λ맗?덈떎)");
-      setComment("");
+      alert('💬 댓글이 등록되었습니다! (실제 서비스에서는 DB에 저장됩니다)');
+      setComment('');
       setShowComments(false);
     }
   };
-
+  
   const checkQuizAnswer = () => {
-    if (!userGuess || userGuess.trim() === "") return;
-
-    const isCorrect =
-      userGuess.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
-    setQuizResult(isCorrect ? "correct" : "wrong");
+    if (!userGuess || userGuess.trim() === '') return;
+    
+    const isCorrect = userGuess.toLowerCase().trim() === quizCharacter.toLowerCase().trim();
+    setQuizResult(isCorrect ? 'correct' : 'wrong');
   };
-
+  
   const selectCharacterFromCandidates = (character: string) => {
-    if (quizResult !== null) return; // ?대? ?듭븞 ?쒖텧??寃쎌슦 ?좏깮 遺덇?
+    if (quizResult !== null) return; // 이미 답안 제출된 경우 선택 불가
     setUserGuess(character);
   };
 
   return (
-    <div
-      className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden"
-      style={{ paddingBottom: "200px" }}
-    >
-      {/* ?대?吏 罹≪쿂 ?곸뿭 ?쒖옉 */}
-      <div className="image-capture-area" ref={captureRef}>
-        {/* 寃곌낵 ?ㅻ뜑 */}
-        <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
-          {/* ?깃꼍?몃Ъ ?뺣낫 - ?띿뒪???쇱そ) / ?대?吏(?ㅻⅨ履? 諛곗튂 */}
-          <div className="flex items-center space-x-6">
-            {/* ?쇱そ: ?띿뒪???뺣낫 */}
-            <div className="flex-1">
-              {/* ?곷떒: ?뱀떊怨???? ?깃꼍?몃Ъ */}
-              <div className="mb-6">
-                <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium inline-block">
-                  ?뱀떊怨???? ?깃꼍?몃Ъ
-                </div>
-              </div>
-
-              {/* 以묎컙: ?대쫫 */}
-              <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center justify-center">
-                  <span className="text-xl md:text-2xl mr-2">✨</span>
-                  {resultData.character}
-                </h1>
-              </div>
-
-              {/* ?섎떒: MBTI ?좏삎 */}
-              <div>
-                <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold inline-block">
-                  {resultType}
-                </div>
+    <div className="result-container p-3 md:p-6 bg-gradient-to-br from-violet-50 via-pink-50 to-orange-50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-xl border border-white/30 w-full max-w-sm md:max-w-lg mx-auto text-center relative overflow-hidden">
+      
+      {/* 이미지 캡처 영역 시작 */}
+      <div className="image-capture-area">
+      
+      {/* 결과 헤더 */}
+      <div className="bg-white/90 rounded-2xl p-4 mb-6 shadow-sm border border-pink-100/50 backdrop-blur-sm">
+        {/* 성경인물 정보 - 텍스트(왼쪽) / 이미지(오른쪽) 배치 */}
+        <div className="flex items-center space-x-6">
+          {/* 왼쪽: 텍스트 정보 */}
+          <div className="flex-1">
+            {/* 상단: 당신과 닮은 성경인물 */}
+            <div className="mb-6">
+              <div className="bg-blue-100 text-blue-700 rounded-full px-4 py-1 text-sm font-medium inline-block">
+                당신과 닮은 성경인물
               </div>
             </div>
-
-            {/* ?ㅻⅨ履? ?대?吏 */}
-            <div className="flex-shrink-0">
-              {resultData.image ? (
-                <div className="space-y-2">
-                  <div
-                    className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
+            
+            {/* 중간: 이름 */}
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+                <span className="text-2xl mr-2">✨</span>
+                {resultData.character}
+              </h1>
+            </div>
+            
+            {/* 하단: MBTI 유형 */}
+            <div>
+              <div className="bg-gradient-to-r from-violet-500 to-pink-500 text-white px-6 py-2 rounded-full text-lg font-bold inline-block">
+                {resultType}
+              </div>
+            </div>
+          </div>
+          
+          {/* 오른쪽: 이미지 */}
+          <div className="flex-shrink-0">
+            {resultData.image ? (
+              <div className="space-y-2">
+                <div 
+                  className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
                   onClick={() => {
-                    const versionNum = parseInt(versionKey);
-                    if (onStartTest) {
-                      onStartTest(versionNum);
-                    } else {
-                      const testUrls = {
-                        1: "https://b-mbti.money-hotissue.com/test1",
-                        2: "https://b-mbti.money-hotissue.com/test2",
-                        3: "https://b-mbti.money-hotissue.com/test3",
-                      };
-                      window.location.href =
-                        testUrls[versionNum as keyof typeof testUrls];
+                    if (resultData.image) {
+                      openImageInNewWindow(resultData.image, resultData.character);
                     }
                   }}
-                  >
-                    <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
-                      <img
-                        src={resultData.image}
-                        alt={resultData.character}
-                        className="w-full h-full object-cover rounded-xl shadow-md"
-                        style={{
-                          imageRendering: "crisp-edges",
-                        }}
-                      />
-                    </div>
+                >
+                  <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
+                    <img 
+                      src={resultData.image} 
+                      alt={resultData.character} 
+                      className="w-full h-full object-cover rounded-xl shadow-md"
+                      style={{
+                        imageRendering: 'crisp-edges'
+                      }}
+                    />
                   </div>
-
-                  {/* ?ш쾶蹂닿린 踰꾪듉 - ?대?吏 ?섎떒????긽 ?쒖떆 */}
-                  <button
-                    onClick={() => {
-                      if (resultData.image) {
-                        openImageInNewWindow(
-                          resultData.image,
-                          resultData.character
-                        );
-                      }
-                    }}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
-                  >
-                    <span>?뵇</span>
-                    <span>?ш쾶蹂닿린</span>
-                  </button>
                 </div>
-              ) : (
-                <div className="w-48 h-48 md:w-56 md:h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
-                  <p className="text-gray-500 text-sm">?대?吏 濡쒕뵫以?..</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ?ㅻ챸 ?띿뒪??- 媛?낆꽦 媛쒖꽑 */}
-        <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
-          <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-            <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent mr-2">
-              ??            </span>
-            ?깃꺽 ?뱀쭠
-          </h3>
-          <div className="space-y-3">
-            {PERSONALITY_TRAITS[resultType]?.map((trait, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                  {index + 1}
-                </span>
-                <p className="text-gray-700 text-sm leading-relaxed text-left">
-                  {trait}
-                </p>
+                
+                {/* 크게보기 버튼 - 이미지 하단에 항상 표시 */}
+                <button
+                  onClick={() => {
+                    if (resultData.image) {
+                      openImageInNewWindow(resultData.image, resultData.character);
+                    }
+                  }}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-1"
+                >
+                  <span>🔍</span>
+                  <span>크게보기</span>
+                </button>
               </div>
-            )) ||
-              // Fallback - 湲곗〈 濡쒖쭅
-              (() => {
-                const sentences = resultData.description
-                  .split(".")
-                  .filter((sentence) => sentence.trim());
-                const targetSentences = sentences.slice(0, 5);
-                while (targetSentences.length < 5 && sentences.length > 0) {
-                  const additionalTraits = [
-                    "?? ??? ? ??? ???? ???? ??? ????.",
-                    "??? ???? ?? ???? ???? ?????.",
-                    "??? ?? ??? ?? ?? ???? ???? ???.",
-                    "???? ?? ??? ?? ???, ???? ??? ????.",
-                    "??? ?? ??? ??? ???? ? ?????.",
-                  ];
-                  const additionalIndex = targetSentences.length;
-                  if (additionalIndex < additionalTraits.length) {
-                    targetSentences.push(additionalTraits[additionalIndex]);
-                  } else {
-                    break;
-                  }
-                }
-
-                return targetSentences.map((sentence, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
-                      {index + 1}
-                    </span>
-                    <p className="text-gray-700 text-sm leading-relaxed text-left">
-                      {sentence.trim()}
-                      {sentence.includes(".") ? "" : "."}
-                    </p>
-                  </div>
-                ));
-              })()}
+            ) : (
+              <div className="w-48 h-48 md:w-56 md:h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
+                <p className="text-gray-500 text-sm">이미지 로딩중...</p>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* ?깃꼍 援ъ젅 - 媛꾩냼?붾맂 ?붿옄??*/}
-        <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6 text-center">
-          <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center justify-center">
-            ?뱰 ????깃꼍援ъ젅 ({resultData.verse})
-          </h4>
-          <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
-            "{resultData.verseText}"
-          </blockquote>
-        </div>
-
-        {/* ?≪뀡 踰꾪듉??- MZ ?ㅽ???*/}
+      {/* 설명 텍스트 - 가독성 개선 */}
+      <div className="bg-white/90 rounded-2xl p-5 mb-6 shadow-sm border border-pink-100/50">
+        <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+          <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent mr-2">✨</span>
+          성격 특징
+        </h3>
         <div className="space-y-3">
-          {/* 硫붿씤 ?≪뀡 踰꾪듉??- ?몃줈 諛곗튂 */}
-          <div className="space-y-3">
-            <button
-              onClick={handleSaveAsImage}
-              className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
-            >
-              ?벝 ?대?吏 ???            </button>
-            <button
-              onClick={handleShare}
-              className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
-              disabled={copied}
-            >
-              {copied ? "?뱥 蹂듭궗??" : "?뵕 怨듭쑀?섍린"}
-            </button>
-          </div>
+          {PERSONALITY_TRAITS[resultType]?.map((trait, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                {index + 1}
+              </span>
+              <p className="text-gray-700 text-sm leading-relaxed text-left">
+                {trait}
+              </p>
+            </div>
+          )) || (
+            // Fallback - 기존 로직
+            (() => {
+              const sentences = resultData.description.split('.').filter(sentence => sentence.trim());
+              const targetSentences = sentences.slice(0, 5);
+              while (targetSentences.length < 5 && sentences.length > 0) {
+                const additionalTraits = [
+                  '깊은 사색과 성찰을 통해 지혜를 얻습니다',
+                  '다른 사람들에게 선한 영향력을 끼칩니다',
+                  '어려운 상황에서도 희망을 잃지 않습니다',
+                  '진실한 마음으로 관계를 맺습니다',
+                  '하나님의 뜻을 구하며 살아갑니다'
+                ];
+                const additionalIndex = targetSentences.length;
+                if (additionalIndex < additionalTraits.length) {
+                  targetSentences.push(additionalTraits[additionalIndex]);
+                } else {
+                  break;
+                }
+              }
+              
+              return targetSentences.map((sentence, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <span className="flex-shrink-0 w-5 h-5 bg-gradient-to-r from-violet-400 to-pink-400 text-white text-xs rounded-full flex items-center justify-center font-semibold mt-0.5">
+                    {index + 1}
+                  </span>
+                  <p className="text-gray-700 text-sm leading-relaxed text-left">
+                    {sentence.trim()}{sentence.includes('.') ? '' : '.'}
+                  </p>
+                </div>
+              ));
+            })()
+          )}
         </div>
+      </div>
 
-        {/* ?댁슱由щ뒗/?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 ?뱀뀡 */}
-        <div className="mb-6 space-y-4 mt-6">
-          {/* ?댁슱由щ뒗 ?깃꺽 ?좏삎 */}
+      {/* 성경 구절 - 간소화된 디자인 */}
+      <div className="bg-gradient-to-r from-violet-100 to-pink-100 p-4 rounded-2xl border-l-4 border-violet-400 shadow-sm mb-6 text-center">
+        <h4 className="text-violet-800 font-bold text-sm mb-2 flex items-center justify-center">
+          📖 대표 성경구절 ({resultData.verse})
+        </h4>
+        <blockquote className="text-gray-800 font-medium text-sm leading-relaxed italic">
+          "{resultData.verseText}"
+        </blockquote>
+      </div>
+
+      {/* 액션 버튼들 - MZ 스타일 */}
+      <div className="space-y-3">
+        {/* 메인 액션 버튼들 - 세로 배치 */}
+        <div className="space-y-3">
+          <button
+            onClick={handleSaveAsImage}
+            className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-violet-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm"
+          >
+            📸 이미지 저장
+          </button>
+          <button
+            onClick={handleShare}
+            className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-2xl hover:from-pink-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm disabled:opacity-75"
+            disabled={copied}
+          >
+            {copied ? '📋 복사됨!' : '🔗 공유하기'}
+          </button>
+        </div>
+      </div>
+
+      {/* 어울리는/어울리지 않는 성격 유형 섹션 */}
+      <div className="mb-6 space-y-4 mt-6">
+          {/* 어울리는 성격 유형 */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-3 md:p-4 shadow-sm border border-green-200">
             {(() => {
               const compatibleType = getCompatibleTypes(resultType)[0];
               if (!compatibleType) return null;
               return (
-                <div className="space-y-3 md:space-y-4">
-                  {/* 1. ?쒕ぉ怨?MBTI ?좏삎 */}
-                  <div className="flex items-center gap-2 flex-wrap justify-center">
-                    <h3 className="text-xs md:text-sm font-bold text-green-800">
-                      ?댁슱由щ뒗 ?깃꺽 ?좏삎 :
-                    </h3>
-                    <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                      {compatibleType}
-                    </span>
-                    <span className="font-bold text-green-800 text-xs md:text-sm">
-                      {RESULTS[compatibleType].character}
-                    </span>
-                    <span className="text-green-600 text-sm md:text-base">
-                      ?뮍
-                    </span>
+                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  {/* 텍스트 정보 */}
+                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
+                    {/* 제목과 MBTI 유형 */}
+                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                      <h3 className="text-xs md:text-sm font-bold text-green-800">어울리는 성격 유형 :</h3>
+                      <span className="bg-green-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
+                        {compatibleType}
+                      </span>
+                      <span className="font-bold text-green-800 text-xs md:text-sm">
+                        {RESULTS[compatibleType].character}
+                      </span>
+                      <span className="text-green-600 text-sm md:text-base">💚</span>
+                    </div>
+                    
+                    {/* 이유 설명 */}
+                    <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
+                        {getCompatibilityReason(resultType, compatibleType)}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* 2. ?대?吏 */}
-                  <div className="flex justify-center">
+                  
+                  {/* 이미지 */}
+                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
-                      <img
-                        src={getMbtiImage(compatibleType)}
+                      <img 
+                        src={getMbtiImage(compatibleType)} 
                         alt={RESULTS[compatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
                         onClick={() => {
-                          openImageInNewWindow(
-                            getMbtiImage(compatibleType),
-                            RESULTS[compatibleType].character
-                          );
+                          openImageInNewWindow(getMbtiImage(compatibleType), RESULTS[compatibleType].character);
                         }}
                       />
-                      {/* ?대?吏 ?덉뿉 ?ш쾶蹂닿린 踰꾪듉 - ??긽 ?쒖떆 */}
+                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        ?뵇 ?ш쾶蹂닿린
+                        🔍 크게보기
                       </div>
                     </div>
-                  </div>
-
-                  {/* 3. ?ㅻ챸 */}
-                  <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-2 md:p-3 border border-green-200">
-                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
-                      {getCompatibilityReason(resultType, compatibleType)}
-                    </p>
                   </div>
                 </div>
               );
             })()}
           </div>
 
-          {/* ?댁슱由ъ? ?딅뒗 ?깃꺽 ?좏삎 */}
+          {/* 어울리지 않는 성격 유형 */}
           <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-3 md:p-4 shadow-sm border border-red-200">
             {(() => {
               const incompatibleType = getIncompatibleTypes(resultType)[0];
               if (!incompatibleType) return null;
               return (
-                <div className="space-y-3 md:space-y-4">
-                  {/* 1. ?쒕ぉ怨?MBTI ?좏삎 */}
-                  <div className="flex items-center gap-2 flex-wrap justify-center">
-                    <h3 className="text-xs md:text-sm font-bold text-red-800">
-                      二쇱쓽?댁빞 ???깃꺽 ?좏삎 :
-                    </h3>
-                    <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
-                      {incompatibleType}
-                    </span>
-                    <span className="font-bold text-red-800 text-xs md:text-sm">
-                      {RESULTS[incompatibleType].character}
-                    </span>
-                    <span className="text-red-600 text-sm md:text-base">
-                      ?뮅
-                    </span>
+                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  {/* 텍스트 정보 */}
+                  <div className="flex-1 space-y-2 md:space-y-3 order-2 md:order-1">
+                    {/* 제목과 MBTI 유형 */}
+                    <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                      <h3 className="text-xs md:text-sm font-bold text-red-800">주의해야 할 성격 유형 :</h3>
+                      <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 md:px-3 py-1 rounded-full">
+                        {incompatibleType}
+                      </span>
+                      <span className="font-bold text-red-800 text-xs md:text-sm">
+                        {RESULTS[incompatibleType].character}
+                      </span>
+                      <span className="text-red-600 text-sm md:text-base">💔</span>
+                    </div>
+                    
+                    {/* 이유 설명 */}
+                    <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
+                      <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center md:text-left">
+                        {getIncompatibilityReason(resultType, incompatibleType)}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* 2. ?대?吏 */}
-                  <div className="flex justify-center">
+                  
+                  {/* 이미지 */}
+                  <div className="flex-shrink-0 order-1 md:order-2 flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 relative cursor-pointer">
-                      <img
-                        src={getMbtiImage(incompatibleType)}
+                      <img 
+                        src={getMbtiImage(incompatibleType)} 
                         alt={RESULTS[incompatibleType].character}
                         className="w-full h-full object-cover rounded-lg shadow-md transition-transform hover:scale-105"
                         onClick={() => {
-                          openImageInNewWindow(
-                            getMbtiImage(incompatibleType),
-                            RESULTS[incompatibleType].character
-                          );
+                          openImageInNewWindow(getMbtiImage(incompatibleType), RESULTS[incompatibleType].character);
                         }}
                       />
-                      {/* ?대?吏 ?덉뿉 ?ш쾶蹂닿린 踰꾪듉 - ??긽 ?쒖떆 */}
+                      {/* 이미지 안에 크게보기 버튼 - 항상 표시 */}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs text-center py-1 rounded-b-lg">
-                        ?뵇 ?ш쾶蹂닿린
+                        🔍 크게보기
                       </div>
                     </div>
-                  </div>
-
-                  {/* 3. ?ㅻ챸 */}
-                  <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-xl p-2 md:p-3 border border-red-200">
-                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed text-center">
-                      {getIncompatibilityReason(resultType, incompatibleType)}
-                    </p>
                   </div>
                 </div>
               );
             })()}
           </div>
-
+          
           <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
             <p className="text-xs text-gray-600 text-center">
-              ?뮕 MBTI 湲곕컲 沅곹빀 遺꾩꽍 (媛쒖씤李??덉쓬)
+              💡 MBTI 기반 궁합 분석 (개인차 있음)
             </p>
           </div>
         </div>
-      </div>{" "}
-      {/* image-capture-area ??*/}
-      {/* ?섎㉧吏 ?뚯뒪??異붿쿇 ?뱀뀡 */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
-        <div className="text-center">
-          <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-                <span className="mr-2">??</span>
-            ?ㅻⅨ ?뚯뒪?몃룄 ?대낫?ㅻ옒??
-          </h3>
-          <p className="text-sm text-gray-600 mb-3">
-            ???뺥솗??遺꾩꽍???꾪빐 異붽? ?뚯뒪???대낫?몄슂! ?렞
-          </p>
+        
+        </div> {/* image-capture-area 끝 */}
 
-          <div className="grid grid-cols-1 gap-3">
-            {Object.entries(TEST_VERSIONS)
-              .filter(
-                ([versionKey]) => parseInt(versionKey) !== completedVersion
-              )
-              .map(([versionKey, version]) => (
-                <div
-                  key={versionKey}
-                  className={`bg-gradient-to-r ${
-                    version.color === "orange"
-                      ? "from-orange-50 to-amber-50 border-orange-200"
-                      : version.color === "purple"
-                      ? "from-purple-50 to-pink-50 border-purple-200"
-                      : "from-blue-50 to-cyan-50 border-blue-200"
-                  } rounded-xl p-4 border hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02]`}
-                  onClick={() => {
-                    const versionNum = parseInt(versionKey);
-                    if (onStartTest) {
-                      onStartTest(versionNum);
-                    } else {
-                      const testUrls = {
-                        1: "https://b-mbti.money-hotissue.com/test1",
-                        2: "https://b-mbti.money-hotissue.com/test2",
-                        3: "https://b-mbti.money-hotissue.com/test3",
-                      };
-                      window.location.href =
-                        testUrls[versionNum as keyof typeof testUrls];
-                    }
-                  }}
-                >
-                  <div className="text-center">
-                    <div className="text-left mb-3">
-                      <div className="font-bold text-gray-800 text-base mb-1">
-                        {version.name}
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        {version.description}
-                      </div>
-                      <div
-                        className={`text-xs ${
-                          version.color === "orange"
-                            ? "text-orange-700"
-                            : version.color === "purple"
-                            ? "text-purple-700"
-                            : "text-blue-700"
-                        }`}
-                      >
-                        {parseInt(versionKey) === 1 &&
-                          "?뮡 ?덈같? 湲곕룄瑜?以묒슂?섍쾶 ?앷컖?섎뒗 遺꾨뱾?먭쾶 異붿쿇"}
-                        {parseInt(versionKey) === 2 &&
-                          "?쭬 ?좎븰 怨좊???????듭쓣 李얘퀬 ?띠? 遺꾨뱾?먭쾶 異붿쿇"}
-                        {parseInt(versionKey) === 3 &&
-                          "???ㅼ젣 ?앺솢?먯꽌 ?좎븰???ㅼ쿇?섎뒗 遺꾨뱾?먭쾶 異붿쿇"}
-                      </div>
-                    </div>
-                    <div className="w-full">
-                      <span
-                        className={`w-full block px-4 py-3 rounded-xl font-semibold text-sm text-center ${
-                          version.color === "orange"
-                            ? "bg-orange-500 text-white"
-                            : version.color === "purple"
-                            ? "bg-purple-500 text-white"
-                            : "bg-blue-500 text-white"
-                        }`}
-                      >
-                        ?쒖옉!
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
-      {/* ?≪뀡 踰꾪듉?ㅼ쓣 媛먯떥??而⑦뀒?대꼫 */}
-      <div className="space-y-3 md:space-y-4">
-        {/* ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫 - 李몄뿬 ?좊룄 臾멸뎄濡?蹂寃?*/}
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
+        {/* 나머지 테스트 추천 섹션 */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
           <div className="text-center">
-            <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
-              <span className="mr-2">??</span>
-              ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫!
+            <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
+              <span className="mr-2">🔥</span>
+              다른 테스트도 해보실래요?
             </h3>
-            <p className="text-xs md:text-sm text-indigo-600 mb-3">
-              ?대?吏瑜?蹂닿퀬 ?꾧뎄?몄? 留욎떠蹂댁꽭????            </p>
-
-            {/* 臾몄젣 ?덉떆 */}
-            <div className="mb-4 p-3 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl border border-indigo-200">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
-                  <img
-                    src="/default-avatar.jpg"
-                    alt="추천 캐릭터"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "/og-image-new.png";
+            <p className="text-sm text-gray-600 mb-3">
+              더 정확한 분석을 위해 추가 테스트 해보세요! 🎯
+            </p>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {Object.entries(TEST_VERSIONS)
+                .filter(([versionKey]) => parseInt(versionKey) !== completedVersion)
+                .map(([versionKey, version]) => (
+                  <div 
+                    key={versionKey} 
+                    className={`bg-gradient-to-r ${
+                      version.color === 'orange' ? 'from-orange-50 to-amber-50 border-orange-200' :
+                      version.color === 'purple' ? 'from-purple-50 to-pink-50 border-purple-200' :
+                      'from-blue-50 to-cyan-50 border-blue-200'
+                    } rounded-xl p-4 border hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-[1.02]`}
+                    onClick={() => {
+                      const testUrls = {
+                        1: 'https://b-mbti.money-hotissue.com/test1',
+                        2: 'https://b-mbti.money-hotissue.com/test2',
+                        3: 'https://b-mbti.money-hotissue.com/test3'
+                      };
+                      window.location.href = testUrls[parseInt(versionKey) as keyof typeof testUrls];
                     }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="text-xs text-gray-600 mb-1">臾몄젣 ?덉떆:</div>
-                  <div className="text-sm font-medium text-gray-800">
-                    ???щ엺? ?꾧뎄?쇨퉴??
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-1">
-                <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  ?ㅼ쐵
-                </div>
-                <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  紐⑥꽭
-                </div>
-                <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  ?꾨툕?쇳븿
-                </div>
-                <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">
-                  ?붾줈紐?                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                // 寃곌낵 ?뺣낫瑜?localStorage???꾩떆 ???(?뚯븘媛湲?湲곕뒫??
-                localStorage.setItem(
-                  "tempResult",
-                  JSON.stringify({
-                    type: resultType,
-                    character: resultData?.character || "",
-                    timestamp: Date.now(),
-                  })
-                );
-
-                // ???대??먯꽌??onQuizGame 肄쒕갚 ?ъ슜
-                if (onQuizGame) {
-                  onQuizGame();
-                } else {
-                  // ?뱀뿉?쒕뒗 湲곗〈 諛⑹떇 ?ъ슜
-                  openWithCoupangAd("/game");
-                }
-              }}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
-            >
-              ?뼹截?寃뚯엫 ?쒖옉?섍린
-            </button>
-
-            {/* 寃뚯엫 ?먯닔 ?쒖떆 (寃뚯엫????踰덉씠?쇰룄 ?덉쓣 ?뚮쭔 ?쒖떆) */}
-            {totalGames > 0 && (
-              <div className="mt-3 md:mt-4 p-2 md:p-3 bg-white/80 rounded-xl border border-indigo-200">
-                <div className="flex items-center justify-between mb-1 md:mb-2">
-                  <span className="text-xs md:text-sm font-semibold text-indigo-800">
-                    ?룇 ??寃뚯엫 湲곕줉
-                  </span>
-                  <button
-                    onClick={() => setShowScoreShare(true)}
-                    className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
                   >
-                    ?뱾 怨듭쑀
-                  </button>
-                </div>
-                <div className="text-center">
-                  <div className="text-base md:text-lg font-bold text-indigo-700">
-                    ?뺣떟瑜? {calculateGameScore()}%
+                    <div className="text-center">
+                      <div className="text-left mb-3">
+                        <div className="font-bold text-gray-800 text-base mb-1">{version.name}</div>
+                        <div className="text-sm text-gray-600 mb-2">{version.description}</div>
+                        <div className={`text-xs ${
+                          version.color === 'orange' ? 'text-orange-700' :
+                          version.color === 'purple' ? 'text-purple-700' :
+                          'text-blue-700'
+                        }`}>
+                          {parseInt(versionKey) === 1 && "💭 예배와 기도를 중요하게 생각하는 분들에게 추천"}
+                          {parseInt(versionKey) === 2 && "🧠 신앙 고민에 대한 답을 찾고 싶은 분들에게 추천"}
+                          {parseInt(versionKey) === 3 && "⚡ 실제 생활에서 신앙을 실천하는 분들에게 추천"}
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <span className={`w-full block px-4 py-3 rounded-xl font-semibold text-sm text-center ${
+                          version.color === 'orange' ? 'bg-orange-500 text-white' :
+                          version.color === 'purple' ? 'bg-purple-500 text-white' :
+                          'bg-blue-500 text-white'
+                        }`}>
+                          시작!
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-600">
-                    ({gameScore}/{totalGames} ?뺣떟)
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ?쒕뜡 寃뚯엫 李몄뿬 ?좊룄 硫섑듃 */}
-            <div className="mt-2 md:mt-3 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
-              <p className="text-xs text-gray-600 text-center leading-relaxed">
-                {randomPrompt}
-              </p>
+                ))}
             </div>
           </div>
         </div>
 
-        {/* ?ㅼ떆 ?뚯뒪??踰꾪듉 */}
-        <button
-          onClick={() => {
-            // completedVersion???덉쑝硫??쒖옉 ?섏씠吏濡?踰꾩쟾 ?뺣낫? ?④퍡 ?대룞
-            if (completedVersion) {
-              openWithCoupangAd(
-                `https://b-mbti.money-hotissue.com/?version=${completedVersion}`
-              );
-            } else {
-              onRestart();
-              // ?ㅼ떆 ?뚯뒪???쒖뿉??荑좏뙜 ?뚰듃?덉뒪 ?섏씡 李쎌텧
-              setTimeout(() => {
-                window.open(getRandomCoupangUrl(), "_blank");
-              }, 1000);
-            }
-          }}
-          className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
-        >
-          ?봺 ?ㅼ떆 ?뚯뒪?명븯湲?        </button>
+        {/* 액션 버튼들을 감싸는 컨테이너 */}
+        <div className="space-y-3 md:space-y-4">
+          {/* 성경인물 맞히기 게임 - 참여 유도 문구로 변경 */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
+            <div className="text-center">
+              <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
+                <span className="mr-2">🖼️</span>
+                성경인물 맞히기 게임!
+              </h3>
+              {/* 문제 예시 */}
+              <div className="mb-4 p-3 bg-white/70 rounded-xl border border-indigo-100">
+                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
+                      <img 
+                        src="/ESTJ 모세.jpg" 
+                        alt="문제 예시"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/ENFP 아브라함.jpg'; // 기본 이미지로 대체
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-600 mb-1">문제 예시:</div>
+                      <div className="text-sm font-medium text-gray-800">이 분은 누구일까요?</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1">
+                    <div className="text-center py-1.5 bg-white rounded text-xs text-gray-600 border">모세</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">다윗</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">아브라함</div>
+                    <div className="text-center py-1.5 bg-gray-50 rounded text-xs text-gray-500 border">솔로몬</div>
+                  </div>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => {
+                  // 결과 정보를 localStorage에 임시 저장 (돌아가기 기능용)
+                  localStorage.setItem('tempResult', JSON.stringify({
+                    type: resultType,
+                    character: resultData?.character || '',
+                    timestamp: Date.now()
+                  }));
+                  openWithCoupangAd('/game');
+                }}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-2xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-sm text-sm md:text-base"
+              >
+                🖼️ 게임 시작하기
+              </button>
+              
+              {/* 게임 점수 표시 (게임을 한 번이라도 했을 때만 표시) */}
+              {totalGames > 0 && (
+                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-white/80 rounded-xl border border-indigo-200">
+                  <div className="flex items-center justify-between mb-1 md:mb-2">
+                    <span className="text-xs md:text-sm font-semibold text-indigo-800">
+                      🏆 내 게임 기록
+                    </span>
+                    <button
+                      onClick={() => setShowScoreShare(true)}
+                      className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
+                    >
+                      📤 공유
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-base md:text-lg font-bold text-indigo-700">
+                      정답률: {calculateGameScore()}%
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      ({gameScore}/{totalGames} 정답)
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* 랜덤 게임 참여 유도 멘트 */}
+              <div className="mt-2 md:mt-3 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
+                  {randomPrompt}
+                </p>
+              </div>
+            </div>
+          </div>
 
-        {/* ?꾧린 ?④린湲?*/}
-        <button
-          onClick={handleLeaveComment}
-          className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm md:text-base"
-        >
-          ?뮠 ?꾧린 ?④린湲?        </button>
-      </div>
-      {/* SNS 怨듭쑀 紐⑤떖 */}
+          {/* 다시 테스트 버튼 */}
+          <button
+            onClick={() => {
+              // completedVersion이 있으면 시작 페이지로 버전 정보와 함께 이동
+              if (completedVersion) {
+                openWithCoupangAd(`https://b-mbti.money-hotissue.com/?version=${completedVersion}`);
+              } else {
+                onRestart();
+                // 다시 테스트 시에도 쿠팡 파트너스 수익 창출
+                setTimeout(() => {
+                  window.open(getRandomCoupangUrl(), '_blank');
+                }, 1000);
+              }
+            }}
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-sm text-sm md:text-base"
+          >
+            🔁 다시 테스트하기
+          </button>
+
+          {/* 후기 남기기 */}
+          <button
+            onClick={handleLeaveComment}
+            className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2.5 md:py-3 px-3 md:px-4 rounded-2xl hover:from-green-600 hover:to-teal-600 transition-all duration-200 shadow-sm text-sm md:text-base"
+          >
+            💬 후기 남기기
+          </button>
+        </div>
+
+      {/* SNS 공유 모달 */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl mx-3">
-            <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">
-              ?뱾 寃곌낵 怨듭쑀?섍린
-            </h3>
-            <button
-              onClick={() => handleSNSShare("copy")}
-              className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base"
-            >
-              ?뱥 留곹겕 蹂듭궗
+            <h3 className="text-lg md:text-xl font-bold text-center mb-4 md:mb-6">📤 결과 공유하기</h3>
+            <button onClick={() => handleSNSShare('copy')} className="w-full p-4 md:p-6 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-3 md:mb-4 text-sm md:text-base">
+              📋 링크 복사
             </button>
-            <button
-              onClick={() => setShowShareModal(false)}
-              className="w-full p-3 md:p-4 text-gray-500 text-sm md:text-base"
-            >
-              痍⑥냼
+            <button onClick={() => setShowShareModal(false)} className="w-full p-3 md:p-4 text-gray-500 text-sm md:text-base">
+              취소
             </button>
           </div>
         </div>
       )}
-      {/* 寃뚯엫 ?먯닔 怨듭쑀 紐⑤떖 */}
+
+      {/* 게임 점수 공유 모달 */}
       {showScoreShare && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
           <div className="bg-white rounded-3xl p-4 md:p-6 max-w-xs md:max-w-sm w-full shadow-2xl mx-3">
-            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">
-              ?룇 寃뚯엫 寃곌낵 怨듭쑀?섍린
-            </h3>
+            <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4">🏆 게임 결과 공유하기</h3>
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-3 md:p-4 mb-3 md:mb-4 text-center">
               <div className="text-lg md:text-xl font-bold text-indigo-700 mb-1">
-                ?뺣떟瑜? {calculateGameScore()}%
+                정답률: {calculateGameScore()}%
               </div>
               <div className="text-xs md:text-sm text-gray-600">
-                ({gameScore}/{totalGames} 臾몄젣 ?뺣떟)
+                ({gameScore}/{totalGames} 문제 정답)
               </div>
               <div className="text-xs text-indigo-600 mt-1 md:mt-2">
-                移쒓뎄?ㅺ낵 寃쎌웳?대낫?몄슂! ?뮞
+                친구들과 경쟁해보세요! 💪
               </div>
             </div>
-            <button
-              onClick={() => handleGameScoreShare("copy")}
-              className="w-full p-3 md:p-4 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-sm md:text-base"
-            >
-              ?뱥 寃곌낵 蹂듭궗
+            <button onClick={() => handleGameScoreShare('copy')} className="w-full p-2 md:p-3 bg-gray-100 text-gray-700 rounded-xl md:rounded-2xl font-semibold mb-2 md:mb-3 text-xs md:text-sm">
+              📋 결과 복사
             </button>
-            <button
-              onClick={() => setShowScoreShare(false)}
-              className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm"
-            >
-              痍⑥냼
+            <button onClick={() => setShowScoreShare(false)} className="w-full p-2 md:p-3 text-gray-500 text-xs md:text-sm">
+              취소
             </button>
           </div>
         </div>
       )}
-      {/* ?꾧린 ?④린湲?紐⑤떖 */}
+
+      {/* 후기 남기기 모달 */}
       {showComments && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-bold text-center mb-4">
-              ?뮠 ?꾧린 ?④린湲?            </h3>
+            <h3 className="text-lg font-bold text-center mb-4">💬 후기 남기기</h3>
             <div className="mb-4 space-y-3">
               {fakeComments.map((c) => (
                 <div key={c.id} className="p-3 bg-gray-50 rounded-2xl">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-sm text-gray-800">
-                      {c.user}
-                    </span>
-                    <span className="text-xs text-gray-500">?ㅿ툘 {c.likes}</span>
+                    <span className="font-semibold text-sm text-gray-800">{c.user}</span>
+                    <span className="text-xs text-gray-500">❤️ {c.likes}</span>
                   </div>
                   <p className="text-sm text-gray-700">{c.comment}</p>
                 </div>
@@ -1430,109 +1345,86 @@ const previewCharacter = useMemo(() => {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="?뚯뒪??寃곌낵???대뼚?⑤굹??"
+              placeholder="테스트 결과는 어떠셨나요?"
               className="w-full p-3 border border-gray-200 rounded-2xl text-sm resize-none h-20"
             />
             <div className="flex gap-2 mt-3">
-              <button
-                onClick={handleSubmitComment}
-                className="flex-1 p-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-2xl font-semibold text-sm"
-              >
-                ?깅줉
+              <button onClick={handleSubmitComment} className="flex-1 p-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-2xl font-semibold text-sm">
+                등록
               </button>
-              <button
-                onClick={() => setShowComments(false)}
-                className="px-4 p-3 text-gray-500 text-sm"
-              >
-                痍⑥냼
+              <button onClick={() => setShowComments(false)} className="px-4 p-3 text-gray-500 text-sm">
+                취소
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* ??젣??寃뚯엫 紐⑤떖 ?뱀뀡 - ???댁긽 ?꾩슂 ?놁쓬 */}
+
+
+
+      {/* 삭제된 게임 모달 섹션 - 더 이상 필요 없음 */}
       {false && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-center mb-4">
-              ?렜 ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫
-            </h3>
-
+            <h3 className="text-xl font-bold text-center mb-4">🎮 성경인물 맞히기 게임</h3>
+            
             <div className="text-center mb-6">
-              {/* 罹먮┃???대?吏 */}
+              {/* 캐릭터 이미지 */}
               <div className="mb-4 bg-gradient-to-br from-violet-50 to-pink-50 rounded-2xl p-4">
                 <div className="w-32 h-32 mx-auto mb-3 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
                   {currentQuizType && (
-                    <img
-                      src={`/${
-                        currentQuizType === "ENFJ"
-                          ? "ENJS ?먰뿤誘몄빞"
-                          : currentQuizType === "ENTP"
-                          ? "ENFP ?꾨툕?쇳븿"
-                          : `${currentQuizType} ${
-                              RESULTS[currentQuizType as keyof typeof RESULTS]
-                                .character
-                            }`
-                      }.jpg`}
-                      alt={`quiz image ${currentQuizType}`}
+                    <img 
+                      src={`/${currentQuizType === 'ENFJ' ? 'ENJS 느헤미야' : 
+                           currentQuizType === 'ENTP' ? 'ENFP 아브라함' : 
+                           `${currentQuizType} ${RESULTS[currentQuizType as keyof typeof RESULTS].character}`}.jpg`}
+                      alt="성경인물"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "/ENFP ?꾨툕?쇳븿.jpg";
+                        (e.target as HTMLImageElement).src = '/ENFP 아브라함.jpg';
                       }}
                     />
                   )}
                 </div>
-                <h4 className="text-lg font-bold text-gray-800 mb-2">
-                  ???щ엺? ?꾧뎄?쇨퉴?? ?쨺
-                </h4>
-
-                {/* ?좏깮???듭븞 ?쒖떆 */}
+                <h4 className="text-lg font-bold text-gray-800 mb-2">이 사람은 누구일까요? 🤔</h4>
+                
+                {/* 선택된 답안 표시 */}
                 {userGuess && quizResult === null && (
                   <div className="mt-3 p-3 bg-blue-100 text-blue-700 rounded-xl">
-                    ?좏깮???듭븞: <strong>{userGuess}</strong>
+                    선택한 답안: <strong>{userGuess}</strong>
                   </div>
                 )}
-
+                
                 {quizResult && (
-                  <div
-                    className={`mt-3 p-3 rounded-xl ${
-                      quizResult === "correct"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {quizResult === "correct"
-                      ? `?럦 ?뺣떟?낅땲?? ${quizCharacter}?섏씠 留욌꽕??`
-                      : `?쁾 ?꾩돩?뚯슂! ?뺣떟? ${quizCharacter}?낅땲??`}
+                  <div className={`mt-3 p-3 rounded-xl ${quizResult === 'correct' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'}`}>
+                    {quizResult === 'correct' 
+                      ? `🎉 정답입니다! ${quizCharacter}님이 맞네요!` 
+                      : `😅 아쉬워요! 정답은 ${quizCharacter}입니다.`}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 16紐??꾨낫 ?좏깮吏 */}
+            {/* 16명 후보 선택지 */}
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-600 mb-3 text-center">
-                ?뮕 ?꾨옒 ?꾨낫 以묒뿉???좏깮?섏꽭??
+                💡 아래 후보 중에서 선택하세요!
               </h4>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                 {ALL_CHARACTERS.map((type) => (
                   <button
                     key={type}
-                    onClick={() =>
-                      selectCharacterFromCandidates(RESULTS[type].character)
-                    }
+                    onClick={() => selectCharacterFromCandidates(RESULTS[type].character)}
                     disabled={quizResult !== null}
                     className={`p-2 rounded-xl text-xs font-medium transition-all duration-200 ${
-                      userGuess === RESULTS[type].character &&
-                      quizResult === null
-                        ? "bg-blue-200 text-blue-800 border-2 border-blue-400"
-                        : quizResult !== null &&
-                          RESULTS[type].character === quizCharacter
-                        ? "bg-green-200 text-green-800 border-2 border-green-400"
+                      userGuess === RESULTS[type].character && quizResult === null
+                        ? 'bg-blue-200 text-blue-800 border-2 border-blue-400'
+                        : quizResult !== null && RESULTS[type].character === quizCharacter
+                        ? 'bg-green-200 text-green-800 border-2 border-green-400'
                         : quizResult === null
-                        ? "bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700"
-                        : "bg-gray-50 text-gray-400"
+                        ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700'
+                        : 'bg-gray-50 text-gray-400'
                     }`}
                   >
                     <div className="font-bold">{RESULTS[type].character}</div>
@@ -1542,113 +1434,45 @@ const previewCharacter = useMemo(() => {
               </div>
             </div>
 
-            {/* 寃뚯엫 ?≪뀡 踰꾪듉 */}
+            {/* 게임 액션 버튼 */}
             <div className="flex gap-2">
               {quizResult === null ? (
-                <button
+                <button 
                   onClick={checkQuizAnswer}
-                  disabled={!userGuess || userGuess.trim() === ""}
+                  disabled={!userGuess || userGuess.trim() === ''}
                   className={`flex-1 p-3 rounded-2xl font-semibold transition-all duration-200 ${
-                    userGuess && userGuess.trim() !== ""
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    userGuess && userGuess.trim() !== ''
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  ???듭븞 ?쒖텧
+                  ✅ 답안 제출
                 </button>
               ) : (
-                <button
+                <button 
                   onClick={getRandomCharacter}
                   className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold"
                 >
-                  ?렜 ?ㅼ떆 ?꾩쟾
+                  🎮 다시 도전
                 </button>
               )}
-              <button
-                onClick={() => {}}
+              <button 
+                onClick={() => {}} 
                 className="px-6 p-3 text-gray-500 text-sm hover:bg-gray-100 rounded-2xl"
               >
-                ?リ린
+                닫기
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* ?섎떒 ?μ떇 */}
+
+      {/* 하단 장식 */}
       <div className="mt-2 flex justify-center space-x-1">
         <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></div>
         <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse delay-75"></div>
         <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse delay-150"></div>
       </div>
-      {/* ?명꽣 */}
-      <div className="mt-8 pt-6 border-t border-gray-200/50">
-        <div className="space-y-2 text-center">
-          <p className="text-xs text-gray-500">
-            荑좏뙜 ?뚰듃?덉뒪 ?쒕룞???쇳솚?쇰줈, ?댁뿉 ?곕Ⅸ ?쇱젙?≪쓽 ?섏닔猷뚮?
-            ?쒓났諛쏆뒿?덈떎.
-          </p>
-          <p className="text-xs text-gray-400">
-            짤 2025 B-MBTI. All rights reserved.
-          </p>
-        </div>
-      </div>
-      {/* ?대?吏 ?뺣? 紐⑤떖 */}
-      {showImageModal && (
-        <div
-          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-sm"
-          style={{ padding: "20px" }}
-          onClick={() => setShowImageModal(false)}
-        >
-          <div
-            className="relative bg-white rounded-2xl w-full max-w-2xl"
-            style={{
-              maxHeight: "90vh",
-              display: "flex",
-              flexDirection: "column",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* ?リ린 踰꾪듉 */}
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all"
-            >
-              ??            </button>
-
-            {/* ?쒕ぉ */}
-            {modalImageTitle && (
-              <div className="px-6 pt-6 pb-3">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 text-center">
-                  {modalImageTitle}
-                </h2>
-              </div>
-            )}
-
-            {/* ?대?吏 */}
-            <div
-              className="flex-1 flex items-center justify-center px-6"
-              style={{ minHeight: 0 }}
-            >
-              <img
-                src={modalImageSrc}
-                alt={modalImageTitle}
-                className="w-full h-auto rounded-xl shadow-lg object-contain"
-                style={{ maxHeight: "calc(90vh - 180px)" }}
-              />
-            </div>
-
-            {/* ?リ린 踰꾪듉 (?섎떒) */}
-            <div className="px-6 pb-6 pt-4">
-              <button
-                onClick={() => setShowImageModal(false)}
-                className="w-full py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
-              >
-                ?リ린
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

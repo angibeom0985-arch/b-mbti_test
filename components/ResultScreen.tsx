@@ -860,6 +860,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             const height = Math.ceil(
               captureElement.scrollHeight || rect.height
             );
+            const currentScrollX = window.scrollX;
+            const currentScrollY = window.scrollY;
             const originalBodyOverflow = document.body.style.overflow;
             document.body.style.overflow = "hidden";
 
@@ -871,8 +873,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               allowTaint: false,
               foreignObjectRendering: true,
               logging: false,
-              scrollX: 0,
-              scrollY: 0,
+              scrollX: -currentScrollX,
+              scrollY: -currentScrollY,
               width,
               height,
               windowWidth: width,
@@ -890,10 +892,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
               },
             });
           } finally {
-            document.body.style.overflow = originalBodyOverflow;
             hiddenElements.forEach((element, index) => {
               element.style.display = previousDisplay[index];
             });
+            document.body.style.overflow = originalBodyOverflow;
           }
 
           if (!canvas) {

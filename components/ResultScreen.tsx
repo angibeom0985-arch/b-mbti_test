@@ -293,7 +293,7 @@ const previewCharacter = useMemo(() => {
     };
   }, []);
 
-  // 而댄룷?뚰듃 留덉슫????寃뚯엫 ?먯닔 遺덈윭?ㅺ린
+  // Restore quiz mini-game score from localStorage
   useEffect(() => {
     const savedScore = localStorage.getItem("quizGameScore");
     const savedTotal = localStorage.getItem("quizGameTotal");
@@ -304,14 +304,13 @@ const previewCharacter = useMemo(() => {
     }
   }, []);
 
-  // ?댁쫰瑜??꾪븳 ?쒕뜡 罹먮┃???좏깮 (useCallback?쇰줈 理쒖쟻??
+  // Select a random character for the quiz and reset the pool when all are used
   const getRandomCharacter = useCallback(() => {
-    // 紐⑤뱺 罹먮┃?곕? ?ъ슜?덈떎硫?紐⑸줉??珥덇린??    let availableCharacters = ALL_CHARACTERS.filter(
+    let availableCharacters = ALL_CHARACTERS.filter(
       (type) => !usedCharacters.includes(type)
     );
 
     if (availableCharacters.length === 0) {
-      // 紐⑤뱺 罹먮┃?곕? ?ъ슜?덉쑝硫?珥덇린?뷀븯怨??꾩옱 罹먮┃?곕쭔 ?쒖쇅
       setUsedCharacters([]);
       availableCharacters = ALL_CHARACTERS.filter(
         (type) => type !== currentQuizType
@@ -329,7 +328,7 @@ const previewCharacter = useMemo(() => {
     setQuizResult(null);
   }, [usedCharacters, currentQuizType]);
 
-  // 紐⑤떖濡??대?吏 ?ш쾶 蹂닿린 ?⑥닔 (useCallback?쇰줈 理쒖쟻??
+  // Open the image in a modal (mobile friendly)
   const openImageInModal = useCallback(
     (imageSrc: string, characterName: string) => {
       setModalImageSrc(imageSrc);
@@ -339,7 +338,6 @@ const previewCharacter = useMemo(() => {
     []
   );
 
-  // 紐⑤컮??理쒖쟻?붾맂 ?덉갹 ?대?吏 蹂닿린 ?⑥닔 (useCallback?쇰줈 理쒖쟻??
   const openImageInNewWindow = useCallback(
     (imageSrc: string, characterName: string) => {
       openImageInModal(imageSrc, characterName);
@@ -467,24 +465,30 @@ const previewCharacter = useMemo(() => {
     [openImageInModal]
   );
 
-  // 媛吏??볤? ?곗씠??  const fakeComments = [
+  // Sample social proof comments shown under the result
+  const fakeComments = [
     {
       id: 1,
-      user: "??쒕떂",
-      comment: "?꾩쟾 ??ㅼ슂!! ?諛??좉린?댁슂 ?뗣뀑",
+      user: "??",
+      comment: "??? ?? ????! ???? ? ???? ???.",
       likes: 23,
     },
-    { id: 2, user: "誘우쓬??, comment: "? 吏꾩쭨 ?뺥솗?섎떎... ?뚮쫫", likes: 18 },
+    {
+      id: 2,
+      user: "??",
+      comment: "?? ??? ???? ???? ???.",
+      likes: 18,
+    },
     {
       id: 3,
-      user: "?뚮쭩??,
-      comment: "移쒓뎄?ㅼ씠?????대뇬?붾뜲 ??留욎븘??",
+      user: "??",
+      comment: "???? ??? ???? ??? ????.",
       likes: 12,
     },
     {
       id: 4,
-      user: "?됯컯",
-      comment: `${resultData?.character} ?꾩쟾 硫뗭졇??! ?????퀬 ?띠뼱??,
+      user: "??",
+      comment: `${resultData?.character} ???? ? ? ???!`,
       likes: 8,
     },
   ];
@@ -497,7 +501,7 @@ const previewCharacter = useMemo(() => {
   if (error && !resultData?.image) {
     return (
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-red-100 w-full max-w-md mx-auto text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-4">?ㅻ쪟 諛쒖깮</h2>
+        <h2 className="text-xl font-semibold text-red-600 mb-4">??? ???? ????</h2>
         <p className="text-gray-600 mb-6 text-sm">{error}</p>
         <button
           onClick={onRestart}
@@ -546,157 +550,36 @@ const previewCharacter = useMemo(() => {
   };
 
   const handleShare = async () => {
-    // 怨듭쑀 URL ?앹꽦
     const shareUrl = `https://b-mbti.money-hotissue.com/?version=${completedVersion}`;
 
-    // 留곹겕 蹂듭궗
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-
-      // 蹂듭궗 ?덈궡 ?쒖떆
-      alert("留곹겕媛 蹂듭궗?섏뿀?듬땲?? 移쒓뎄?ㅺ낵 怨듭쑀?대낫?몄슂 ?삃");
-
-      // 3珥???蹂듭궗 ?곹깭 珥덇린??      setTimeout(() => setCopied(false), 3000);
+      alert("??? ???????. ???? ??? ???!");
+      setTimeout(() => setCopied(false), 3000);
     } catch (err) {
-      // clipboard API ?ㅽ뙣 ???泥?諛⑸쾿
       const textArea = document.createElement("textarea");
       textArea.value = shareUrl;
       document.body.appendChild(textArea);
       textArea.select();
+
       try {
         document.execCommand("copy");
         setCopied(true);
-        alert("留곹겕媛 蹂듭궗?섏뿀?듬땲?? 移쒓뎄?ㅺ낵 怨듭쑀?대낫?몄슂 ?삃");
+        alert("??? ???????. ???? ??? ???!");
         setTimeout(() => setCopied(false), 3000);
       } catch (err) {
-        alert("留곹겕 蹂듭궗???ㅽ뙣?덉뒿?덈떎.");
+        alert("?? ??? ??????. ?? ??? ???.");
+      } finally {
+        document.body.removeChild(textArea);
       }
-      document.body.removeChild(textArea);
     }
 
-    // 荑좏뙜 留곹겕 ?닿린
     window.open(getRandomCoupangUrl(), "_blank");
   };
 
   const handleShareOld = () => {
-    // ?덉갹?먯꽌 怨듭쑀 ?듭뀡??蹂댁뿬二쇰뒗 ?⑥닔
-    const shareText = `?솋 ?깃꼍?몃Ъ MBTI ?뚯뒪??寃곌낵 ?솋\n\n???'${
-      resultData?.character
-    }(${resultType})' ?좏삎?댁뿉??\n\n${resultData?.description.slice(
-      0,
-      50
-    )}...\n\n?щ윭遺꾨룄 ?뚯뒪?명빐蹂댁꽭??`;
-    const shareUrl = "https://gowith153.com";
-
-    const newWindow = window.open(
-      "",
-      "_blank",
-      "width=500,height=600,scrollbars=yes,resizable=yes"
-    );
-    if (newWindow) {
-      newWindow.document.write(`
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>怨듭쑀?섍린</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-            body { 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-              color: #333; 
-              padding: 20px; 
-              min-height: 100vh; 
-              display: flex; 
-              flex-direction: column; 
-              align-items: center; 
-              justify-content: center; 
-            }
-            .container { 
-              background: white; 
-              border-radius: 16px; 
-              padding: 24px; 
-              box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-              max-width: 400px; 
-              width: 100%; 
-            }
-            h1 { 
-              text-align: center; 
-              margin-bottom: 24px; 
-              color: #333; 
-              font-size: 24px; 
-            }
-            .share-button { 
-              display: block; 
-              width: 100%; 
-              padding: 16px; 
-              margin: 12px 0; 
-              border: none; 
-              border-radius: 12px; 
-              font-size: 16px; 
-              font-weight: 600; 
-              cursor: pointer; 
-              transition: all 0.3s ease; 
-              text-decoration: none; 
-              text-align: center; 
-            }
-            .copy { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-            .copy:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
-            .back-button { 
-              background: linear-gradient(135deg, #f093fb, #f5576c); 
-              color: white; 
-              padding: 12px 20px; 
-              border: none; 
-              border-radius: 8px; 
-              margin-top: 20px; 
-              cursor: pointer; 
-              font-size: 14px; 
-              width: 100%; 
-            }
-            .back-button:hover { transform: translateY(-2px); }
-            @media (max-width: 480px) {
-              body { padding: 16px; }
-              .container { padding: 20px; }
-              h1 { font-size: 20px; }
-              .share-button { padding: 14px; font-size: 15px; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>?뱾 怨듭쑀?섍린</h1>
-            
-            <button class="share-button copy" onclick="copyLink()">
-              ?뵕 留곹겕 蹂듭궗
-            </button>
-            
-            <button class="back-button" onclick="window.close(); if(window.opener && !window.opener.closed) { window.opener.focus(); }">
-              ?룧 寃곌낵 ?섏씠吏濡??뚯븘媛湲?            </button>
-          </div>
-          
-          <script>
-            function copyLink() {
-              const fullText = \`${shareText}\\n${shareUrl}\`;
-              navigator.clipboard.writeText(fullText).then(() => {
-                alert('?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??');
-              }).catch(() => {
-                // 蹂듭궗 ?ㅽ뙣 ???泥?諛⑸쾿
-                const textArea = document.createElement('textarea');
-                textArea.value = fullText;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('?뱥 留곹겕媛 蹂듭궗?섏뿀?듬땲??');
-              });
-            }
-          </script>
-        </body>
-        </html>
-      `);
-      newWindow.document.close();
-    }
+    openWithCoupangAd("/share");
   };
 
   const handleSNSShare = (platform: string) => {
@@ -976,7 +859,7 @@ const previewCharacter = useMemo(() => {
               {/* 以묎컙: ?대쫫 */}
               <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center justify-center">
-                  <span className="text-xl md:text-2xl mr-2">??/span>
+                  <span className="text-xl md:text-2xl mr-2">✨</span>
                   {resultData.character}
                 </h1>
               </div>
@@ -995,14 +878,20 @@ const previewCharacter = useMemo(() => {
                 <div className="space-y-2">
                   <div
                     className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
-                    onClick={() => {
-                      if (resultData.image) {
-                        openImageInNewWindow(
-                          resultData.image,
-                          resultData.character
-                        );
-                      }
-                    }}
+                  onClick={() => {
+                    const versionNum = parseInt(versionKey);
+                    if (onStartTest) {
+                      onStartTest(versionNum);
+                    } else {
+                      const testUrls = {
+                        1: "https://b-mbti.money-hotissue.com/test1",
+                        2: "https://b-mbti.money-hotissue.com/test2",
+                        3: "https://b-mbti.money-hotissue.com/test3",
+                      };
+                      window.location.href =
+                        testUrls[versionNum as keyof typeof testUrls];
+                    }
+                  }}
                   >
                     <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/80 rounded-2xl p-2 md:p-3 shadow-lg border border-pink-100/50 overflow-hidden relative">
                       <img
@@ -1067,11 +956,11 @@ const previewCharacter = useMemo(() => {
                 const targetSentences = sentences.slice(0, 5);
                 while (targetSentences.length < 5 && sentences.length > 0) {
                   const additionalTraits = [
-                    "源딆? ?ъ깋怨??깆같???듯빐 吏?쒕? ?살뒿?덈떎",
-                    "?ㅻⅨ ?щ엺?ㅼ뿉寃??좏븳 ?곹뼢?μ쓣 ?쇱묩?덈떎",
-                    "?대젮???곹솴?먯꽌???щ쭩???껋? ?딆뒿?덈떎",
-                    "吏꾩떎??留덉쓬?쇰줈 愿怨꾨? 留븐뒿?덈떎",
-                    "?섎굹?섏쓽 ?살쓣 援ы븯硫??댁븘媛묐땲??,
+                    "?? ??? ? ??? ???? ???? ??? ????.",
+                    "??? ???? ?? ???? ???? ?????.",
+                    "??? ?? ??? ?? ?? ???? ???? ???.",
+                    "???? ?? ??? ?? ???, ???? ??? ????.",
+                    "??? ?? ??? ??? ???? ? ?????.",
                   ];
                   const additionalIndex = targetSentences.length;
                   if (additionalIndex < additionalTraits.length) {
@@ -1249,7 +1138,7 @@ const previewCharacter = useMemo(() => {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6 border border-blue-100/50">
         <div className="text-center">
           <h3 className="font-bold text-gray-800 mb-2 flex items-center justify-center">
-            <span className="mr-2">?뵦</span>
+                <span className="mr-2">??</span>
             ?ㅻⅨ ?뚯뒪?몃룄 ?대낫?ㅻ옒??
           </h3>
           <p className="text-sm text-gray-600 mb-3">
@@ -1274,9 +1163,9 @@ const previewCharacter = useMemo(() => {
                   onClick={() => {
                     const versionNum = parseInt(versionKey);
                     if (onStartTest) {
-                      // ???대??먯꽌 ?곹깭 蹂寃?                      onStartTest(versionNum);
+                      onStartTest(versionNum);
                     } else {
-                      // ?뱀뿉?쒕뒗 URL 蹂寃?                      const testUrls = {
+                      const testUrls = {
                         1: "https://b-mbti.money-hotissue.com/test1",
                         2: "https://b-mbti.money-hotissue.com/test2",
                         3: "https://b-mbti.money-hotissue.com/test3",
@@ -1336,7 +1225,7 @@ const previewCharacter = useMemo(() => {
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-3 md:p-4 mb-4 md:mb-6 border-2 border-indigo-200 shadow-md">
           <div className="text-center">
             <h3 className="font-bold text-indigo-800 mb-2 flex items-center justify-center text-sm md:text-base">
-              <span className="mr-2">?뼹截?/span>
+              <span className="mr-2">??</span>
               ?깃꼍?몃Ъ 留욏엳湲?寃뚯엫!
             </h3>
             <p className="text-xs md:text-sm text-indigo-600 mb-3">
@@ -1347,12 +1236,13 @@ const previewCharacter = useMemo(() => {
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
                   <img
-                    src="/ISFP ?ㅼ쐵.jpg"
-                    alt="?ㅼ쐵"
+                    src="/default-avatar.jpg"
+                    alt="?? ???"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = "/ENFP ?꾨툕?쇳븿.jpg"; // 湲곕낯 ?대?吏濡??泥?                    }}
+                      target.src = "/og-image-new.png";
+                    }}
                   />
                 </div>
                 <div className="flex-1">

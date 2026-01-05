@@ -227,7 +227,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   const captureRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  // showOtherCharacters ?곹깭 ?쒓굅??  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
   const [selectedTestVersion, setSelectedTestVersion] = useState<number | null>(
     null
